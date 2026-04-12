@@ -1,0 +1,171 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
+	_ "github.com/eduaccess/eduaccess-api/docs"
+	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
+	authHTTP "github.com/eduaccess/eduaccess-api/internal/auth/delivery/http"
+	authInfra "github.com/eduaccess/eduaccess-api/internal/auth/infrastructure"
+	schoolApp "github.com/eduaccess/eduaccess-api/internal/school/application"
+	schoolHTTP "github.com/eduaccess/eduaccess-api/internal/school/delivery/http"
+	schoolInfra "github.com/eduaccess/eduaccess-api/internal/school/infrastructure"
+	appvalidator "github.com/eduaccess/eduaccess-api/internal/shared/validator"
+	studentApp "github.com/eduaccess/eduaccess-api/internal/student/application"
+	studentHTTP "github.com/eduaccess/eduaccess-api/internal/student/delivery/http"
+	studentInfra "github.com/eduaccess/eduaccess-api/internal/student/infrastructure"
+	userApp "github.com/eduaccess/eduaccess-api/internal/user/application"
+	userHTTP "github.com/eduaccess/eduaccess-api/internal/user/delivery/http"
+	userInfra "github.com/eduaccess/eduaccess-api/internal/user/infrastructure"
+	"github.com/eduaccess/eduaccess-api/pkg/database"
+	echoSwagger "github.com/swaggo/echo-swagger"
+)
+
+// @title           EduAccess API
+// @version         1.0
+// @description     Multi-tenant School Management SaaS API
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   EduAccess Support
+// @contact.email  support@eduaccess.id
+
+// @license.name  MIT
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, reading from environment")
+	}
+
+	db, err := database.Connect()
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+
+	e := echo.New()
+	e.HideBanner = true
+	e.Validator = appvalidator.New()
+
+	// Middleware
+	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
+	e.Use(middleware.CORS())
+	e.Use(middleware.RequestID())
+
+	// Swagger
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	// Health check
+	e.GET("/health", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
+	})
+
+	// API v1 group
+	v1 := e.Group("/api/v1")
+
+	// ── Auth module ───────────────────────────────────────────────────────────
+	userRepo := authInfra.NewGormUserRepository(db)
+	rtRepo := authInfra.NewGormRefreshTokenRepository(db)
+	authHTTP.NewHandler(
+		v1,
+		authApp.NewRegisterHandler(userRepo),
+		authApp.NewLoginHandler(userRepo, rtRepo),
+		authApp.NewRefreshHandler(userRepo, rtRepo),
+		authApp.NewLogoutHandler(rtRepo),
+	)
+
+	// ── User management module ────────────────────────────────────────────────
+	userMgmtRepo := userInfra.NewGormUserManagementRepository(db)
+	userHTTP.NewHandler(
+		v1,
+		userApp.NewListUsersHandler(userMgmtRepo),
+		userApp.NewGetUserHandler(userMgmtRepo),
+		userApp.NewUpdateUserHandler(userMgmtRepo),
+		userApp.NewDeactivateUserHandler(userMgmtRepo),
+		userApp.NewChangePasswordHandler(userMgmtRepo),
+	)
+
+	// ── School setup module ───────────────────────────────────────────────────
+	schoolRepo := schoolInfra.NewGormSchoolRepository(db)
+	schoolHTTP.NewHandler(
+		v1,
+		schoolApp.NewCreateSchoolHandler(schoolRepo),
+		schoolApp.NewListSchoolsHandler(schoolRepo),
+		schoolApp.NewGetSchoolHandler(schoolRepo),
+		schoolApp.NewUpdateSchoolHandler(schoolRepo),
+		schoolApp.NewDeactivateSchoolHandler(schoolRepo),
+		schoolApp.NewListRulesHandler(schoolRepo),
+		schoolApp.NewUpsertRulesHandler(schoolRepo),
+		schoolApp.NewGetSubscriptionHandler(schoolRepo),
+	)
+
+	// ── Student module ────────────────────────────────────────────────────────
+	studentRepo := studentInfra.NewGormStudentRepository(db)
+	academicRepo := studentInfra.NewGormAcademicRepository(db)
+	studentHTTP.NewHandler(
+		v1,
+		studentApp.NewCreateStudentHandler(userRepo, studentRepo),
+		studentApp.NewListStudentsHandler(studentRepo),
+		studentApp.NewGetStudentHandler(studentRepo),
+		studentApp.NewUpdateStudentHandler(studentRepo),
+		studentApp.NewDeactivateStudentHandler(studentRepo),
+		studentApp.NewLinkParentHandler(studentRepo),
+		studentApp.NewUnlinkParentHandler(studentRepo),
+		studentApp.NewCreateParentHandler(userRepo, studentRepo),
+		studentApp.NewListParentsHandler(studentRepo),
+		studentApp.NewGetParentHandler(studentRepo),
+		studentApp.NewUpdateParentHandler(studentRepo),
+		studentApp.NewDeactivateParentHandler(studentRepo),
+		studentApp.NewCreateLevelHandler(academicRepo),
+		studentApp.NewListLevelsHandler(academicRepo),
+		studentApp.NewUpdateLevelHandler(academicRepo),
+		studentApp.NewDeleteLevelHandler(academicRepo),
+		studentApp.NewCreateClassHandler(academicRepo),
+		studentApp.NewListClassesHandler(academicRepo),
+		studentApp.NewUpdateClassHandler(academicRepo),
+		studentApp.NewDeleteClassHandler(academicRepo),
+		studentApp.NewCreateSubClassHandler(academicRepo),
+		studentApp.NewListSubClassesHandler(academicRepo),
+		studentApp.NewUpdateSubClassHandler(academicRepo),
+		studentApp.NewDeleteSubClassHandler(academicRepo),
+	)
+
+	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	// Graceful shutdown
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	go func() {
+		if err := e.Start(fmt.Sprintf(":%s", port)); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("server error: %v", err)
+		}
+	}()
+
+	<-ctx.Done()
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("server shutdown error: %v", err)
+	}
+	log.Println("server stopped")
+}
