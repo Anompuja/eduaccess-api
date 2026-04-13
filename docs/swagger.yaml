@@ -1,0 +1,2129 @@
+basePath: /api/v1
+definitions:
+  http.AcademicNameRequest:
+    properties:
+      name:
+        maxLength: 191
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  http.ChangePasswordRequest:
+    properties:
+      new_password:
+        minLength: 8
+        type: string
+      old_password:
+        minLength: 8
+        type: string
+    required:
+    - new_password
+    type: object
+  http.ClassResponse:
+    properties:
+      created_at:
+        type: string
+      education_level_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.CreateClassRequest:
+    properties:
+      level_id:
+        type: string
+      name:
+        maxLength: 191
+        minLength: 1
+        type: string
+    required:
+    - level_id
+    - name
+    type: object
+  http.CreateParentRequest:
+    properties:
+      address:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      father_name:
+        maxLength: 191
+        type: string
+      father_religion:
+        maxLength: 100
+        type: string
+      mother_name:
+        maxLength: 191
+        type: string
+      mother_religion:
+        maxLength: 100
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  http.CreateSchoolRequest:
+    properties:
+      address:
+        maxLength: 191
+        type: string
+      description:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      image_path:
+        maxLength: 191
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 50
+        type: string
+      time_zone:
+        maxLength: 100
+        type: string
+    required:
+    - name
+    type: object
+  http.CreateStudentRequest:
+    properties:
+      address:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        maxLength: 191
+        type: string
+      class_id:
+        type: string
+      education_level_id:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      gender:
+        enum:
+        - L
+        - P
+        type: string
+      jalur_masuk_sekolah:
+        enum:
+        - reguler
+        - beasiswa
+        - mutasi
+        - lainnya
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      nis:
+        maxLength: 191
+        type: string
+      nisn:
+        maxLength: 191
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      religion:
+        maxLength: 100
+        type: string
+      sub_class_id:
+        type: string
+      tahun_masuk:
+        maxLength: 10
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  http.CreateSubClassRequest:
+    properties:
+      class_id:
+        type: string
+      name:
+        maxLength: 191
+        minLength: 1
+        type: string
+    required:
+    - class_id
+    - name
+    type: object
+  http.EducationLevelResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.LinkParentRequest:
+    properties:
+      is_primary:
+        type: boolean
+      parent_id:
+        type: string
+      relationship:
+        enum:
+        - father
+        - mother
+        - guardian
+        - other
+        type: string
+    required:
+    - parent_id
+    - relationship
+    type: object
+  http.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  http.LogoutRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  http.ParentLinkResponse:
+    properties:
+      id:
+        type: string
+      is_primary:
+        type: boolean
+      parent:
+        $ref: '#/definitions/http.ParentResponse'
+      parent_id:
+        type: string
+      relationship:
+        type: string
+    type: object
+  http.ParentResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      father_name:
+        type: string
+      father_religion:
+        type: string
+      id:
+        type: string
+      mother_name:
+        type: string
+      mother_religion:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  http.PlanResponse:
+    properties:
+      description:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      monthly_price:
+        type: integer
+      name:
+        type: string
+      yearly_price:
+        type: integer
+    type: object
+  http.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  http.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        enum:
+        - admin_sekolah
+        - kepala_sekolah
+        - guru
+        - staff
+        - orangtua
+        - siswa
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - role
+    type: object
+  http.RegisterResponse:
+    properties:
+      user_id:
+        type: string
+    type: object
+  http.RuleInput:
+    properties:
+      key:
+        maxLength: 191
+        minLength: 1
+        type: string
+      note:
+        type: string
+      value:
+        maxLength: 191
+        type: string
+    required:
+    - key
+    - value
+    type: object
+  http.SchoolResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      headmaster_id:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      status:
+        type: string
+      subscription:
+        $ref: '#/definitions/http.SubscriptionResponse'
+      time_zone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.SchoolRuleResponse:
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      note:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      value:
+        type: string
+    type: object
+  http.StudentResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      class_id:
+        type: string
+      created_at:
+        type: string
+      education_level_id:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      jalur_masuk_sekolah:
+        type: string
+      name:
+        type: string
+      nis:
+        type: string
+      nisn:
+        type: string
+      parents:
+        items:
+          $ref: '#/definitions/http.ParentLinkResponse'
+        type: array
+      phone_number:
+        type: string
+      religion:
+        type: string
+      school_id:
+        type: string
+      sub_class_id:
+        type: string
+      tahun_masuk:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  http.SubClassResponse:
+    properties:
+      class_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.SubscriptionResponse:
+    properties:
+      created_at:
+        type: string
+      cycle:
+        type: string
+      ends_at:
+        type: string
+      id:
+        type: string
+      plan:
+        $ref: '#/definitions/http.PlanResponse'
+      price:
+        type: integer
+      quantity:
+        type: integer
+      school_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  http.UpdateParentRequest:
+    properties:
+      address:
+        type: string
+      father_name:
+        maxLength: 191
+        type: string
+      father_religion:
+        maxLength: 100
+        type: string
+      mother_name:
+        maxLength: 191
+        type: string
+      mother_religion:
+        maxLength: 100
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+    type: object
+  http.UpdateSchoolRequest:
+    properties:
+      address:
+        maxLength: 191
+        type: string
+      description:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      image_path:
+        maxLength: 191
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 50
+        type: string
+      status:
+        enum:
+        - active
+        - nonactive
+        type: string
+      time_zone:
+        maxLength: 100
+        type: string
+    type: object
+  http.UpdateStudentRequest:
+    properties:
+      address:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        maxLength: 191
+        type: string
+      class_id:
+        type: string
+      education_level_id:
+        type: string
+      gender:
+        enum:
+        - L
+        - P
+        type: string
+      jalur_masuk_sekolah:
+        enum:
+        - reguler
+        - beasiswa
+        - mutasi
+        - lainnya
+        type: string
+      nis:
+        maxLength: 191
+        type: string
+      nisn:
+        maxLength: 191
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      religion:
+        maxLength: 100
+        type: string
+      sub_class_id:
+        type: string
+      tahun_masuk:
+        maxLength: 10
+        type: string
+    type: object
+  http.UpdateUserRequest:
+    properties:
+      avatar:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+    type: object
+  http.UpsertRulesRequest:
+    properties:
+      rules:
+        items:
+          $ref: '#/definitions/http.RuleInput'
+        minItems: 1
+        type: array
+    required:
+    - rules
+    type: object
+  http.UserResponse:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+      verified:
+        type: boolean
+    type: object
+  response.PaginatedResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.Pagination'
+      success:
+        type: boolean
+    type: object
+  response.Pagination:
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@eduaccess.id
+    name: EduAccess Support
+  description: Multi-tenant School Management SaaS API
+  license:
+    name: MIT
+  termsOfService: http://swagger.io/terms/
+  title: EduAccess API
+  version: "1.0"
+paths:
+  /academic/classes:
+    get:
+      parameters:
+      - description: Filter by education level UUID
+        in: query
+        name: level_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.ClassResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List classes
+      tags:
+      - academic
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Class data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.ClassResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Create class
+      tags:
+      - academic
+  /academic/classes/{id}:
+    delete:
+      parameters:
+      - description: Class UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete class
+      tags:
+      - academic
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Class UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Class name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.AcademicNameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.ClassResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Update class
+      tags:
+      - academic
+  /academic/levels:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.EducationLevelResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List education levels
+      tags:
+      - academic
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Level name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.AcademicNameRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.EducationLevelResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Create education level
+      tags:
+      - academic
+  /academic/levels/{id}:
+    delete:
+      parameters:
+      - description: Level UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete education level
+      tags:
+      - academic
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Level UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Level name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.AcademicNameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.EducationLevelResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Update education level
+      tags:
+      - academic
+  /academic/sub-classes:
+    get:
+      parameters:
+      - description: Filter by class UUID
+        in: query
+        name: class_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.SubClassResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List sub-classes
+      tags:
+      - academic
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Sub-class data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateSubClassRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.SubClassResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Create sub-class
+      tags:
+      - academic
+  /academic/sub-classes/{id}:
+    delete:
+      parameters:
+      - description: Sub-class UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete sub-class
+      tags:
+      - academic
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Sub-class UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Sub-class name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.AcademicNameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.SubClassResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Update sub-class
+      tags:
+      - academic
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns an access + refresh token pair.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.TokenResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Revokes the provided refresh token.
+      parameters:
+      - description: Refresh token to revoke
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Issues a new access + refresh token pair, rotating the refresh
+        token.
+      parameters:
+      - description: Refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.TokenResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Refresh tokens
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account. Superadmin accounts cannot be created
+        via this endpoint.
+      parameters:
+      - description: Registration payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.RegisterResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Register a new user
+      tags:
+      - auth
+  /parents:
+    get:
+      description: Returns a paginated list of parents. Tenant-scoped.
+      parameters:
+      - description: Search by name or email
+        in: query
+        name: search
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20)
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.ParentResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List parents
+      tags:
+      - parents
+    post:
+      consumes:
+      - application/json
+      description: Creates a user account (role=orangtua) and parent profile atomically.
+      parameters:
+      - description: Parent data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateParentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.ParentResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create parent
+      tags:
+      - parents
+  /parents/{id}:
+    delete:
+      parameters:
+      - description: Parent profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Deactivate parent
+      tags:
+      - parents
+    get:
+      parameters:
+      - description: Parent profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.ParentResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get parent by ID
+      tags:
+      - parents
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Parent profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateParentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.ParentResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Update parent
+      tags:
+      - parents
+  /profile:
+    get:
+      description: Returns the profile of the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get own profile
+      tags:
+      - profile
+    put:
+      consumes:
+      - application/json
+      description: Updates the authenticated user's name and/or avatar.
+      parameters:
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update own profile
+      tags:
+      - profile
+  /schools:
+    get:
+      description: Returns paginated schools. Superadmin sees all; others see their
+        own.
+      parameters:
+      - description: Search by name or email
+        in: query
+        name: search
+        type: string
+      - description: Filter by status (active|nonactive)
+        in: query
+        name: status
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20)
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.SchoolResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List schools
+      tags:
+      - schools
+    post:
+      consumes:
+      - application/json
+      description: Creates a new school tenant. Superadmin only.
+      parameters:
+      - description: School data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateSchoolRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.SchoolResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create school
+      tags:
+      - schools
+  /schools/{id}:
+    delete:
+      description: Soft-deletes a school. Superadmin only.
+      parameters:
+      - description: School UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Deactivate school
+      tags:
+      - schools
+    get:
+      description: Returns a single school. Others can only fetch their own school.
+      parameters:
+      - description: School UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.SchoolResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get school by ID
+      tags:
+      - schools
+    put:
+      consumes:
+      - application/json
+      description: Updates school fields. admin_sekolah can update their own school;
+        superadmin can update any and change status.
+      parameters:
+      - description: School UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateSchoolRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.SchoolResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update school
+      tags:
+      - schools
+  /schools/{id}/rules:
+    get:
+      description: Returns all key-value rules for a school.
+      parameters:
+      - description: School UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.SchoolRuleResponse'
+                  type: array
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List school rules
+      tags:
+      - schools
+    put:
+      consumes:
+      - application/json
+      description: Creates or updates multiple key-value rules for a school.
+      parameters:
+      - description: School UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rules to upsert
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpsertRulesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.SchoolRuleResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Upsert school rules
+      tags:
+      - schools
+  /schools/{id}/subscription:
+    get:
+      description: Returns the active subscription for a school.
+      parameters:
+      - description: School UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.SubscriptionResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get school subscription
+      tags:
+      - schools
+  /students:
+    get:
+      description: Returns a paginated list of students. Tenant-scoped.
+      parameters:
+      - description: Search by name, email, NIS or NISN
+        in: query
+        name: search
+        type: string
+      - description: Filter by education level UUID
+        in: query
+        name: education_level_id
+        type: string
+      - description: Filter by class UUID
+        in: query
+        name: class_id
+        type: string
+      - description: Filter by sub-class UUID
+        in: query
+        name: sub_class_id
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20)
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.StudentResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List students
+      tags:
+      - students
+    post:
+      consumes:
+      - application/json
+      description: Creates a user account (role=siswa) and student profile atomically.
+      parameters:
+      - description: Student data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateStudentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.StudentResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create student
+      tags:
+      - students
+  /students/{id}:
+    delete:
+      description: Soft-deletes a student profile.
+      parameters:
+      - description: Student profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Deactivate student
+      tags:
+      - students
+    get:
+      description: Returns a student with parent links. Tenant-scoped.
+      parameters:
+      - description: Student profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.StudentResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get student by ID
+      tags:
+      - students
+    put:
+      consumes:
+      - application/json
+      description: Updates student profile fields.
+      parameters:
+      - description: Student profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateStudentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.StudentResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update student
+      tags:
+      - students
+  /students/{id}/parents:
+    post:
+      consumes:
+      - application/json
+      description: Links an existing parent profile to a student.
+      parameters:
+      - description: Student profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Link data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.LinkParentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Link parent to student
+      tags:
+      - students
+  /students/{id}/parents/{parent_id}:
+    delete:
+      description: Removes the link between a parent and a student.
+      parameters:
+      - description: Student profile UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Parent profile UUID
+        in: path
+        name: parent_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Unlink parent from student
+      tags:
+      - students
+  /users:
+    get:
+      description: Returns a paginated list of users. Admin sekolah sees only their
+        school. Superadmin sees all.
+      parameters:
+      - description: Filter by role
+        in: query
+        name: role
+        type: string
+      - description: Search by name, email or username
+        in: query
+        name: search
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20, max 100)
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.UserResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Soft-deletes a user. Admin sekolah cannot deactivate other admins.
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Deactivate user
+      tags:
+      - users
+    get:
+      description: Returns a single user. Admin sekolah can only fetch users within
+        their school.
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.UserResponse'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Updates name and/or avatar. Admin sekolah can only update users
+        in their school.
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
+  /users/{id}/password:
+    put:
+      consumes:
+      - application/json
+      description: Changes a user's password. Users must supply their current password;
+        superadmin can skip it.
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Passwords
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Change password
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
