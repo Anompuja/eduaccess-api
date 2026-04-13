@@ -161,7 +161,10 @@ func main() {
 	defer stop()
 
 	go func() {
-		if err := e.Start(fmt.Sprintf(":%s", port)); err != nil && err != http.ErrServerClosed {
+		addr := fmt.Sprintf(":%s", port)
+		log.Printf(" Server is running at http://localhost:%s", port)
+		log.Printf(" Swagger documentation at http://localhost:%s/swagger/index.html", port)
+		if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server error: %v", err)
 		}
 	}()

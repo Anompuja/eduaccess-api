@@ -28,10 +28,22 @@ func (userModel) TableName() string { return "users" }
 
 // userWithRole is a scan target for the JOIN query used by FindByEmail/FindByID.
 type userWithRole struct {
-	userModel
-	RoleID   *uuid.UUID `gorm:"column:role_id"`
-	RoleName *string    `gorm:"column:role_name"`
-	SchoolID *uuid.UUID `gorm:"column:school_id"`
+	ID               uuid.UUID  `gorm:"column:id"`
+	Name             string     `gorm:"column:name"`
+	Username         string     `gorm:"column:username"`
+	Email            string     `gorm:"column:email"`
+	Password         string     `gorm:"column:password"`
+	Avatar           string     `gorm:"column:avatar"`
+	QrCode           *string    `gorm:"column:qr_code"`
+	EmailVerifiedAt  *time.Time `gorm:"column:email_verified_at"`
+	VerificationCode *string    `gorm:"column:verification_code"`
+	Verified         bool       `gorm:"column:verified"`
+	DeletedAt        *time.Time `gorm:"column:deleted_at"`
+	CreatedAt        time.Time  `gorm:"column:created_at"`
+	UpdatedAt        time.Time  `gorm:"column:updated_at"`
+	RoleID           *uuid.UUID `gorm:"column:role_id"`
+	RoleName         *string    `gorm:"column:role_name"`
+	SchoolID         *uuid.UUID `gorm:"column:school_id"`
 }
 
 func (r *userWithRole) toDomain() *domain.User {
