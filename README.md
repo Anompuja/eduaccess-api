@@ -112,6 +112,7 @@ cp .env.example .env
 |---------------------|----------|----------------------------------------------------------|
 | `APP_ENV`           | No       | `development` (enables SQL logging) or `production`      |
 | `APP_PORT`          | No       | HTTP port, default `8080`                                |
+| `CORS_ALLOW_ORIGINS`| No       | Comma-separated allowlist of origins (default `*`)       |
 | `DATABASE_URL`      | Either   | Full Postgres DSN — use this for Supabase / Railway      |
 | `DB_HOST`           | Either   | Individual DB connection vars (alternative to above)     |
 | `DB_PORT`           | Either   | Default `5432`                                           |
@@ -186,6 +187,34 @@ swag init -g cmd/main.go --output docs
 
 # Run
 go run ./cmd/main.go
+```
+
+### Run Together With Flutter Frontend
+
+Backend base API path is `/api/v1`, and Flutter should point to this base URL.
+
+1. Run backend:
+
+```bash
+cp .env.example .env
+# set JWT_SECRET before running
+go run ./cmd/main.go
+```
+
+2. Run Flutter with the correct API base URL:
+
+```bash
+# Web/Desktop
+flutter run --dart-define=EDUACCESS_BASE_URL=http://localhost:8080/api/v1
+
+# Android emulator
+flutter run --dart-define=EDUACCESS_BASE_URL=http://10.0.2.2:8080/api/v1
+```
+
+For Flutter Web in development, you can restrict CORS safely instead of `*`:
+
+```dotenv
+CORS_ALLOW_ORIGINS=http://localhost:3000,http://localhost:5000
 ```
 
 ---
