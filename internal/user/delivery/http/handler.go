@@ -114,6 +114,7 @@ func (h *Handler) GetUser(c echo.Context) error {
 	}
 
 	user, err := h.getUser.Handle(c.Request().Context(), application.GetUserQuery{
+		RequesterID:       authmw.GetUserID(c),
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		UserID:            id,
@@ -249,6 +250,7 @@ func (h *Handler) GetProfile(c echo.Context) error {
 	userID := authmw.GetUserID(c)
 
 	user, err := h.getUser.Handle(c.Request().Context(), application.GetUserQuery{
+		RequesterID:       userID,
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		UserID:            userID,
