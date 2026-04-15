@@ -33,7 +33,7 @@ func (h *GetStudentHandler) Handle(ctx context.Context, q GetStudentQuery) (*dom
 
 	// Tenant guard: non-superadmin can only see students in their school
 	if q.RequesterRole != "superadmin" {
-		if q.RequesterSchoolID == nil || student.SchoolID != *q.RequesterSchoolID {
+		if q.RequesterSchoolID != nil && student.SchoolID != *q.RequesterSchoolID {
 			return nil, apperror.New(apperror.ErrForbidden, "access denied to this student")
 		}
 	}

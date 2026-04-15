@@ -125,7 +125,7 @@ func main() {
 	academicRepo := studentInfra.NewGormAcademicRepository(db)
 	studentHTTP.NewHandler(
 		v1,
-		studentApp.NewCreateStudentHandler(userRepo, studentRepo),
+		studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo),
 		studentApp.NewListStudentsHandler(studentRepo),
 		studentApp.NewGetStudentHandler(studentRepo),
 		studentApp.NewUpdateStudentHandler(studentRepo),

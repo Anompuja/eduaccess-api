@@ -35,7 +35,7 @@ func (h *DeactivateStudentHandler) Handle(ctx context.Context, cmd DeactivateStu
 	}
 
 	if cmd.RequesterRole != "superadmin" {
-		if cmd.RequesterSchoolID == nil || profile.SchoolID != *cmd.RequesterSchoolID {
+		if cmd.RequesterSchoolID != nil && profile.SchoolID != *cmd.RequesterSchoolID {
 			return apperror.New(apperror.ErrForbidden, "access denied to this student")
 		}
 	}

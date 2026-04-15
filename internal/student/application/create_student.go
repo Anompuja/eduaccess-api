@@ -39,26 +39,45 @@ type CreateStudentCommand struct {
 
 // CreateStudentHandler creates a user (role=siswa) + student_profile atomically.
 type CreateStudentHandler struct {
-	users   UserCreator
-	repo    domain.StudentRepository
+	users    UserCreator
+	repo     domain.StudentRepository
+	academic domain.AcademicRepository
 }
 
-func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository) *CreateStudentHandler {
-	return &CreateStudentHandler{users: users, repo: repo}
+func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository, academic domain.AcademicRepository) *CreateStudentHandler {
+	return &CreateStudentHandler{users: users, repo: repo, academic: academic}
 }
 
 func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentCommand) (*domain.StudentProfile, error) {
 	if cmd.RequesterRole != "superadmin" && cmd.RequesterRole != "admin_sekolah" {
 		return nil, apperror.New(apperror.ErrForbidden, "only admin_sekolah or superadmin can create students")
 	}
-	if cmd.RequesterRole != "superadmin" && cmd.RequesterSchoolID == nil {
-		return nil, apperror.New(apperror.ErrForbidden, "school context required")
-	}
 
-	// Resolve school ID
+	// Resolve school ID from requester context; if missing, fallback to referenced academic entities.
 	schoolID := cmd.RequesterSchoolID
-	if cmd.RequesterRole == "superadmin" && schoolID == nil {
-		return nil, apperror.New(apperror.ErrBadRequest, "school_id required for superadmin")
+	if schoolID == nil && cmd.SubClassID != nil {
+		subClass, err := h.academic.FindSubClassByID(ctx, *cmd.SubClassID)
+		if err != nil {
+			return nil, err
+		}
+		schoolID = &subClass.SchoolID
+	}
+	if schoolID == nil && cmd.ClassID != nil {
+		class, err := h.academic.FindClassByID(ctx, *cmd.ClassID)
+		if err != nil {
+			return nil, err
+		}
+		schoolID = &class.SchoolID
+	}
+	if schoolID == nil && cmd.EducationLevelID != nil {
+		level, err := h.academic.FindLevelByID(ctx, *cmd.EducationLevelID)
+		if err != nil {
+			return nil, err
+		}
+		schoolID = &level.SchoolID
+	}
+	if schoolID == nil {
+		return nil, apperror.New(apperror.ErrBadRequest, "unable to resolve school context; provide class_id, sub_class_id, or education_level_id")
 	}
 
 	// Check email uniqueness

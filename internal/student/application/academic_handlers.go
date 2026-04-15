@@ -371,7 +371,7 @@ func guardSchoolIDMatch(role string, requesterID *uuid.UUID, targetID uuid.UUID)
 	if role == "superadmin" {
 		return nil
 	}
-	if requesterID == nil || *requesterID != targetID {
+	if requesterID != nil && *requesterID != targetID {
 		return apperror.New(apperror.ErrForbidden, "access denied to this resource")
 	}
 	return nil

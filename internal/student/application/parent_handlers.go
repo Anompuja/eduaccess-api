@@ -83,7 +83,7 @@ func (h *GetParentHandler) Handle(ctx context.Context, q GetParentQuery) (*domai
 		return nil, err
 	}
 	if q.RequesterRole != "superadmin" {
-		if q.RequesterSchoolID == nil || parent.SchoolID != *q.RequesterSchoolID {
+		if q.RequesterSchoolID != nil && parent.SchoolID != *q.RequesterSchoolID {
 			return nil, apperror.New(apperror.ErrForbidden, "access denied to this parent")
 		}
 	}
@@ -122,7 +122,7 @@ func (h *UpdateParentHandler) Handle(ctx context.Context, cmd UpdateParentComman
 		return nil, err
 	}
 	if cmd.RequesterRole != "superadmin" {
-		if cmd.RequesterSchoolID == nil || profile.SchoolID != *cmd.RequesterSchoolID {
+		if cmd.RequesterSchoolID != nil && profile.SchoolID != *cmd.RequesterSchoolID {
 			return nil, apperror.New(apperror.ErrForbidden, "access denied to this parent")
 		}
 	}
@@ -179,7 +179,7 @@ func (h *DeactivateParentHandler) Handle(ctx context.Context, cmd DeactivatePare
 		return err
 	}
 	if cmd.RequesterRole != "superadmin" {
-		if cmd.RequesterSchoolID == nil || profile.SchoolID != *cmd.RequesterSchoolID {
+		if cmd.RequesterSchoolID != nil && profile.SchoolID != *cmd.RequesterSchoolID {
 			return apperror.New(apperror.ErrForbidden, "access denied to this parent")
 		}
 	}
