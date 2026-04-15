@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -65,7 +66,11 @@ func main() {
 	// Middleware
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: getAllowedOrigins(),
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderXRequestedWith},
+	}))
 	e.Use(middleware.RequestID())
 
 	// Swagger
@@ -156,7 +161,10 @@ func main() {
 	defer stop()
 
 	go func() {
-		if err := e.Start(fmt.Sprintf(":%s", port)); err != nil && err != http.ErrServerClosed {
+		addr := fmt.Sprintf(":%s", port)
+		log.Printf(" Server is running at http://localhost:%s", port)
+		log.Printf(" Swagger documentation at http://localhost:%s/swagger/index.html", port)
+		if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server error: %v", err)
 		}
 	}()
@@ -168,4 +176,25 @@ func main() {
 		log.Fatalf("server shutdown error: %v", err)
 	}
 	log.Println("server stopped")
+}
+
+func getAllowedOrigins() []string {
+	origins := strings.TrimSpace(os.Getenv("CORS_ALLOW_ORIGINS"))
+	if origins == "" {
+		return []string{"*"}
+	}
+
+	parts := strings.Split(origins, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		v := strings.TrimSpace(p)
+		if v != "" {
+			out = append(out, v)
+		}
+	}
+	if len(out) == 0 {
+		return []string{"*"}
+	}
+
+	return out
 }
