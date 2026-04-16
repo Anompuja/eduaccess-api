@@ -22,6 +22,9 @@ type SchoolRepository interface {
 
 	// Subscription (read-only)
 	FindActiveSubscription(ctx context.Context, schoolID uuid.UUID) (*Subscription, error)
+
+	// SetHeadmasterID updates the schools.headmaster_id column.
+	SetHeadmasterID(ctx context.Context, schoolID, headmasterUserID uuid.UUID) error
 }
 
 // SchoolFilter holds list query parameters.

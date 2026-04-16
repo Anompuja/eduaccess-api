@@ -287,6 +287,20 @@ func (r *GormSchoolRepository) FindActiveSubscription(ctx context.Context, schoo
 	return result, nil
 }
 
+// SetHeadmasterID updates schools.headmaster_id for the given school.
+// It satisfies both domain.SchoolRepository and the headmaster application's
+// SchoolHeadmasterSetter port.
+func (r *GormSchoolRepository) SetHeadmasterID(ctx context.Context, schoolID, headmasterUserID uuid.UUID) error {
+	now := time.Now()
+	return r.db.WithContext(ctx).
+		Table("schools").
+		Where("id = ?", schoolID).
+		Updates(map[string]interface{}{
+			"headmaster_id": headmasterUserID,
+			"updated_at":    now,
+		}).Error
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 func toSchoolDomain(m schoolModel) *domain.School {
