@@ -25,6 +25,9 @@ type HeadmasterResponse struct {
 
 // CreateHeadmasterRequest is the body for POST /headmasters.
 type CreateHeadmasterRequest struct {
+	// SchoolID is required when called by superadmin (who has no school in their JWT).
+	// admin_sekolah may omit it — their JWT school is used automatically.
+	SchoolID     string     `json:"school_id"     validate:"omitempty,uuid"`
 	Name         string     `json:"name"          validate:"required,min=2,max=100"`
 	Email        string     `json:"email"         validate:"required,email"`
 	Username     string     `json:"username"      validate:"omitempty,min=3,max=50"`

@@ -71,9 +71,19 @@ func (h *Handler) Create(c echo.Context) error {
 		return err
 	}
 
+	var schoolID *uuid.UUID
+	if req.SchoolID != "" {
+		parsed, err := uuid.Parse(req.SchoolID)
+		if err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+		schoolID = &parsed
+	}
+
 	profile, err := h.create.Handle(c.Request().Context(), application.CreateHeadmasterCommand{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
+		SchoolID:          schoolID,
 		Name:              req.Name,
 		Email:             req.Email,
 		Username:          req.Username,

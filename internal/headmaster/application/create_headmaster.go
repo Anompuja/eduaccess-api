@@ -16,6 +16,9 @@ import (
 type CreateHeadmasterCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	// SchoolID may be set by superadmin to target a specific school.
+	// For admin_sekolah this is ignored; their JWT school is used.
+	SchoolID *uuid.UUID
 	// User account fields
 	Name     string
 	Email    string
@@ -53,9 +56,14 @@ func (h *CreateHeadmasterHandler) Handle(ctx context.Context, cmd CreateHeadmast
 		return nil, apperror.New(apperror.ErrForbidden, "only admin_sekolah or superadmin can create a headmaster")
 	}
 
+	// admin_sekolah is always scoped to their own school.
+	// superadmin must explicitly provide a school_id in the request body.
 	schoolID := cmd.RequesterSchoolID
+	if schoolID == nil && cmd.RequesterRole == authdomain.RoleSuperadmin {
+		schoolID = cmd.SchoolID
+	}
 	if schoolID == nil {
-		return nil, apperror.New(apperror.ErrBadRequest, "school context is required to create a headmaster")
+		return nil, apperror.New(apperror.ErrBadRequest, "school_id is required (superadmin must provide it in the request body)")
 	}
 
 	emailExists, err := h.users.ExistsByEmail(ctx, cmd.Email)
