@@ -1,12 +1,16 @@
 # EduAccess API
 
+---
+
 BIG DISCLAIMER
-THE FIRST INITIAL COMMIT WE USE A TEMPLATE USING GO SAAS TEMPLATE AND MERGE IT WITH OUR INTERN PROJECT INSPIRATION< THE FIRST INITIAL COMMIT IS NOT FULLU COMPLETED ITS BASE REFRENCE FOR OUR TEAM TO WORK ON
+THE FIRST INITIAL COMMIT WE USE A TEMPLATE USING GO SAAS TEMPLATE AND MERGE IT WITH OUR INTERN PROJECT INSPIRATION THE FIRST INITIAL COMMIT IS NOT FULLY COMPLETED ITS BASE REFRENCE FOR OUR TEAM TO WORK ON
 Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and PostgreSQL (Supabase-ready).
 
 ---
 
 ## Table of Contents
+
+-[Midtermneeds](#midtermneeds)
 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
@@ -34,6 +38,44 @@ Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and Postg
 
 ---
 
+## Midtermneeds
+
+**Auth is enabled on all routes. You MUST send a Bearer token on every request (except login and registration). Here's the only thing you need to do:**
+
+## Step 1 — Login
+
+````json
+POST /api/v1/auth/login
+{
+  "email": "superadmin@gmail.com",
+  "password": "password"
+}
+```(this is not a superadmin account for a better case this is admin_sekolah account)
+
+Copy the `access_token` from the response.
+
+## Step 2 — Use the Token on Every Request
+
+In every subsequent request, set the Authorization header:
+
+````
+
+Authorization: Bearer <paste_your_access_token_here>
+
+```
+
+In Swagger UI: click the **Authorize** button (lock icon) on the most upper right, type `Bearer <token>`, click Authorize.
+
+## That's It. You Do NOT Need to Pass school_id Anywhere(except if your a superadmin account).
+
+The `school_id` is **automatically embedded in your token** when you log in. The server reads it from the token you never include it manually in request bodies or headers. (except for superadmin)
+
+> **Two account types you:**
+>
+> - **superadmin** — for platform-level routes: creating schools, listing all users, etc due to this roles it not attach to any schools, this roles need to inclue school_id on spesific request.
+> - **admin_sekolah** (linked to a school) — for school-scoped routes: headmasters, students, etc.
+
+---
 ## Overview
 
 EduAccess is a multi-tenant API that powers school management for multiple schools from a single deployment. Each school is a tenant; data is scoped by `school_id`. A **superadmin** manages the platform across all tenants; each school has its own **admin_sekolah**.
@@ -57,40 +99,44 @@ EduAccess is a multi-tenant API that powers school management for multiple schoo
 ## Project Structure
 
 ```
+
 eduaccess-api/
 ├── cmd/
-│   └── main.go                  # Entrypoint — wires all modules
+│ └── main.go # Entrypoint — wires all modules
 ├── database/
-│   └── migrations/
-│       └── 001_initial_schema.sql
-├── docs/                        # Auto-generated Swagger docs
+│ └── migrations/
+│ └── 001_initial_schema.sql
+├── docs/ # Auto-generated Swagger docs
 ├── internal/
-│   ├── auth/                    # Register, login, refresh, logout
-│   ├── school/                  # School CRUD, rules, subscriptions
-│   ├── student/                 # Students, parents, academic structure
-│   ├── user/                    # User management & profile
-│   └── shared/
-│       ├── apperror/            # Domain error types
-│       ├── middleware/          # JWT auth middleware
-│       ├── response/            # Consistent JSON response helpers
-│       └── validator/           # Request binding & validation
+│ ├── auth/ # Register, login, refresh, logout
+│ ├── school/ # School CRUD, rules, subscriptions
+│ ├── student/ # Students, parents, academic structure
+│ ├── user/ # User management & profile
+│ └── shared/
+│ ├── apperror/ # Domain error types
+│ ├── middleware/ # JWT auth middleware
+│ ├── response/ # Consistent JSON response helpers
+│ └── validator/ # Request binding & validation
 ├── pkg/
-│   ├── database/                # GORM connection setup
-│   └── jwt/                     # Token generation & parsing
-├── .env.example                 # Copy this to .env
+│ ├── database/ # GORM connection setup
+│ └── jwt/ # Token generation & parsing
+├── .env.example # Copy this to .env
 ├── docker-compose.yml
 └── Dockerfile
+
 ```
 
 Each domain follows a clean architecture layout:
 
 ```
+
 internal/<domain>/
-├── application/   # Use-case handlers (business logic)
+├── application/ # Use-case handlers (business logic)
 ├── delivery/http/ # HTTP handlers & DTOs
-├── domain/        # Entities, interfaces, constants
+├── domain/ # Entities, interfaces, constants
 └── infrastructure/# GORM repositories
-```
+
+````
 
 ---
 
@@ -108,7 +154,7 @@ Copy the example file and fill in the values:
 
 ```bash
 cp .env.example .env
-```
+````
 
 | Variable             | Required | Description                                            |
 | -------------------- | -------- | ------------------------------------------------------ |
