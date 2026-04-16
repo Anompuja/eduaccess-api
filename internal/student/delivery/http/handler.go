@@ -111,8 +111,8 @@ func NewHandler(
 	students.GET("/:id", h.GetStudent)
 	students.PUT("/:id", h.UpdateStudent)
 	students.DELETE("/:id", h.DeactivateStudent)
-	students.POST("/:id/parents", h.LinkParent)
-	students.DELETE("/:id/parents/:parent_id", h.UnlinkParent)
+	// students.POST("/:id/parents", h.LinkParent)
+	// students.DELETE("/:id/parents/:parent_id", h.UnlinkParent)
 
 	// Parents
 	parents := v1.Group("/parents", auth)
@@ -391,64 +391,64 @@ func (h *Handler) DeactivateStudent(c echo.Context) error {
 //	@Failure      400   {object}  response.Response
 //	@Failure      403   {object}  response.Response
 //	@Router       /students/{id}/parents [post]
-func (h *Handler) LinkParent(c echo.Context) error {
-	studentID, err := parseUUID(c, "id")
-	if err != nil {
-		return err
-	}
-	var req LinkParentRequest
-	if err := validator.BindAndValidate(c, &req); err != nil {
-		return err
-	}
-	parentID, err := uuid.Parse(req.ParentID)
-	if err != nil {
-		return response.BadRequest(c, "invalid parent_id")
-	}
-	if err := h.linkParent.Handle(c.Request().Context(), application.LinkParentCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
-		RequesterRole:     authmw.GetRole(c),
-		StudentID:         studentID,
-		ParentID:          parentID,
-		Relationship:      req.Relationship,
-		IsPrimary:         req.IsPrimary,
-	}); err != nil {
-		return handleAppError(c, err)
-	}
-	return response.OK(c, "parent linked", nil)
-}
+// func (h *Handler) LinkParent(c echo.Context) error {
+// 	studentID, err := parseUUID(c, "id")
+// 	if err != nil {
+// 		return err
+// 	}
+// 	var req LinkParentRequest
+// 	if err := validator.BindAndValidate(c, &req); err != nil {
+// 		return err
+// 	}
+// 	parentID, err := uuid.Parse(req.ParentID)
+// 	if err != nil {
+// 		return response.BadRequest(c, "invalid parent_id")
+// 	}
+// 	if err := h.linkParent.Handle(c.Request().Context(), application.LinkParentCommand{
+// 		RequesterSchoolID: authmw.GetSchoolID(c),
+// 		RequesterRole:     authmw.GetRole(c),
+// 		StudentID:         studentID,
+// 		ParentID:          parentID,
+// 		Relationship:      req.Relationship,
+// 		IsPrimary:         req.IsPrimary,
+// 	}); err != nil {
+// 		return handleAppError(c, err)
+// 	}
+// 	return response.OK(c, "parent linked", nil)
+// }
 
-// UnlinkParent godoc
-//
-//	@Summary      Unlink parent from student
-//	@Description  Removes the link between a parent and a student.
-//	@Tags         students
-//	@Produce      json
-//	@Security     BearerAuth
-//	@Param        id         path      string  true  "Student profile UUID"
-//	@Param        parent_id  path      string  true  "Parent profile UUID"
-//	@Success      200  {object}  response.Response
-//	@Failure      403  {object}  response.Response
-//	@Failure      404  {object}  response.Response
-//	@Router       /students/{id}/parents/{parent_id} [delete]
-func (h *Handler) UnlinkParent(c echo.Context) error {
-	studentID, err := parseUUID(c, "id")
-	if err != nil {
-		return err
-	}
-	parentID, err := parseUUID(c, "parent_id")
-	if err != nil {
-		return err
-	}
-	if err := h.unlinkParent.Handle(c.Request().Context(), application.UnlinkParentCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
-		RequesterRole:     authmw.GetRole(c),
-		StudentID:         studentID,
-		ParentID:          parentID,
-	}); err != nil {
-		return handleAppError(c, err)
-	}
-	return response.OK(c, "parent unlinked", nil)
-}
+// // UnlinkParent godoc
+// //
+// //	@Summary      Unlink parent from student
+// //	@Description  Removes the link between a parent and a student.
+// //	@Tags         students
+// //	@Produce      json
+// //	@Security     BearerAuth
+// //	@Param        id         path      string  true  "Student profile UUID"
+// //	@Param        parent_id  path      string  true  "Parent profile UUID"
+// //	@Success      200  {object}  response.Response
+// //	@Failure      403  {object}  response.Response
+// //	@Failure      404  {object}  response.Response
+// //	@Router       /students/{id}/parents/{parent_id} [delete]
+// func (h *Handler) UnlinkParent(c echo.Context) error {
+// 	studentID, err := parseUUID(c, "id")
+// 	if err != nil {
+// 		return err
+// 	}
+// 	parentID, err := parseUUID(c, "parent_id")
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if err := h.unlinkParent.Handle(c.Request().Context(), application.UnlinkParentCommand{
+// 		RequesterSchoolID: authmw.GetSchoolID(c),
+// 		RequesterRole:     authmw.GetRole(c),
+// 		StudentID:         studentID,
+// 		ParentID:          parentID,
+// 	}); err != nil {
+// 		return handleAppError(c, err)
+// 	}
+// 	return response.OK(c, "parent unlinked", nil)
+// }
 
 // ── Parents ───────────────────────────────────────────────────────────────────
 
