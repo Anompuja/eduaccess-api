@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/auth/domain"
@@ -45,6 +46,11 @@ func (h *LoginHandler) Handle(ctx context.Context, cmd LoginCommand) (*TokenPair
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(cmd.Password)); err != nil {
 		return nil, apperror.New(apperror.ErrWrongPassword, "invalid credentials")
+	}
+
+	if user.Role != domain.RoleSuperadmin && user.SchoolID == nil {
+		log.Printf("auth login: user %s with role %s has no school membership", user.ID.String(), user.Role)
+		return nil, apperror.New(apperror.ErrForbidden, "school context required")
 	}
 
 	accessToken, err := pkgjwt.GenerateAccessToken(user.ID, user.SchoolID, user.Role)

@@ -13,16 +13,34 @@ import (
 )
 
 // userJoinQuery is the reusable JOIN SQL for loading a user with their role and school.
+//
+// Strategy for users linked to multiple schools:
+// - Prefer schools with status = 'active'
+// - If more than one remains, pick the most recently linked membership
+//
+// This keeps school context deterministic for JWT generation.
 const userJoinQuery = `
 SELECT
     u.*,
     r.id   AS role_id,
     r.name AS role_name,
-    su.school_id
+		preferred_school.school_id
 FROM users u
 LEFT JOIN model_has_roles mhr ON mhr.user_id = u.id
 LEFT JOIN roles r              ON r.id = mhr.role_id
-LEFT JOIN school_users su      ON su.user_id = u.id AND su.deleted_at IS NULL
+LEFT JOIN LATERAL (
+		SELECT su.school_id
+		FROM school_users su
+		LEFT JOIN schools s ON s.id = su.school_id
+		WHERE su.user_id = u.id
+			AND su.deleted_at IS NULL
+			AND (s.id IS NULL OR s.deleted_at IS NULL)
+		ORDER BY
+			CASE WHEN s.status = 'active' THEN 0 ELSE 1 END,
+			su.created_at DESC,
+			su.school_id
+		LIMIT 1
+) preferred_school ON TRUE
 WHERE u.deleted_at IS NULL
 `
 

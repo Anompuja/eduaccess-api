@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/auth/domain"
@@ -49,6 +50,10 @@ func (h *RefreshHandler) Handle(ctx context.Context, cmd RefreshCommand) (*Token
 	}
 	if !user.IsActive() {
 		return nil, apperror.New(apperror.ErrForbidden, "account is deactivated")
+	}
+	if user.Role != domain.RoleSuperadmin && user.SchoolID == nil {
+		log.Printf("auth refresh: user %s with role %s has no school membership", user.ID.String(), user.Role)
+		return nil, apperror.New(apperror.ErrForbidden, "school context required")
 	}
 
 	// Rotate: delete old token, issue new pair

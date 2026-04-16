@@ -70,20 +70,49 @@ func (parentLinkModel) TableName() string { return "student_parent_links" }
 
 // studentWithUser is the scan target for the JOIN query.
 type studentWithUser struct {
-	studentProfileModel
-	UserName  string `gorm:"column:user_name"`
-	UserEmail string `gorm:"column:user_email"`
-	Username  string `gorm:"column:username"`
-	Avatar    string `gorm:"column:avatar"`
+	ID                uuid.UUID  `gorm:"column:id"`
+	UserID            uuid.UUID  `gorm:"column:user_id"`
+	SchoolID          uuid.UUID  `gorm:"column:school_id"`
+	NIS               string     `gorm:"column:nis"`
+	NISN              string     `gorm:"column:nisn"`
+	PhoneNumber       string     `gorm:"column:phone_number"`
+	Address           string     `gorm:"column:address"`
+	Gender            string     `gorm:"column:gender"`
+	Religion          string     `gorm:"column:religion"`
+	BirthPlace        string     `gorm:"column:birth_place"`
+	BirthDate         *time.Time `gorm:"column:birth_date"`
+	TahunMasuk        string     `gorm:"column:tahun_masuk"`
+	JalurMasukSekolah string     `gorm:"column:jalur_masuk_sekolah"`
+	EducationLevelID  *uuid.UUID `gorm:"column:school_education_level_id"`
+	ClassID           *uuid.UUID `gorm:"column:school_class_id"`
+	SubClassID        *uuid.UUID `gorm:"column:school_sub_class_id"`
+	DeletedAt         *time.Time `gorm:"column:deleted_at"`
+	CreatedAt         time.Time  `gorm:"column:created_at"`
+	UpdatedAt         time.Time  `gorm:"column:updated_at"`
+	UserName          string     `gorm:"column:user_name"`
+	UserEmail         string     `gorm:"column:user_email"`
+	Username          string     `gorm:"column:username"`
+	Avatar            string     `gorm:"column:avatar"`
 }
 
 // parentWithUser is the scan target for the parent JOIN query.
 type parentWithUser struct {
-	parentProfileModel
-	UserName  string `gorm:"column:user_name"`
-	UserEmail string `gorm:"column:user_email"`
-	Username  string `gorm:"column:username"`
-	Avatar    string `gorm:"column:avatar"`
+	ID             uuid.UUID  `gorm:"column:id"`
+	UserID         uuid.UUID  `gorm:"column:user_id"`
+	SchoolID       uuid.UUID  `gorm:"column:school_id"`
+	FatherName     string     `gorm:"column:father_name"`
+	MotherName     string     `gorm:"column:mother_name"`
+	FatherReligion string     `gorm:"column:father_religion"`
+	MotherReligion string     `gorm:"column:mother_religion"`
+	PhoneNumber    string     `gorm:"column:phone_number"`
+	Address        string     `gorm:"column:address"`
+	DeletedAt      *time.Time `gorm:"column:deleted_at"`
+	CreatedAt      time.Time  `gorm:"column:created_at"`
+	UpdatedAt      time.Time  `gorm:"column:updated_at"`
+	UserName       string     `gorm:"column:user_name"`
+	UserEmail      string     `gorm:"column:user_email"`
+	Username       string     `gorm:"column:username"`
+	Avatar         string     `gorm:"column:avatar"`
 }
 
 // ── Repository ────────────────────────────────────────────────────────────────
