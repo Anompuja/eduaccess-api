@@ -22,6 +22,9 @@ import (
 	schoolHTTP "github.com/eduaccess/eduaccess-api/internal/school/delivery/http"
 	schoolInfra "github.com/eduaccess/eduaccess-api/internal/school/infrastructure"
 	appvalidator "github.com/eduaccess/eduaccess-api/internal/shared/validator"
+	headmasterApp "github.com/eduaccess/eduaccess-api/internal/headmaster/application"
+	headmasterHTTP "github.com/eduaccess/eduaccess-api/internal/headmaster/delivery/http"
+	headmasterInfra "github.com/eduaccess/eduaccess-api/internal/headmaster/infrastructure"
 	studentApp "github.com/eduaccess/eduaccess-api/internal/student/application"
 	studentHTTP "github.com/eduaccess/eduaccess-api/internal/student/delivery/http"
 	studentInfra "github.com/eduaccess/eduaccess-api/internal/student/infrastructure"
@@ -118,6 +121,17 @@ func main() {
 		schoolApp.NewListRulesHandler(schoolRepo),
 		schoolApp.NewUpsertRulesHandler(schoolRepo),
 		schoolApp.NewGetSubscriptionHandler(schoolRepo),
+	)
+
+	// ── Headmaster module ─────────────────────────────────────────────────────
+	headmasterRepo := headmasterInfra.NewGormHeadmasterRepository(db)
+	headmasterHTTP.NewHandler(
+		v1,
+		headmasterApp.NewCreateHeadmasterHandler(userRepo, headmasterRepo, schoolRepo),
+		headmasterApp.NewListHeadmastersHandler(headmasterRepo),
+		headmasterApp.NewGetHeadmasterHandler(headmasterRepo),
+		headmasterApp.NewUpdateHeadmasterHandler(headmasterRepo),
+		headmasterApp.NewDeactivateHeadmasterHandler(headmasterRepo),
 	)
 
 	// ── Student module ────────────────────────────────────────────────────────
