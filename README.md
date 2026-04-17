@@ -266,6 +266,8 @@ CORS_ALLOW_ORIGINS=http://localhost:3000,http://localhost:5000
 ## Database Setup
 
 The full schema lives in [database/migrations/001_initial_schema.sql](database/migrations/001_initial_schema.sql).
+this is the ERD we plan to impelment (their might be changes in the future)
+https://drive.google.com/file/d/1Rt9KfwXE1S2RZ9Zu3CM6iX4B6pqTg5y0/view?usp=sharing
 
 Key tables:
 
