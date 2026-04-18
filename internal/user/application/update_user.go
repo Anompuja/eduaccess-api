@@ -17,6 +17,8 @@ type UpdateUserCommand struct {
 	UserID            uuid.UUID
 	Name              *string
 	Avatar            *string
+	Username          *string
+	Email             *string
 }
 
 // UpdateUserHandler handles the UpdateUserCommand.
@@ -46,6 +48,12 @@ func (h *UpdateUserHandler) Handle(ctx context.Context, cmd UpdateUserCommand) (
 	}
 	if cmd.Avatar != nil {
 		user.Avatar = *cmd.Avatar
+	}
+	if cmd.Username != nil {
+		user.Username = *cmd.Username
+	}
+	if cmd.Email != nil {
+		user.Email = *cmd.Email
 	}
 	user.UpdatedAt = time.Now()
 
