@@ -20,6 +20,8 @@ type UserResponse struct {
 type UpdateUserRequest struct {
 	Name   *string `json:"name"   validate:"omitempty,min=2,max=100"`
 	Avatar *string `json:"avatar" validate:"omitempty,max=255"`
+	Username *string `json:"username" validate:"omitempty,min=3,max=50"`
+	Email *string `json:"email" validate:"omitempty,email,max=191"`
 }
 
 // ChangePasswordRequest is the body for PUT /users/:id/password.

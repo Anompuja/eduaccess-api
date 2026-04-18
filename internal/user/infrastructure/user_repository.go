@@ -32,6 +32,14 @@ func (r *GormUserManagementRepository) FindByID(ctx context.Context, id uuid.UUI
 	return r.auth.FindByID(ctx, id)
 }
 
+func (r *GormUserManagementRepository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
+	return r.auth.ExistsByEmail(ctx, email)
+}
+
+func (r *GormUserManagementRepository) ExistsByUsername(ctx context.Context, username string) (bool, error) {
+	return r.auth.ExistsByUsername(ctx, username)
+}
+
 func (r *GormUserManagementRepository) List(ctx context.Context, f application.ListFilter) ([]*domain.User, int64, error) {
 	base := `
 FROM users u
@@ -135,6 +143,8 @@ func (r *GormUserManagementRepository) Update(ctx context.Context, user *domain.
 			"avatar":     user.Avatar,
 			"password":   user.Password,
 			"updated_at": user.UpdatedAt,
+			"username":   user.Username,
+			"email":      user.Email,
 		}).Error
 }
 
