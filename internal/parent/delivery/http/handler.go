@@ -20,6 +20,7 @@ type Handler struct {
 	createParent *application.CreateParentHandler
 	listParents  *application.ListParentsHandler
 	getParent    *application.GetParentHandler
+	updateParent *application.UpdateParentHandler
 }
 
 // NewHandler registers parent routes and returns the handler.
@@ -28,17 +29,20 @@ func NewHandler(
 	createParent *application.CreateParentHandler,
 	listParents *application.ListParentsHandler,
 	getParent *application.GetParentHandler,
+	updateParent *application.UpdateParentHandler,
 ) *Handler {
 	h := &Handler{
 		createParent: createParent,
 		listParents:  listParents,
 		getParent:    getParent,
+		updateParent: updateParent,
 	}
 
 	parents := v1.Group("/parents", authmw.RequireAuth)
 	parents.POST("", h.CreateParent)
 	parents.GET("", h.ListParents)
 	parents.GET("/:id", h.GetParent)
+	parents.PUT("/:id", h.UpdateParent)
 
 	return h
 }
@@ -122,6 +126,35 @@ func (h *Handler) GetParent(c echo.Context) error {
 	}
 
 	return response.OK(c, "parent retrieved", toParentResponse(parent))
+}
+
+func (h *Handler) UpdateParent(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+
+	var req UpdateParentRequest
+	if err := validator.BindAndValidate(c, &req); err != nil {
+		return err
+	}
+
+	parent, err := h.updateParent.Handle(c.Request().Context(), application.UpdateParentCommand{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		ParentID:          id,
+		FatherName:        req.FatherName,
+		MotherName:        req.MotherName,
+		FatherReligion:    req.FatherReligion,
+		MotherReligion:    req.MotherReligion,
+		PhoneNumber:       req.PhoneNumber,
+		Address:           req.Address,
+	})
+	if err != nil {
+		return handleAppError(c, err)
+	}
+
+	return response.OK(c, "parent updated", toParentResponse(parent))
 }
 
 func toParentResponse(p *domain.ParentProfile) ParentResponse {

@@ -140,6 +140,21 @@ LIMIT ? OFFSET ?`, base, where)
 	return parents, total, nil
 }
 
+func (r *GormParentRepository) UpdateParentProfile(ctx context.Context, p *domain.ParentProfile) error {
+	return r.db.WithContext(ctx).
+		Table("parent_profiles").
+		Where("id = ?", p.ID).
+		Updates(map[string]interface{}{
+			"father_name":     p.FatherName,
+			"mother_name":     p.MotherName,
+			"father_religion": p.FatherReligion,
+			"mother_religion": p.MotherReligion,
+			"phone_number":    p.PhoneNumber,
+			"address":         p.Address,
+			"updated_at":      p.UpdatedAt,
+		}).Error
+}
+
 func toParentDomain(row parentWithUser) *domain.ParentProfile {
 	return &domain.ParentProfile{
 		ID:             row.ID,

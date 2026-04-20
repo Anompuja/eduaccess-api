@@ -178,6 +178,7 @@ func main() {
 		parentApp.NewCreateParentHandler(userRepo, parentRepo),
 		parentApp.NewListParentsHandler(parentRepo),
 		parentApp.NewGetParentHandler(parentRepo),
+		parentApp.NewUpdateParentHandler(parentRepo),
 	)
 
 	// ── Admin module ──────────────────────────────────────────────────────────

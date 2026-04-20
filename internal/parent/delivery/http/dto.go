@@ -33,3 +33,12 @@ type CreateParentRequest struct {
 	PhoneNumber    string  `json:"phone_number"    validate:"omitempty,max=50"`
 	Address        string  `json:"address"         validate:"omitempty"`
 }
+
+type UpdateParentRequest struct {
+	FatherName     *string `json:"father_name"     validate:"omitempty,max=191"`
+	MotherName     *string `json:"mother_name"     validate:"omitempty,max=191"`
+	FatherReligion *string `json:"father_religion" validate:"omitempty,max=100"`
+	MotherReligion *string `json:"mother_religion" validate:"omitempty,max=100"`
+	PhoneNumber    *string `json:"phone_number"    validate:"omitempty,max=50"`
+	Address        *string `json:"address"         validate:"omitempty"`
+}
