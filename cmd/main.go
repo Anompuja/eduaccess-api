@@ -21,13 +21,16 @@ import (
 	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
 	authHTTP "github.com/eduaccess/eduaccess-api/internal/auth/delivery/http"
 	authInfra "github.com/eduaccess/eduaccess-api/internal/auth/infrastructure"
+	headmasterApp "github.com/eduaccess/eduaccess-api/internal/headmaster/application"
+	headmasterHTTP "github.com/eduaccess/eduaccess-api/internal/headmaster/delivery/http"
+	headmasterInfra "github.com/eduaccess/eduaccess-api/internal/headmaster/infrastructure"
+	parentApp "github.com/eduaccess/eduaccess-api/internal/parent/application"
+	parentHTTP "github.com/eduaccess/eduaccess-api/internal/parent/delivery/http"
+	parentInfra "github.com/eduaccess/eduaccess-api/internal/parent/infrastructure"
 	schoolApp "github.com/eduaccess/eduaccess-api/internal/school/application"
 	schoolHTTP "github.com/eduaccess/eduaccess-api/internal/school/delivery/http"
 	schoolInfra "github.com/eduaccess/eduaccess-api/internal/school/infrastructure"
 	appvalidator "github.com/eduaccess/eduaccess-api/internal/shared/validator"
-	headmasterApp "github.com/eduaccess/eduaccess-api/internal/headmaster/application"
-	headmasterHTTP "github.com/eduaccess/eduaccess-api/internal/headmaster/delivery/http"
-	headmasterInfra "github.com/eduaccess/eduaccess-api/internal/headmaster/infrastructure"
 	studentApp "github.com/eduaccess/eduaccess-api/internal/student/application"
 	studentHTTP "github.com/eduaccess/eduaccess-api/internal/student/delivery/http"
 	studentInfra "github.com/eduaccess/eduaccess-api/internal/student/infrastructure"
@@ -166,6 +169,13 @@ func main() {
 		studentApp.NewListSubClassesHandler(academicRepo),
 		studentApp.NewUpdateSubClassHandler(academicRepo),
 		studentApp.NewDeleteSubClassHandler(academicRepo),
+	)
+
+	// Parent module
+	parentRepo := parentInfra.NewGormParentRepository(db)
+	parentHTTP.NewHandler(
+		v1,
+		parentApp.NewListParentsHandler(parentRepo),
 	)
 
 	// ── Admin module ──────────────────────────────────────────────────────────

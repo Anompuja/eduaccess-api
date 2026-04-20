@@ -106,14 +106,6 @@ func NewHandler(
 	// Students
 	h.registerStudentRoutes(v1, auth)
 
-	// Parents
-	parents := v1.Group("/parents", auth)
-	parents.POST("", h.CreateParent)
-	parents.GET("", h.ListParents)
-	parents.GET("/:id", h.GetParent)
-	parents.PUT("/:id", h.UpdateParent)
-	parents.DELETE("/:id", h.DeactivateParent)
-
 	// Academic structure
 	levels := v1.Group("/academic/levels", auth)
 	levels.POST("", h.CreateLevel)
