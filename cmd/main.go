@@ -14,6 +14,9 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	_ "github.com/eduaccess/eduaccess-api/docs"
+	adminApp "github.com/eduaccess/eduaccess-api/internal/admin/application"
+	adminHTTP "github.com/eduaccess/eduaccess-api/internal/admin/delivery/http"
+	adminInfra "github.com/eduaccess/eduaccess-api/internal/admin/infrastructure"
 	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
 	authHTTP "github.com/eduaccess/eduaccess-api/internal/auth/delivery/http"
 	authInfra "github.com/eduaccess/eduaccess-api/internal/auth/infrastructure"
@@ -144,6 +147,17 @@ func main() {
 		studentApp.NewListSubClassesHandler(academicRepo),
 		studentApp.NewUpdateSubClassHandler(academicRepo),
 		studentApp.NewDeleteSubClassHandler(academicRepo),
+	)
+
+	// ── Admin module ──────────────────────────────────────────────────────────
+	adminRepo := adminInfra.NewGormAdminRepository(db)
+	adminHTTP.NewHandler(
+		v1,
+		adminApp.NewCreateAdminHandler(userRepo, adminRepo),
+		adminApp.NewGetAdminHandler(adminRepo),
+		adminApp.NewListAdminsHandler(adminRepo),
+		adminApp.NewUpdateAdminHandler(userMgmtRepo, adminRepo),
+		adminApp.NewDeactivateAdminHandler(adminRepo),
 	)
 
 	port := os.Getenv("APP_PORT")
