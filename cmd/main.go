@@ -176,6 +176,7 @@ func main() {
 	parentHTTP.NewHandler(
 		v1,
 		parentApp.NewListParentsHandler(parentRepo),
+		parentApp.NewGetParentHandler(parentRepo),
 	)
 
 	// ── Admin module ──────────────────────────────────────────────────────────

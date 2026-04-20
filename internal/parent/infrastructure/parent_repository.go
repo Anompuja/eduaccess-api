@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/parent/domain"
+	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -54,6 +55,23 @@ type GormParentRepository struct {
 
 func NewGormParentRepository(db *gorm.DB) *GormParentRepository {
 	return &GormParentRepository{db: db}
+}
+
+func (r *GormParentRepository) FindParentByID(ctx context.Context, id uuid.UUID) (*domain.ParentProfile, error) {
+	var row parentWithUser
+	sql := `
+SELECT pp.*, u.name AS user_name, u.email AS user_email, u.username, u.avatar
+FROM parent_profiles pp
+JOIN users u ON u.id = pp.user_id
+WHERE pp.id = ? AND pp.deleted_at IS NULL
+LIMIT 1`
+	if err := r.db.WithContext(ctx).Raw(sql, id).Scan(&row).Error; err != nil {
+		return nil, err
+	}
+	if row.ID == uuid.Nil {
+		return nil, apperror.New(apperror.ErrNotFound, "parent not found")
+	}
+	return toParentDomain(row), nil
 }
 
 func (r *GormParentRepository) ListParents(ctx context.Context, f domain.ParentFilter) ([]*domain.ParentProfile, int64, error) {

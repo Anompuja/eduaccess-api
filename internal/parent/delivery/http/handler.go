@@ -10,25 +10,30 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 // Handler wires parent use-cases to HTTP endpoints.
 type Handler struct {
 	listParents *application.ListParentsHandler
+	getParent   *application.GetParentHandler
 }
 
 // NewHandler registers parent routes and returns the handler.
 func NewHandler(
 	v1 *echo.Group,
 	listParents *application.ListParentsHandler,
+	getParent *application.GetParentHandler,
 ) *Handler {
 	h := &Handler{
 		listParents: listParents,
+		getParent:   getParent,
 	}
 
 	parents := v1.Group("/parents", authmw.RequireAuth)
 	parents.GET("", h.ListParents)
+	parents.GET("/:id", h.GetParent)
 
 	return h
 }
@@ -55,6 +60,24 @@ func (h *Handler) ListParents(c echo.Context) error {
 	return response.Paginated(c, "parents retrieved", dtos, result.Page, result.PerPage, result.Total)
 }
 
+func (h *Handler) GetParent(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+
+	parent, err := h.getParent.Handle(c.Request().Context(), application.GetParentQuery{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		ParentID:          id,
+	})
+	if err != nil {
+		return handleAppError(c, err)
+	}
+
+	return response.OK(c, "parent retrieved", toParentResponse(parent))
+}
+
 func toParentResponse(p *domain.ParentProfile) ParentResponse {
 	return ParentResponse{
 		ID:             p.ID.String(),
@@ -73,6 +96,19 @@ func toParentResponse(p *domain.ParentProfile) ParentResponse {
 		CreatedAt:      p.CreatedAt,
 		UpdatedAt:      p.UpdatedAt,
 	}
+}
+
+func parseUUID(c echo.Context, param string) (uuid.UUID, error) {
+	raw := c.Param(param)
+	id, err := uuid.Parse(raw)
+	if err != nil {
+		_ = c.JSON(http.StatusBadRequest, response.Response{
+			Success: false,
+			Message: "invalid UUID: " + param,
+		})
+		return uuid.UUID{}, echo.ErrBadRequest
+	}
+	return id, nil
 }
 
 func handleAppError(c echo.Context, err error) error {
