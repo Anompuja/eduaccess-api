@@ -21,6 +21,7 @@ Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and Postg
   - [Authentication](#authentication)
   - [Users & Profile](#users--profile)
   - [Schools](#schools)
+  - [Admins](#admins)
   - [Students](#students)
   - [Parents](#parents)
   - [Academic Structure](#academic-structure)
@@ -40,15 +41,15 @@ EduAccess is a multi-tenant API that powers school management for multiple schoo
 
 ## Tech Stack
 
-| Layer       | Technology                              |
-|-------------|------------------------------------------|
-| Language    | Go 1.25+                                 |
-| HTTP        | Echo v4                                  |
-| ORM         | GORM (PostgreSQL driver via pgx)         |
-| Auth        | JWT (HS256) — access + refresh tokens    |
-| Database    | PostgreSQL 15+ / Supabase                |
-| API Docs    | Swagger (swaggo/swag)                    |
-| Container   | Docker + Docker Compose                  |
+| Layer     | Technology                            |
+| --------- | ------------------------------------- |
+| Language  | Go 1.25+                              |
+| HTTP      | Echo v4                               |
+| ORM       | GORM (PostgreSQL driver via pgx)      |
+| Auth      | JWT (HS256) — access + refresh tokens |
+| Database  | PostgreSQL 15+ / Supabase             |
+| API Docs  | Swagger (swaggo/swag)                 |
+| Container | Docker + Docker Compose               |
 
 ---
 
@@ -108,20 +109,20 @@ Copy the example file and fill in the values:
 cp .env.example .env
 ```
 
-| Variable            | Required | Description                                              |
-|---------------------|----------|----------------------------------------------------------|
-| `APP_ENV`           | No       | `development` (enables SQL logging) or `production`      |
-| `APP_PORT`          | No       | HTTP port, default `8080`                                |
-| `DATABASE_URL`      | Either   | Full Postgres DSN — use this for Supabase / Railway      |
-| `DB_HOST`           | Either   | Individual DB connection vars (alternative to above)     |
-| `DB_PORT`           | Either   | Default `5432`                                           |
-| `DB_USER`           | Either   | Database user                                            |
-| `DB_PASSWORD`       | Either   | Database password                                        |
-| `DB_NAME`           | Either   | Database name                                            |
-| `DB_SSLMODE`        | No       | `disable` (local) or `require` (Supabase)                |
-| `DB_MAX_OPEN_CONNS` | No       | Max open DB connections, default `25`                    |
-| `DB_MAX_IDLE_CONNS` | No       | Max idle DB connections, default `5`                     |
-| `JWT_SECRET`        | **Yes**  | Secret key for signing JWTs — use a long random string   |
+| Variable            | Required | Description                                            |
+| ------------------- | -------- | ------------------------------------------------------ |
+| `APP_ENV`           | No       | `development` (enables SQL logging) or `production`    |
+| `APP_PORT`          | No       | HTTP port, default `8080`                              |
+| `DATABASE_URL`      | Either   | Full Postgres DSN — use this for Supabase / Railway    |
+| `DB_HOST`           | Either   | Individual DB connection vars (alternative to above)   |
+| `DB_PORT`           | Either   | Default `5432`                                         |
+| `DB_USER`           | Either   | Database user                                          |
+| `DB_PASSWORD`       | Either   | Database password                                      |
+| `DB_NAME`           | Either   | Database name                                          |
+| `DB_SSLMODE`        | No       | `disable` (local) or `require` (Supabase)              |
+| `DB_MAX_OPEN_CONNS` | No       | Max open DB connections, default `25`                  |
+| `DB_MAX_IDLE_CONNS` | No       | Max idle DB connections, default `5`                   |
+| `JWT_SECRET`        | **Yes**  | Secret key for signing JWTs — use a long random string |
 
 > **Never commit your `.env` file.** It is already in `.gitignore`. Share secrets through a password manager or your team's secrets vault.
 
@@ -196,21 +197,21 @@ The full schema lives in [database/migrations/001_initial_schema.sql](database/m
 
 Key tables:
 
-| Table                   | Purpose                                            |
-|-------------------------|----------------------------------------------------|
-| `users`                 | All user accounts (all roles)                      |
-| `roles`                 | Role definitions                                   |
-| `model_has_roles`       | User ↔ role assignment                             |
-| `refresh_tokens`        | JWT refresh token store                            |
-| `schools`               | School tenants                                     |
-| `school_users`          | User ↔ school membership (provides `school_id`)    |
-| `school_rules`          | Key-value config per school                        |
-| `subscriptions`         | School subscription & plan                         |
-| `student_profiles`      | Student-specific data                              |
-| `student_parent_links`  | Many-to-many student ↔ parent                     |
-| `academic_levels`       | Grade levels (e.g. SD, SMP)                        |
-| `classrooms`            | Classes within a level                             |
-| `sub_classrooms`        | Sub-classes / sections                             |
+| Table                  | Purpose                                         |
+| ---------------------- | ----------------------------------------------- |
+| `users`                | All user accounts (all roles)                   |
+| `roles`                | Role definitions                                |
+| `model_has_roles`      | User ↔ role assignment                          |
+| `refresh_tokens`       | JWT refresh token store                         |
+| `schools`              | School tenants                                  |
+| `school_users`         | User ↔ school membership (provides `school_id`) |
+| `school_rules`         | Key-value config per school                     |
+| `subscriptions`        | School subscription & plan                      |
+| `student_profiles`     | Student-specific data                           |
+| `student_parent_links` | Many-to-many student ↔ parent                   |
+| `academic_levels`      | Grade levels (e.g. SD, SMP)                     |
+| `classrooms`           | Classes within a level                          |
+| `sub_classrooms`       | Sub-classes / sections                          |
 
 When using **Docker Compose**, the schema is applied automatically on first start. When using **Supabase**, apply it once via the SQL editor or `psql`.
 
@@ -218,15 +219,15 @@ When using **Docker Compose**, the schema is applied automatically on first star
 
 ## Roles & Permissions
 
-| Role              | Constant (`domain` package) | Access                              |
-|-------------------|-----------------------------|-------------------------------------|
-| `superadmin`      | `RoleSuperadmin`            | Full platform access; no school_id  |
-| `admin_sekolah`   | `RoleAdminSekolah`          | Full access within their school     |
-| `kepala_sekolah`  | `RoleKepalaSekolah`         | Read/manage within their school     |
-| `guru`            | `RoleGuru`                  | Teacher access                      |
-| `staff`           | `RoleStaff`                 | Staff access                        |
-| `orangtua`        | `RoleOrangTua`              | Parent (linked to students)         |
-| `siswa`           | `RoleSiswa`                 | Student                             |
+| Role             | Constant (`domain` package) | Access                             |
+| ---------------- | --------------------------- | ---------------------------------- |
+| `superadmin`     | `RoleSuperadmin`            | Full platform access; no school_id |
+| `admin_sekolah`  | `RoleAdminSekolah`          | Full access within their school    |
+| `kepala_sekolah` | `RoleKepalaSekolah`         | Read/manage within their school    |
+| `guru`           | `RoleGuru`                  | Teacher access                     |
+| `staff`          | `RoleStaff`                 | Staff access                       |
+| `orangtua`       | `RoleOrangTua`              | Parent (linked to students)        |
+| `siswa`          | `RoleSiswa`                 | Student                            |
 
 Role-based rules are enforced at the application layer (use-case handlers), not just at the route level. The JWT payload carries the role, so each handler can check it without a DB round-trip.
 
@@ -246,14 +247,15 @@ Authorization: Bearer <access_token>
 
 ### Authentication
 
-| Method | Path              | Auth | Description                            |
-|--------|-------------------|------|----------------------------------------|
-| POST   | `/auth/register`  | No   | Register a new user                    |
-| POST   | `/auth/login`     | No   | Login, returns access + refresh tokens |
-| POST   | `/auth/refresh`   | No   | Rotate refresh token, get new pair     |
-| POST   | `/auth/logout`    | No   | Revoke refresh token                   |
+| Method | Path             | Auth | Description                            |
+| ------ | ---------------- | ---- | -------------------------------------- |
+| POST   | `/auth/register` | No   | Register a new user                    |
+| POST   | `/auth/login`    | No   | Login, returns access + refresh tokens |
+| POST   | `/auth/refresh`  | No   | Rotate refresh token, get new pair     |
+| POST   | `/auth/logout`   | No   | Revoke refresh token                   |
 
 **Register**
+
 ```json
 POST /api/v1/auth/register
 {
@@ -268,6 +270,7 @@ POST /api/v1/auth/register
 > `superadmin` accounts cannot be created via this endpoint.
 
 **Login**
+
 ```json
 POST /api/v1/auth/login
 {
@@ -275,13 +278,15 @@ POST /api/v1/auth/login
   "password": "secret123"
 }
 ```
+
 Returns:
+
 ```json
 {
   "success": true,
   "message": "login successful",
   "data": {
-    "access_token":  "<jwt>",
+    "access_token": "<jwt>",
     "refresh_token": "<jwt>"
   }
 }
@@ -290,6 +295,7 @@ Returns:
 Access tokens expire in **15 minutes**. Refresh tokens expire in **7 days**.
 
 **Refresh**
+
 ```json
 POST /api/v1/auth/refresh
 {
@@ -298,6 +304,7 @@ POST /api/v1/auth/refresh
 ```
 
 **Logout**
+
 ```json
 POST /api/v1/auth/logout
 {
@@ -309,15 +316,15 @@ POST /api/v1/auth/logout
 
 ### Users & Profile
 
-| Method | Path                  | Auth | Description               |
-|--------|-----------------------|------|---------------------------|
-| GET    | `/users`              | Yes  | List users (paginated)    |
-| GET    | `/users/:id`          | Yes  | Get user by ID            |
-| PUT    | `/users/:id`          | Yes  | Update user name/avatar   |
-| DELETE | `/users/:id`          | Yes  | Soft-deactivate user      |
-| PUT    | `/users/:id/password` | Yes  | Change password           |
-| GET    | `/profile`            | Yes  | Get own profile           |
-| PUT    | `/profile`            | Yes  | Update own profile        |
+| Method | Path                  | Auth | Description             |
+| ------ | --------------------- | ---- | ----------------------- |
+| GET    | `/users`              | Yes  | List users (paginated)  |
+| GET    | `/users/:id`          | Yes  | Get user by ID          |
+| PUT    | `/users/:id`          | Yes  | Update user name/avatar |
+| DELETE | `/users/:id`          | Yes  | Soft-deactivate user    |
+| PUT    | `/users/:id/password` | Yes  | Change password         |
+| GET    | `/profile`            | Yes  | Get own profile         |
+| PUT    | `/profile`            | Yes  | Update own profile      |
 
 Query params for `GET /users`: `role`, `search`, `page`, `per_page`
 
@@ -325,25 +332,39 @@ Query params for `GET /users`: `role`, `search`, `page`, `per_page`
 
 ### Schools
 
-| Method | Path                         | Auth | Description                     |
-|--------|------------------------------|------|---------------------------------|
-| POST   | `/schools`                   | Yes  | Create school (superadmin only) |
-| GET    | `/schools`                   | Yes  | List schools (paginated)        |
-| GET    | `/schools/:id`               | Yes  | Get school by ID                |
-| PUT    | `/schools/:id`               | Yes  | Update school                   |
-| DELETE | `/schools/:id`               | Yes  | Soft-deactivate school          |
-| GET    | `/schools/:id/rules`         | Yes  | Get school key-value rules      |
-| PUT    | `/schools/:id/rules`         | Yes  | Create/update school rules      |
-| GET    | `/schools/:id/subscription`  | Yes  | Get school subscription & plan  |
+| Method | Path                        | Auth | Description                     |
+| ------ | --------------------------- | ---- | ------------------------------- |
+| POST   | `/schools`                  | Yes  | Create school (superadmin only) |
+| GET    | `/schools`                  | Yes  | List schools (paginated)        |
+| GET    | `/schools/:id`              | Yes  | Get school by ID                |
+| PUT    | `/schools/:id`              | Yes  | Update school                   |
+| DELETE | `/schools/:id`              | Yes  | Soft-deactivate school          |
+| GET    | `/schools/:id/rules`        | Yes  | Get school key-value rules      |
+| PUT    | `/schools/:id/rules`        | Yes  | Create/update school rules      |
+| GET    | `/schools/:id/subscription` | Yes  | Get school subscription & plan  |
 
 Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `page`, `per_page`
 
 ---
 
+### Admins
+
+| Method | Path          | Auth | Description             |
+| ------ | ------------- | ---- | ----------------------- |
+| POST   | `/admins`     | Yes  | Create admin profile    |
+| GET    | `/admins`     | Yes  | List admins (paginated) |
+| GET    | `/admins/:id` | Yes  | Get admin by ID         |
+| PUT    | `/admins/:id` | Yes  | Update admin            |
+| DELETE | `/admins/:id` | Yes  | Soft-deactivate admin   |
+
+Query params for `GET /admins`: `search`, `page`, `per_page`
+
+---
+
 ### Students
 
-| Method | Path                               | Auth | Description               |
-|--------|------------------------------------|------|---------------------------|
+| Method | Path                               | Auth | Description                |
+| ------ | ---------------------------------- | ---- | -------------------------- |
 | POST   | `/students`                        | Yes  | Create student             |
 | GET    | `/students`                        | Yes  | List students (paginated)  |
 | GET    | `/students/:id`                    | Yes  | Get student by ID          |
@@ -357,7 +378,7 @@ Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `pag
 ### Parents
 
 | Method | Path           | Auth | Description              |
-|--------|----------------|------|--------------------------|
+| ------ | -------------- | ---- | ------------------------ |
 | POST   | `/parents`     | Yes  | Create parent account    |
 | GET    | `/parents`     | Yes  | List parents (paginated) |
 | GET    | `/parents/:id` | Yes  | Get parent by ID         |
@@ -369,7 +390,7 @@ Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `pag
 ### Academic Structure
 
 | Method | Path                       | Auth | Description      |
-|--------|----------------------------|------|------------------|
+| ------ | -------------------------- | ---- | ---------------- |
 | POST   | `/academic/levels`         | Yes  | Create level     |
 | GET    | `/academic/levels`         | Yes  | List levels      |
 | PUT    | `/academic/levels/:id`     | Yes  | Update level     |
@@ -415,6 +436,7 @@ Tokens are signed with **HS256** using `JWT_SECRET`. The payload includes `user_
 All endpoints return a consistent JSON envelope.
 
 **Success (single object)**
+
 ```json
 {
   "success": true,
@@ -424,6 +446,7 @@ All endpoints return a consistent JSON envelope.
 ```
 
 **Success (paginated list)**
+
 ```json
 {
   "success":  true,
@@ -436,6 +459,7 @@ All endpoints return a consistent JSON envelope.
 ```
 
 **Error**
+
 ```json
 {
   "success": false,
@@ -446,7 +470,7 @@ All endpoints return a consistent JSON envelope.
 Common HTTP status codes:
 
 | Code | Meaning               |
-|------|-----------------------|
+| ---- | --------------------- |
 | 200  | OK                    |
 | 201  | Created               |
 | 400  | Bad Request           |
@@ -468,6 +492,7 @@ http://localhost:8080/swagger/index.html
 ```
 
 To use protected endpoints:
+
 1. Call `POST /api/v1/auth/login` to get an access token.
 2. Click **Authorize** (top right) and enter `Bearer <your_access_token>`.
 
