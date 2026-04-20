@@ -27,6 +27,7 @@ Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and Postg
   - [Authentication](#authentication)
   - [Users & Profile](#users--profile)
   - [Schools](#schools)
+  - [Admins](#admins)
   - [Students](#students)
   - [Parents](#parents)
   - [Academic Structure](#academic-structure)
@@ -417,6 +418,20 @@ Query params for `GET /users`: `role`, `search`, `page`, `per_page`
 | GET    | `/schools/:id/subscription` | Yes  | Get school subscription & plan  |
 
 Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `page`, `per_page`
+
+---
+
+### Admins
+
+| Method | Path          | Auth | Description             |
+| ------ | ------------- | ---- | ----------------------- |
+| POST   | `/admins`     | Yes  | Create admin profile    |
+| GET    | `/admins`     | Yes  | List admins (paginated) |
+| GET    | `/admins/:id` | Yes  | Get admin by ID         |
+| PUT    | `/admins/:id` | Yes  | Update admin            |
+| DELETE | `/admins/:id` | Yes  | Soft-deactivate admin   |
+
+Query params for `GET /admins`: `search`, `page`, `per_page`
 
 ---
 
