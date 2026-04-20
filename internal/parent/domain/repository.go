@@ -16,6 +16,7 @@ type ParentFilter struct {
 
 // ParentRepository handles parent profile persistence.
 type ParentRepository interface {
+	CreateParentProfile(ctx context.Context, profile *ParentProfile) error
 	FindParentByID(ctx context.Context, id uuid.UUID) (*ParentProfile, error)
 	ListParents(ctx context.Context, f ParentFilter) ([]*ParentProfile, int64, error)
 }

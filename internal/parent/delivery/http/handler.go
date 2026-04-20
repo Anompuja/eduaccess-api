@@ -10,32 +10,78 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
+	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 // Handler wires parent use-cases to HTTP endpoints.
 type Handler struct {
-	listParents *application.ListParentsHandler
-	getParent   *application.GetParentHandler
+	createParent *application.CreateParentHandler
+	listParents  *application.ListParentsHandler
+	getParent    *application.GetParentHandler
 }
 
 // NewHandler registers parent routes and returns the handler.
 func NewHandler(
 	v1 *echo.Group,
+	createParent *application.CreateParentHandler,
 	listParents *application.ListParentsHandler,
 	getParent *application.GetParentHandler,
 ) *Handler {
 	h := &Handler{
-		listParents: listParents,
-		getParent:   getParent,
+		createParent: createParent,
+		listParents:  listParents,
+		getParent:    getParent,
 	}
 
 	parents := v1.Group("/parents", authmw.RequireAuth)
+	parents.POST("", h.CreateParent)
 	parents.GET("", h.ListParents)
 	parents.GET("/:id", h.GetParent)
 
 	return h
+}
+
+func (h *Handler) CreateParent(c echo.Context) error {
+	var req CreateParentRequest
+	if err := validator.BindAndValidate(c, &req); err != nil {
+		return err
+	}
+
+	var schoolID *uuid.UUID
+	if req.SchoolID != nil && *req.SchoolID != "" {
+		id, err := uuid.Parse(*req.SchoolID)
+		if err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+		schoolID = &id
+	}
+
+	parent, err := h.createParent.Handle(c.Request().Context(), application.CreateParentCommand{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		SchoolID:          schoolID,
+		Name:              req.Name,
+		Email:             req.Email,
+		Username:          req.Username,
+		Password:          req.Password,
+		FatherName:        req.FatherName,
+		MotherName:        req.MotherName,
+		FatherReligion:    req.FatherReligion,
+		MotherReligion:    req.MotherReligion,
+		PhoneNumber:       req.PhoneNumber,
+		Address:           req.Address,
+	})
+	if err != nil {
+		return handleAppError(c, err)
+	}
+
+	return c.JSON(http.StatusCreated, response.Response{
+		Success: true,
+		Message: "parent created",
+		Data:    toParentResponse(parent),
+	})
 }
 
 func (h *Handler) ListParents(c echo.Context) error {

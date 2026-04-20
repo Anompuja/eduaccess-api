@@ -57,6 +57,23 @@ func NewGormParentRepository(db *gorm.DB) *GormParentRepository {
 	return &GormParentRepository{db: db}
 }
 
+func (r *GormParentRepository) CreateParentProfile(ctx context.Context, p *domain.ParentProfile) error {
+	m := parentProfileModel{
+		ID:             p.ID,
+		UserID:         p.UserID,
+		SchoolID:       p.SchoolID,
+		FatherName:     p.FatherName,
+		MotherName:     p.MotherName,
+		FatherReligion: p.FatherReligion,
+		MotherReligion: p.MotherReligion,
+		PhoneNumber:    p.PhoneNumber,
+		Address:        p.Address,
+		CreatedAt:      p.CreatedAt,
+		UpdatedAt:      p.UpdatedAt,
+	}
+	return r.db.WithContext(ctx).Create(&m).Error
+}
+
 func (r *GormParentRepository) FindParentByID(ctx context.Context, id uuid.UUID) (*domain.ParentProfile, error) {
 	var row parentWithUser
 	sql := `

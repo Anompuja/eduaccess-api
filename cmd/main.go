@@ -175,6 +175,7 @@ func main() {
 	parentRepo := parentInfra.NewGormParentRepository(db)
 	parentHTTP.NewHandler(
 		v1,
+		parentApp.NewCreateParentHandler(userRepo, parentRepo),
 		parentApp.NewListParentsHandler(parentRepo),
 		parentApp.NewGetParentHandler(parentRepo),
 	)
