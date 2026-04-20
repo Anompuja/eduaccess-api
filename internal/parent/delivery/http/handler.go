@@ -21,6 +21,7 @@ type Handler struct {
 	listParents  *application.ListParentsHandler
 	getParent    *application.GetParentHandler
 	updateParent *application.UpdateParentHandler
+	deactivate   *application.DeactivateParentHandler
 }
 
 // NewHandler registers parent routes and returns the handler.
@@ -30,12 +31,14 @@ func NewHandler(
 	listParents *application.ListParentsHandler,
 	getParent *application.GetParentHandler,
 	updateParent *application.UpdateParentHandler,
+	deactivate *application.DeactivateParentHandler,
 ) *Handler {
 	h := &Handler{
 		createParent: createParent,
 		listParents:  listParents,
 		getParent:    getParent,
 		updateParent: updateParent,
+		deactivate:   deactivate,
 	}
 
 	parents := v1.Group("/parents", authmw.RequireAuth)
@@ -43,6 +46,7 @@ func NewHandler(
 	parents.GET("", h.ListParents)
 	parents.GET("/:id", h.GetParent)
 	parents.PUT("/:id", h.UpdateParent)
+	parents.DELETE("/:id", h.DeactivateParent)
 
 	return h
 }
@@ -155,6 +159,23 @@ func (h *Handler) UpdateParent(c echo.Context) error {
 	}
 
 	return response.OK(c, "parent updated", toParentResponse(parent))
+}
+
+func (h *Handler) DeactivateParent(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+
+	if err := h.deactivate.Handle(c.Request().Context(), application.DeactivateParentCommand{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		ParentID:          id,
+	}); err != nil {
+		return handleAppError(c, err)
+	}
+
+	return response.OK(c, "parent deactivated", nil)
 }
 
 func toParentResponse(p *domain.ParentProfile) ParentResponse {

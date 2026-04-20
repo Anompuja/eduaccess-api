@@ -179,6 +179,7 @@ func main() {
 		parentApp.NewListParentsHandler(parentRepo),
 		parentApp.NewGetParentHandler(parentRepo),
 		parentApp.NewUpdateParentHandler(parentRepo),
+		parentApp.NewDeactivateParentHandler(parentRepo),
 	)
 
 	// ── Admin module ──────────────────────────────────────────────────────────

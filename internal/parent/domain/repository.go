@@ -20,4 +20,5 @@ type ParentRepository interface {
 	FindParentByID(ctx context.Context, id uuid.UUID) (*ParentProfile, error)
 	ListParents(ctx context.Context, f ParentFilter) ([]*ParentProfile, int64, error)
 	UpdateParentProfile(ctx context.Context, profile *ParentProfile) error
+	SoftDeleteParent(ctx context.Context, id uuid.UUID) error
 }

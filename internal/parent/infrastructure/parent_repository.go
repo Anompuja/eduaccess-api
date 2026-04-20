@@ -155,6 +155,14 @@ func (r *GormParentRepository) UpdateParentProfile(ctx context.Context, p *domai
 		}).Error
 }
 
+func (r *GormParentRepository) SoftDeleteParent(ctx context.Context, id uuid.UUID) error {
+	now := time.Now()
+	return r.db.WithContext(ctx).
+		Table("parent_profiles").
+		Where("id = ?", id).
+		Updates(map[string]interface{}{"deleted_at": now, "updated_at": now}).Error
+}
+
 func toParentDomain(row parentWithUser) *domain.ParentProfile {
 	return &domain.ParentProfile{
 		ID:             row.ID,
