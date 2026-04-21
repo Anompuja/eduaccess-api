@@ -106,36 +106,165 @@ eduaccess-api/
 │ └── main.go # Entrypoint — wires all modules
 ├── database/
 │ └── migrations/
-│ └── 001_initial_schema.sql
+│ └── 001_initial_schema.sql # Full schema + seed data (roles, plans)
 ├── docs/ # Auto-generated Swagger docs
+│ ├── docs.go
+│ ├── swagger.json
+│ └── swagger.yaml
 ├── internal/
+│ ├── admin/ # Admin sekolah CRUD
+│ │ ├── application/
+│ │ │ ├── create_admin.go
+│ │ │ ├── deactivate_admin.go
+│ │ │ ├── get_admin.go
+│ │ │ ├── list_admins.go
+│ │ │ ├── update_admin.go
+│ │ │ ├── user_creator.go
+│ │ │ └── user_updater.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── admin.go
+│ │ │ └── repository.go
+│ │ └── infrastructure/
+│ │ └── admin_repository.go
 │ ├── auth/ # Register, login, refresh, logout
+│ │ ├── application/
+│ │ │ ├── login.go
+│ │ │ ├── logout.go
+│ │ │ ├── refresh.go
+│ │ │ └── register.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── repository.go
+│ │ │ └── user.go
+│ │ └── infrastructure/
+│ │ ├── refresh_token_repository.go
+│ │ ├── user_model.go
+│ │ └── user_repository.go
+│ ├── headmaster/ # Kepala sekolah CRUD
+│ │ ├── application/
+│ │ │ ├── create_headmaster.go
+│ │ │ ├── deactivate_headmaster.go
+│ │ │ ├── get_headmaster.go
+│ │ │ ├── list_headmasters.go
+│ │ │ ├── school_updater.go
+│ │ │ ├── update_headmaster.go
+│ │ │ └── user_creator.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── headmaster.go
+│ │ │ └── repository.go
+│ │ └── infrastructure/
+│ │ └── headmaster_repository.go
+│ ├── parent/ # Parent CRUD
+│ │ ├── application/
+│ │ │ ├── create_parent.go
+│ │ │ ├── deactivate_parent.go
+│ │ │ ├── get_parent.go
+│ │ │ ├── list_parents.go
+│ │ │ ├── update_parent.go
+│ │ │ └── user_creator.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── parent.go
+│ │ │ └── repository.go
+│ │ └── infrastructure/
+│ │ └── parent_repository.go
 │ ├── school/ # School CRUD, rules, subscriptions
-│ ├── student/ # Students, parents, academic structure
-│ ├── user/ # User management & profile
-│ └── shared/
-│ ├── apperror/ # Domain error types
-│ ├── middleware/ # JWT auth middleware
-│ ├── response/ # Consistent JSON response helpers
-│ └── validator/ # Request binding & validation
+│ │ ├── application/
+│ │ │ ├── create_school.go
+│ │ │ ├── deactivate_school.go
+│ │ │ ├── get_school.go
+│ │ │ ├── get_subscription.go
+│ │ │ ├── list_schools.go
+│ │ │ ├── manage_rules.go
+│ │ │ └── update_school.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── repository.go
+│ │ │ └── school.go
+│ │ └── infrastructure/
+│ │ └── school_repository.go
+│ ├── shared/ # Cross-cutting utilities
+│ │ ├── apperror/
+│ │ │ └── apperror.go # Domain error types
+│ │ ├── middleware/
+│ │ │ └── auth.go # JWT auth middleware
+│ │ ├── response/
+│ │ │ └── response.go # Consistent JSON response helpers
+│ │ └── validator/
+│ │ └── validator.go # Request binding & validation
+│ ├── student/ # Students, parents (linked), academic structure
+│ │ ├── application/
+│ │ │ ├── academic_handlers.go # Level / class / sub-class CRUD
+│ │ │ ├── create_parent.go
+│ │ │ ├── create_student.go
+│ │ │ ├── deactivate_student.go
+│ │ │ ├── get_student.go
+│ │ │ ├── list_students.go
+│ │ │ ├── manage_parent_link.go # Link / unlink parent ↔ student
+│ │ │ ├── parent_handlers.go
+│ │ │ ├── update_student.go
+│ │ │ └── user_creator.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ ├── handler.go
+│ │ │ └── student_handler.go
+│ │ ├── domain/
+│ │ │ ├── academic.go
+│ │ │ ├── parent.go
+│ │ │ ├── repository.go
+│ │ │ ├── student_profile.go
+│ │ │ └── student_repository.go
+│ │ └── infrastructure/
+│ │ ├── academic_repository.go
+│ │ ├── parent_repository.go
+│ │ └── student_profile_repository.go
+│ └── user/ # Platform user management & profile
+│ ├── application/
+│ │ ├── change_password.go
+│ │ ├── deactivate_user.go
+│ │ ├── get_user.go
+│ │ ├── list_users.go
+│ │ ├── repository.go
+│ │ └── update_user.go
+│ ├── delivery/http/
+│ │ ├── dto.go
+│ │ └── handler.go
+│ └── infrastructure/
+│ └── user_repository.go
 ├── pkg/
-│ ├── database/ # GORM connection setup
-│ └── jwt/ # Token generation & parsing
-├── .env.example # Copy this to .env
+│ ├── database/
+│ │ └── database.go # GORM connection setup
+│ └── jwt/
+│ └── jwt.go # Token generation & parsing
+├── .env.example
 ├── docker-compose.yml
-└── Dockerfile
+├── Dockerfile
+├── go.mod
+└── go.sum
 
 ```
 
-Each domain follows a clean architecture layout:
+Each domain module follows the same clean architecture layout:
 
 ```
 
 internal/<domain>/
-├── application/ # Use-case handlers (business logic)
-├── delivery/http/ # HTTP handlers & DTOs
-├── domain/ # Entities, interfaces, constants
-└── infrastructure/# GORM repositories
+├── application/ # Use-case handlers — business logic, no HTTP concerns
+├── delivery/http/ # Echo handlers + request/response DTOs
+├── domain/ # Entities, repository interfaces, domain constants
+└── infrastructure/ # GORM repository implementations
 
 ````
 
@@ -195,44 +324,29 @@ The compose file mounts `database/migrations/` into Postgres so the schema is ap
 
 ---
 
-### Option B — Connect to Supabase
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. In the Supabase dashboard go to **Settings → Database → Connection string → URI** and copy the connection string.
-3. Set it in your `.env`:
-
-```dotenv
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require
-JWT_SECRET=your-long-random-secret
-```
-
-4. Apply the initial migration. You can paste the contents of `database/migrations/001_initial_schema.sql` into the Supabase SQL editor, or run it via `psql`:
-
-```bash
-psql "$DATABASE_URL" -f database/migrations/001_initial_schema.sql
-```
-
-5. Start the API:
-
-```bash
-go run ./cmd/main.go
-```
-
----
-
 ### Run Without Docker
 
-```bash
-# Install dependencies
-go mod download
+Steps for anyone cloning this repo for the first time:
 
-# (Optional) Regenerate Swagger docs after changing annotations
-go install github.com/swaggo/swag/cmd/swag@latest
+```bash
+# 1. Clone the repo
+git clone https://github.com/your-org/eduaccess-api.git
+cd eduaccess-api
+
+# Install / tidy Go dependencies
+go mod tidy
+
+# Copy the environment file and fill in your values
+cp .env.example .env
+# Open .env and set DATABASE_URL and JWT_SECRET at minimum
+
 swag init -g cmd/main.go --output docs
 
-# Run
+# 6. Run the server
 go run ./cmd/main.go
 ```
+
+The server starts at `http://localhost:8080` and Swagger UI is at `http://localhost:8080/swagger/index.html`.
 
 ### Run Together With Flutter Frontend
 
