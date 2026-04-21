@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/eduaccess/eduaccess-api/internal/academic/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
-	"github.com/eduaccess/eduaccess-api/internal/student/domain"
 	"github.com/google/uuid"
 )
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	academicdomain "github.com/eduaccess/eduaccess-api/internal/academic/domain"
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/student/domain"
@@ -41,10 +42,10 @@ type CreateStudentCommand struct {
 type CreateStudentHandler struct {
 	users    UserCreator
 	repo     domain.StudentRepository
-	academic domain.AcademicRepository
+	academic academicdomain.AcademicRepository
 }
 
-func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository, academic domain.AcademicRepository) *CreateStudentHandler {
+func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository, academic academicdomain.AcademicRepository) *CreateStudentHandler {
 	return &CreateStudentHandler{users: users, repo: repo, academic: academic}
 }
 

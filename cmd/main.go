@@ -15,6 +15,9 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	_ "github.com/eduaccess/eduaccess-api/docs"
+	academicApp "github.com/eduaccess/eduaccess-api/internal/academic/application"
+	academicHTTP "github.com/eduaccess/eduaccess-api/internal/academic/delivery/http"
+	academicInfra "github.com/eduaccess/eduaccess-api/internal/academic/infrastructure"
 	adminApp "github.com/eduaccess/eduaccess-api/internal/admin/application"
 	adminHTTP "github.com/eduaccess/eduaccess-api/internal/admin/delivery/http"
 	adminInfra "github.com/eduaccess/eduaccess-api/internal/admin/infrastructure"
@@ -142,7 +145,7 @@ func main() {
 
 	// ── Student module ────────────────────────────────────────────────────────
 	studentRepo := studentInfra.NewGormStudentRepository(db)
-	academicRepo := studentInfra.NewGormAcademicRepository(db)
+	academicRepo := academicInfra.NewGormAcademicRepository(db)
 	studentHTTP.NewHandler(
 		v1,
 		studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo),
@@ -157,18 +160,23 @@ func main() {
 		studentApp.NewGetParentHandler(studentRepo),
 		studentApp.NewUpdateParentHandler(studentRepo),
 		studentApp.NewDeactivateParentHandler(studentRepo),
-		studentApp.NewCreateLevelHandler(academicRepo),
-		studentApp.NewListLevelsHandler(academicRepo),
-		studentApp.NewUpdateLevelHandler(academicRepo),
-		studentApp.NewDeleteLevelHandler(academicRepo),
-		studentApp.NewCreateClassHandler(academicRepo),
-		studentApp.NewListClassesHandler(academicRepo),
-		studentApp.NewUpdateClassHandler(academicRepo),
-		studentApp.NewDeleteClassHandler(academicRepo),
-		studentApp.NewCreateSubClassHandler(academicRepo),
-		studentApp.NewListSubClassesHandler(academicRepo),
-		studentApp.NewUpdateSubClassHandler(academicRepo),
-		studentApp.NewDeleteSubClassHandler(academicRepo),
+	)
+
+	// â”€â”€ Academic module â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+	academicHTTP.NewHandler(
+		v1,
+		academicApp.NewCreateLevelHandler(academicRepo),
+		academicApp.NewListLevelsHandler(academicRepo),
+		academicApp.NewUpdateLevelHandler(academicRepo),
+		academicApp.NewDeleteLevelHandler(academicRepo),
+		academicApp.NewCreateClassHandler(academicRepo),
+		academicApp.NewListClassesHandler(academicRepo),
+		academicApp.NewUpdateClassHandler(academicRepo),
+		academicApp.NewDeleteClassHandler(academicRepo),
+		academicApp.NewCreateSubClassHandler(academicRepo),
+		academicApp.NewListSubClassesHandler(academicRepo),
+		academicApp.NewUpdateSubClassHandler(academicRepo),
+		academicApp.NewDeleteSubClassHandler(academicRepo),
 	)
 
 	// Parent module
