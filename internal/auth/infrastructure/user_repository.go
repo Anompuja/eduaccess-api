@@ -86,7 +86,6 @@ func (r *GormUserRepository) Create(ctx context.Context, user *domain.User) erro
 			Name:      user.Name,
 			Username:  user.Username,
 			Email:     user.Email,
-			Password:  user.Password,
 			Avatar:    user.Avatar,
 			Verified:  user.Verified,
 			CreatedAt: user.CreatedAt,

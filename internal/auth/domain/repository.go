@@ -15,10 +15,3 @@ type UserRepository interface {
 	ExistsByUsername(ctx context.Context, username string) (bool, error)
 }
 
-// RefreshTokenRepository defines persistence operations for refresh tokens.
-type RefreshTokenRepository interface {
-	Create(ctx context.Context, rt *RefreshToken) error
-	FindByToken(ctx context.Context, token string) (*RefreshToken, error)
-	DeleteByToken(ctx context.Context, token string) error
-	DeleteByUserID(ctx context.Context, userID uuid.UUID) error
-}

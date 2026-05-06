@@ -42,11 +42,3 @@ func (u *User) IsActive() bool {
 	return u.DeletedAt == nil
 }
 
-// RefreshToken is the domain entity for the refresh_tokens table.
-type RefreshToken struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Token     string
-	ExpiresAt time.Time
-	CreatedAt time.Time
-}

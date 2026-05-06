@@ -34,6 +34,7 @@ import (
 	schoolHTTP "github.com/eduaccess/eduaccess-api/internal/school/delivery/http"
 	schoolInfra "github.com/eduaccess/eduaccess-api/internal/school/infrastructure"
 	appvalidator "github.com/eduaccess/eduaccess-api/internal/shared/validator"
+	storageHTTP "github.com/eduaccess/eduaccess-api/internal/storage/delivery/http"
 	studentApp "github.com/eduaccess/eduaccess-api/internal/student/application"
 	studentHTTP "github.com/eduaccess/eduaccess-api/internal/student/delivery/http"
 	studentInfra "github.com/eduaccess/eduaccess-api/internal/student/infrastructure"
@@ -41,6 +42,7 @@ import (
 	userHTTP "github.com/eduaccess/eduaccess-api/internal/user/delivery/http"
 	userInfra "github.com/eduaccess/eduaccess-api/internal/user/infrastructure"
 	"github.com/eduaccess/eduaccess-api/pkg/database"
+	supabasePkg "github.com/eduaccess/eduaccess-api/pkg/supabase"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
@@ -60,7 +62,7 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description Type "Bearer" followed by a space and JWT token.
+// @description Type "Bearer" followed by a space and a Supabase JWT.
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, reading from environment")
@@ -70,6 +72,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
+
+	supabase := supabasePkg.NewClient()
 
 	e := echo.New()
 	e.HideBanner = true
@@ -97,15 +101,11 @@ func main() {
 	v1 := e.Group("/api/v1")
 
 	// ── Auth module ───────────────────────────────────────────────────────────
-	userRepo := authInfra.NewGormUserRepository(db)
-	rtRepo := authInfra.NewGormRefreshTokenRepository(db)
-	authHTTP.NewHandler(
-		v1,
-		authApp.NewRegisterHandler(userRepo),
-		authApp.NewLoginHandler(userRepo, rtRepo),
-		authApp.NewRefreshHandler(userRepo, rtRepo),
-		authApp.NewLogoutHandler(rtRepo),
-	)
+	// Login, register, and session management are handled by Supabase Auth SDK
+	// on the frontend. The backend validates Supabase JWTs in middleware.
+	userRepo := authInfra.NewSupabaseUserRepository(db, supabase)
+	registerHandler := authApp.NewRegisterHandler(userRepo)
+	authHTTP.NewHandler(v1, registerHandler, supabase)
 
 	// ── User management module ────────────────────────────────────────────────
 	userMgmtRepo := userInfra.NewGormUserManagementRepository(db)
@@ -113,9 +113,9 @@ func main() {
 		v1,
 		userApp.NewListUsersHandler(userMgmtRepo),
 		userApp.NewGetUserHandler(userMgmtRepo),
-		userApp.NewUpdateUserHandler(userMgmtRepo),
+		userApp.NewUpdateUserHandler(userMgmtRepo, supabase),
 		userApp.NewDeactivateUserHandler(userMgmtRepo),
-		userApp.NewChangePasswordHandler(userMgmtRepo),
+		userApp.NewChangePasswordHandler(userMgmtRepo, supabase),
 	)
 
 	// ── School setup module ───────────────────────────────────────────────────
@@ -162,7 +162,7 @@ func main() {
 		studentApp.NewDeactivateParentHandler(studentRepo),
 	)
 
-	// â”€â”€ Academic module â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+	// ── Academic module ───────────────────────────────────────────────────────
 	academicHTTP.NewHandler(
 		v1,
 		academicApp.NewCreateLevelHandler(academicRepo),
@@ -179,7 +179,7 @@ func main() {
 		academicApp.NewDeleteSubClassHandler(academicRepo),
 	)
 
-	// Parent module
+	// ── Parent module ─────────────────────────────────────────────────────────
 	parentRepo := parentInfra.NewGormParentRepository(db)
 	parentHTTP.NewHandler(
 		v1,
@@ -201,7 +201,14 @@ func main() {
 		adminApp.NewDeactivateAdminHandler(adminRepo),
 	)
 
-	port := os.Getenv("APP_PORT")
+	// ── Storage module ────────────────────────────────────────────────────────
+	storageHTTP.NewHandler(v1, supabase)
+
+	// Resolve port — Heroku injects $PORT at runtime
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = os.Getenv("APP_PORT")
+	}
 	if port == "" {
 		port = "8080"
 	}
@@ -212,8 +219,8 @@ func main() {
 
 	go func() {
 		addr := fmt.Sprintf(":%s", port)
-		log.Printf(" Server is running at http://localhost:%s", port)
-		log.Printf(" Swagger documentation at http://localhost:%s/swagger/index.html", port)
+		log.Printf("Server is running at http://localhost:%s", port)
+		log.Printf("Swagger documentation at http://localhost:%s/swagger/index.html", port)
 		if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server error: %v", err)
 		}

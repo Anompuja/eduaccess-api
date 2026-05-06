@@ -872,7 +872,7 @@ const docTemplate = `{
         },
         "/auth/login": {
             "post": {
-                "description": "Authenticates a user and returns an access + refresh token pair.",
+                "description": "Authenticates via Supabase Auth and returns a JWT. Use the access_token as Bearer token for subsequent requests.",
                 "consumes": [
                     "application/json"
                 ],
@@ -906,17 +906,11 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.TokenResponse"
+                                            "$ref": "#/definitions/http.LoginResponse"
                                         }
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
@@ -924,92 +918,25 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
                     }
                 }
             }
         },
-        "/auth/logout": {
-            "post": {
-                "description": "Revokes the provided refresh token.",
-                "consumes": [
-                    "application/json"
+        "/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
                 ],
+                "description": "Returns the user ID, school, and role extracted from the Supabase JWT.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "auth"
                 ],
-                "summary": "Logout",
-                "parameters": [
-                    {
-                        "description": "Refresh token to revoke",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/http.LogoutRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/refresh": {
-            "post": {
-                "description": "Issues a new access + refresh token pair, rotating the refresh token.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Refresh tokens",
-                "parameters": [
-                    {
-                        "description": "Refresh token",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/http.RefreshRequest"
-                        }
-                    }
-                ],
+                "summary": "Current user identity",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1022,27 +949,15 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.TokenResponse"
+                                            "$ref": "#/definitions/http.MeResponse"
                                         }
                                     }
                                 }
                             ]
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
                     "401": {
                         "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1052,7 +967,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Creates a new user account. Superadmin accounts cannot be created via this endpoint.",
+                "description": "Creates a Supabase Auth account and a public profile with role and school assignment.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1101,18 +1016,6 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Conflict",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1518,7 +1421,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateParentRequest"
+                            "$ref": "#/definitions/internal_student_delivery_http.CreateParentRequest"
                         }
                     }
                 ],
@@ -1648,7 +1551,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateParentRequest"
+                            "$ref": "#/definitions/internal_student_delivery_http.UpdateParentRequest"
                         }
                     }
                 ],
@@ -2307,6 +2210,126 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/storage/signed-url": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates a time-limited signed URL for a private bucket file.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "storage"
+                ],
+                "summary": "Get signed URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bucket name",
+                        "name": "bucket",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "File path within bucket",
+                        "name": "path",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.SignedURLResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/storage/upload": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Uploads a multipart file to a Supabase Storage bucket and returns the public URL.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "storage"
+                ],
+                "summary": "Upload a file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bucket name (avatars|school-images|documents|profile-photos)",
+                        "name": "bucket",
+                        "in": "query"
+                    },
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.UploadResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -3207,56 +3230,6 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateParentRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "father_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "father_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "mother_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "mother_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 3
-                }
-            }
-        },
         "http.CreateSchoolRequest": {
             "type": "object",
             "required": [
@@ -3483,13 +3456,33 @@ const docTemplate = `{
                 }
             }
         },
-        "http.LogoutRequest": {
+        "http.LoginResponse": {
             "type": "object",
-            "required": [
-                "refresh_token"
-            ],
             "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
                 "refresh_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.MeResponse": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }
@@ -3540,17 +3533,6 @@ const docTemplate = `{
                 }
             }
         },
-        "http.RefreshRequest": {
-            "type": "object",
-            "required": [
-                "refresh_token"
-            ],
-            "properties": {
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
         "http.RegisterRequest": {
             "type": "object",
             "required": [
@@ -3564,29 +3546,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
+                    "type": "string"
                 },
                 "password": {
                     "type": "string",
                     "minLength": 8
                 },
                 "role": {
-                    "type": "string",
-                    "enum": [
-                        "admin_sekolah",
-                        "kepala_sekolah",
-                        "guru",
-                        "staff",
-                        "orangtua",
-                        "siswa"
-                    ]
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
                 },
                 "username": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 3
+                    "type": "string"
                 }
             }
         },
@@ -3682,6 +3655,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.SignedURLResponse": {
+            "type": "object",
+            "properties": {
+                "url": {
                     "type": "string"
                 }
             }
@@ -3821,17 +3802,6 @@ const docTemplate = `{
                 }
             }
         },
-        "http.TokenResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
         "http.UpdateAdminRequest": {
             "type": "object",
             "properties": {
@@ -3920,34 +3890,6 @@ const docTemplate = `{
                 "religion": {
                     "type": "string",
                     "maxLength": 100
-                }
-            }
-        },
-        "http.UpdateParentRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "father_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "father_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "mother_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "mother_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
                 }
             }
         },
@@ -4074,6 +4016,20 @@ const docTemplate = `{
                 }
             }
         },
+        "http.UploadResponse": {
+            "type": "object",
+            "properties": {
+                "bucket": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "http.UpsertRulesRequest": {
             "type": "object",
             "required": [
@@ -4121,6 +4077,56 @@ const docTemplate = `{
                 },
                 "verified": {
                     "type": "boolean"
+                }
+            }
+        },
+        "internal_student_delivery_http.CreateParentRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "father_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "father_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "mother_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "mother_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
                 }
             }
         },
@@ -4174,6 +4180,34 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_student_delivery_http.UpdateParentRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "father_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "father_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "mother_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "mother_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                }
+            }
+        },
         "response.PaginatedResponse": {
             "type": "object",
             "properties": {
@@ -4221,7 +4255,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "description": "Type \"Bearer\" followed by a space and a Supabase JWT.",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

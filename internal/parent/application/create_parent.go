@@ -88,9 +88,8 @@ func (h *CreateParentHandler) Handle(ctx context.Context, cmd CreateParentComman
 	}
 
 	now := time.Now()
-	userID := uuid.New()
 	user := &authdomain.User{
-		ID:        userID,
+		ID:        uuid.New(),
 		SchoolID:  schoolID,
 		Role:      authdomain.RoleOrangTua,
 		Name:      cmd.Name,
@@ -105,6 +104,9 @@ func (h *CreateParentHandler) Handle(ctx context.Context, cmd CreateParentComman
 	if err := h.users.Create(ctx, user); err != nil {
 		return nil, err
 	}
+
+	// Capture the Supabase-assigned UUID after creation
+	userID := user.ID
 
 	profile := &domain.ParentProfile{
 		ID:             uuid.New(),

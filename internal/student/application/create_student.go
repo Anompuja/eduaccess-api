@@ -113,9 +113,8 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 		return nil, err
 	}
 
-	userID := uuid.New()
 	user := &authdomain.User{
-		ID:        userID,
+		ID:        uuid.New(),
 		SchoolID:  schoolID,
 		Role:      authdomain.RoleSiswa,
 		Name:      cmd.Name,
@@ -130,6 +129,7 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 	if err := h.users.Create(ctx, user); err != nil {
 		return nil, err
 	}
+	userID := user.ID
 
 	profile := &domain.StudentProfile{
 		ID:                uuid.New(),

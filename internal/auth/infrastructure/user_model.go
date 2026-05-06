@@ -7,43 +7,37 @@ import (
 	"github.com/google/uuid"
 )
 
-// userModel maps to the users table.
+// userModel maps to the users table (password managed by Supabase Auth).
 type userModel struct {
-	ID               uuid.UUID  `gorm:"type:uuid;primaryKey"`
-	Name             string
-	Username         string
-	Email            string
-	Password         string
-	Avatar           string
-	QrCode           *string
-	EmailVerifiedAt  *time.Time
-	VerificationCode *string
-	Verified         bool
-	DeletedAt        *time.Time
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
+	ID        uuid.UUID  `gorm:"type:uuid;primaryKey"`
+	Name      string
+	Username  string
+	Email     string
+	Avatar    string
+	QrCode    *string
+	Verified  bool
+	DeletedAt *time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (userModel) TableName() string { return "users" }
 
 // userWithRole is a scan target for the JOIN query used by FindByEmail/FindByID.
 type userWithRole struct {
-	ID               uuid.UUID  `gorm:"column:id"`
-	Name             string     `gorm:"column:name"`
-	Username         string     `gorm:"column:username"`
-	Email            string     `gorm:"column:email"`
-	Password         string     `gorm:"column:password"`
-	Avatar           string     `gorm:"column:avatar"`
-	QrCode           *string    `gorm:"column:qr_code"`
-	EmailVerifiedAt  *time.Time `gorm:"column:email_verified_at"`
-	VerificationCode *string    `gorm:"column:verification_code"`
-	Verified         bool       `gorm:"column:verified"`
-	DeletedAt        *time.Time `gorm:"column:deleted_at"`
-	CreatedAt        time.Time  `gorm:"column:created_at"`
-	UpdatedAt        time.Time  `gorm:"column:updated_at"`
-	RoleID           *uuid.UUID `gorm:"column:role_id"`
-	RoleName         *string    `gorm:"column:role_name"`
-	SchoolID         *uuid.UUID `gorm:"column:school_id"`
+	ID        uuid.UUID  `gorm:"column:id"`
+	Name      string     `gorm:"column:name"`
+	Username  string     `gorm:"column:username"`
+	Email     string     `gorm:"column:email"`
+	Avatar    string     `gorm:"column:avatar"`
+	QrCode    *string    `gorm:"column:qr_code"`
+	Verified  bool       `gorm:"column:verified"`
+	DeletedAt *time.Time `gorm:"column:deleted_at"`
+	CreatedAt time.Time  `gorm:"column:created_at"`
+	UpdatedAt time.Time  `gorm:"column:updated_at"`
+	RoleID    *uuid.UUID `gorm:"column:role_id"`
+	RoleName  *string    `gorm:"column:role_name"`
+	SchoolID  *uuid.UUID `gorm:"column:school_id"`
 }
 
 func (r *userWithRole) toDomain() *domain.User {
@@ -54,7 +48,6 @@ func (r *userWithRole) toDomain() *domain.User {
 		Name:      r.Name,
 		Username:  r.Username,
 		Email:     r.Email,
-		Password:  r.Password,
 		Avatar:    r.Avatar,
 		Verified:  r.Verified,
 		DeletedAt: r.DeletedAt,
@@ -95,33 +88,3 @@ type schoolUserModel struct {
 
 func (schoolUserModel) TableName() string { return "school_users" }
 
-// refreshTokenModel maps to the refresh_tokens table.
-type refreshTokenModel struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
-	UserID    uuid.UUID `gorm:"type:uuid"`
-	Token     string
-	ExpiresAt time.Time
-	CreatedAt time.Time
-}
-
-func (refreshTokenModel) TableName() string { return "refresh_tokens" }
-
-func refreshTokenModelFromDomain(rt *domain.RefreshToken) *refreshTokenModel {
-	return &refreshTokenModel{
-		ID:        rt.ID,
-		UserID:    rt.UserID,
-		Token:     rt.Token,
-		ExpiresAt: rt.ExpiresAt,
-		CreatedAt: rt.CreatedAt,
-	}
-}
-
-func (m *refreshTokenModel) toDomain() *domain.RefreshToken {
-	return &domain.RefreshToken{
-		ID:        m.ID,
-		UserID:    m.UserID,
-		Token:     m.Token,
-		ExpiresAt: m.ExpiresAt,
-		CreatedAt: m.CreatedAt,
-	}
-}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
+	supabasePkg "github.com/eduaccess/eduaccess-api/pkg/supabase"
 	"github.com/google/uuid"
 )
 
@@ -23,11 +24,12 @@ type UpdateUserCommand struct {
 
 // UpdateUserHandler handles the UpdateUserCommand.
 type UpdateUserHandler struct {
-	users UserWriteRepository
+	users    UserWriteRepository
+	supabase *supabasePkg.Client
 }
 
-func NewUpdateUserHandler(users UserWriteRepository) *UpdateUserHandler {
-	return &UpdateUserHandler{users: users}
+func NewUpdateUserHandler(users UserWriteRepository, supabase *supabasePkg.Client) *UpdateUserHandler {
+	return &UpdateUserHandler{users: users, supabase: supabase}
 }
 
 func (h *UpdateUserHandler) Handle(ctx context.Context, cmd UpdateUserCommand) (*domain.User, error) {
@@ -40,6 +42,13 @@ func (h *UpdateUserHandler) Handle(ctx context.Context, cmd UpdateUserCommand) (
 	if cmd.RequesterRole != domain.RoleSuperadmin {
 		if user.SchoolID == nil || cmd.RequesterSchoolID == nil || *user.SchoolID != *cmd.RequesterSchoolID {
 			return nil, apperror.New(apperror.ErrForbidden, "access denied")
+		}
+	}
+
+	// If email is being updated, sync to Supabase Auth first
+	if cmd.Email != nil && *cmd.Email != user.Email {
+		if err := h.supabase.UpdateUserEmail(ctx, user.ID, *cmd.Email); err != nil {
+			return nil, err
 		}
 	}
 

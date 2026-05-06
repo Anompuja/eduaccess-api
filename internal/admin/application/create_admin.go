@@ -97,9 +97,8 @@ func (h *CreateAdminHandler) Handle(ctx context.Context, cmd CreateAdminCommand)
 	}
 
 	now := time.Now()
-	userID := uuid.New()
 	user := &authdomain.User{
-		ID:        userID,
+		ID:        uuid.New(),
 		SchoolID:  schoolID,
 		Role:      authdomain.RoleAdminSekolah,
 		Name:      cmd.Name,
@@ -114,6 +113,9 @@ func (h *CreateAdminHandler) Handle(ctx context.Context, cmd CreateAdminCommand)
 	if err := h.users.Create(ctx, user); err != nil {
 		return nil, err
 	}
+
+	// Capture the Supabase-assigned UUID after creation
+	userID := user.ID
 
 	profile := &domain.AdminProfile{
 		ID:           uuid.New(),

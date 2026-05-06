@@ -95,9 +95,8 @@ func (h *CreateHeadmasterHandler) Handle(ctx context.Context, cmd CreateHeadmast
 		return nil, err
 	}
 
-	userID := uuid.New()
 	user := &authdomain.User{
-		ID:        userID,
+		ID:        uuid.New(),
 		SchoolID:  schoolID,
 		Role:      authdomain.RoleKepalaSekolah,
 		Name:      cmd.Name,
@@ -112,6 +111,9 @@ func (h *CreateHeadmasterHandler) Handle(ctx context.Context, cmd CreateHeadmast
 	if err := h.users.Create(ctx, user); err != nil {
 		return nil, err
 	}
+
+	// Capture the Supabase-assigned UUID after creation
+	userID := user.ID
 
 	profile := &domain.HeadmasterProfile{
 		ID:           uuid.New(),

@@ -8,7 +8,6 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // RegisterCommand is the input for the register use-case.
@@ -18,7 +17,7 @@ type RegisterCommand struct {
 	Name     string
 	Username string  // optional — derived from email prefix if blank
 	Email    string
-	Password string
+	Password string  // plaintext; Supabase Auth will hash it
 }
 
 // RegisterResult is returned on success.
@@ -36,7 +35,6 @@ func NewRegisterHandler(users domain.UserRepository) *RegisterHandler {
 }
 
 func (h *RegisterHandler) Handle(ctx context.Context, cmd RegisterCommand) (*RegisterResult, error) {
-	// Derive username from email prefix when not supplied
 	username := cmd.Username
 	if username == "" {
 		parts := strings.SplitN(cmd.Email, "@", 2)
@@ -59,20 +57,14 @@ func (h *RegisterHandler) Handle(ctx context.Context, cmd RegisterCommand) (*Reg
 		return nil, apperror.New(apperror.ErrConflict, "username already taken")
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(cmd.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, apperror.New(apperror.ErrInternal, "failed to hash password")
-	}
-
 	now := time.Now()
 	user := &domain.User{
-		ID:        uuid.New(),
 		SchoolID:  cmd.SchoolID,
 		Role:      cmd.Role,
 		Name:      cmd.Name,
 		Username:  username,
 		Email:     cmd.Email,
-		Password:  string(hash),
+		Password:  cmd.Password, // passed to Supabase Admin API, never stored in our DB
 		Avatar:    "default.png",
 		Verified:  false,
 		CreatedAt: now,
@@ -80,7 +72,7 @@ func (h *RegisterHandler) Handle(ctx context.Context, cmd RegisterCommand) (*Reg
 	}
 
 	if err := h.users.Create(ctx, user); err != nil {
-		return nil, err // already an AppError from repo
+		return nil, err
 	}
 
 	return &RegisterResult{UserID: user.ID}, nil
