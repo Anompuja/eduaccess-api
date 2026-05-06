@@ -48,8 +48,8 @@ Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and Postg
 ````json
 POST /api/v1/auth/login
 {
-  "email": "adminsekolah2@gmail.com",
-  "password": "password"
+  "email": "superadmin@eduaccess.com",
+  "password": "Test1234!"
 }
 ```(this is not a superadmin account for a better case this is admin_sekolah account)
 
