@@ -68,6 +68,8 @@ func NewHandler(
 
 	// Students
 	h.registerStudentRoutes(v1, auth)
+	// Parents
+	h.registerParentRoutes(v1, auth)
 
 	return h
 }

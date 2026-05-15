@@ -24,6 +24,9 @@ import (
 	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
 	authHTTP "github.com/eduaccess/eduaccess-api/internal/auth/delivery/http"
 	authInfra "github.com/eduaccess/eduaccess-api/internal/auth/infrastructure"
+	dashboardApp "github.com/eduaccess/eduaccess-api/internal/dashboard/application"
+	dashboardHTTP "github.com/eduaccess/eduaccess-api/internal/dashboard/delivery/http"
+	dashboardInfra "github.com/eduaccess/eduaccess-api/internal/dashboard/infrastructure"
 	headmasterApp "github.com/eduaccess/eduaccess-api/internal/headmaster/application"
 	headmasterHTTP "github.com/eduaccess/eduaccess-api/internal/headmaster/delivery/http"
 	headmasterInfra "github.com/eduaccess/eduaccess-api/internal/headmaster/infrastructure"
@@ -130,6 +133,13 @@ func main() {
 		schoolApp.NewListRulesHandler(schoolRepo),
 		schoolApp.NewUpsertRulesHandler(schoolRepo),
 		schoolApp.NewGetSubscriptionHandler(schoolRepo),
+	)
+
+	// ── Dashboard module ──────────────────────────────────────────────────────
+	dashboardRepo := dashboardInfra.NewGormDashboardRepository(db)
+	dashboardHTTP.NewHandler(
+		v1,
+		dashboardApp.NewGetStatsHandler(dashboardRepo),
 	)
 
 	// ── Headmaster module ─────────────────────────────────────────────────────

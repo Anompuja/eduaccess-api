@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/headmaster/application"
 	"github.com/eduaccess/eduaccess-api/internal/headmaster/domain"
@@ -80,7 +81,7 @@ func (h *Handler) Create(c echo.Context) error {
 		schoolID = &parsed
 	}
 
-	profile, err := h.create.Handle(c.Request().Context(), application.CreateHeadmasterCommand{
+	cmd := application.CreateHeadmasterCommand{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		SchoolID:          schoolID,
@@ -93,10 +94,13 @@ func (h *Handler) Create(c echo.Context) error {
 		Gender:            req.Gender,
 		Religion:          req.Religion,
 		BirthPlace:        req.BirthPlace,
-		BirthDate:         req.BirthDate,
 		NIK:               req.NIK,
 		KTPImagePath:      req.KTPImagePath,
-	})
+	}
+	if err := parseDateField(req.BirthDate, &cmd.BirthDate); err != nil {
+		return response.BadRequest(c, "birth_date must be YYYY-MM-DD")
+	}
+	profile, err := h.create.Handle(c.Request().Context(), cmd)
 	if err != nil {
 		return handleAppError(c, err)
 	}
@@ -201,7 +205,7 @@ func (h *Handler) Update(c echo.Context) error {
 		return err
 	}
 
-	profile, err := h.update.Handle(c.Request().Context(), application.UpdateHeadmasterCommand{
+	cmd2 := application.UpdateHeadmasterCommand{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		HeadmasterID:      id,
@@ -210,10 +214,13 @@ func (h *Handler) Update(c echo.Context) error {
 		Gender:            req.Gender,
 		Religion:          req.Religion,
 		BirthPlace:        req.BirthPlace,
-		BirthDate:         req.BirthDate,
 		NIK:               req.NIK,
 		KTPImagePath:      req.KTPImagePath,
-	})
+	}
+	if err := parseDateField(req.BirthDate, &cmd2.BirthDate); err != nil {
+		return response.BadRequest(c, "birth_date must be YYYY-MM-DD")
+	}
+	profile, err := h.update.Handle(c.Request().Context(), cmd2)
 	if err != nil {
 		return handleAppError(c, err)
 	}
@@ -272,6 +279,18 @@ func toHeadmasterResponse(p *domain.HeadmasterProfile) HeadmasterResponse {
 		CreatedAt:    p.CreatedAt,
 		UpdatedAt:    p.UpdatedAt,
 	}
+}
+
+func parseDateField(src *string, dst **time.Time) error {
+	if src == nil || *src == "" {
+		return nil
+	}
+	t, err := time.Parse("2006-01-02", *src)
+	if err != nil {
+		return err
+	}
+	*dst = &t
+	return nil
 }
 
 func parseUUID(c echo.Context, param string) (uuid.UUID, error) {

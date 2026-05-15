@@ -100,7 +100,7 @@ func (h *Handler) CreateLevel(c echo.Context) error {
 		return err
 	}
 	level, err := h.createLevel.Handle(c.Request().Context(), application.CreateLevelCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		Name:              req.Name,
 	})
@@ -120,7 +120,7 @@ func (h *Handler) CreateLevel(c echo.Context) error {
 //	@Router       /academic/levels [get]
 func (h *Handler) ListLevels(c echo.Context) error {
 	levels, err := h.listLevels.Handle(c.Request().Context(), application.ListLevelsQuery{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 	})
 	if err != nil {
@@ -154,7 +154,7 @@ func (h *Handler) UpdateLevel(c echo.Context) error {
 		return err
 	}
 	level, err := h.updateLevel.Handle(c.Request().Context(), application.UpdateLevelCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		LevelID:           id,
 		Name:              req.Name,
@@ -180,7 +180,7 @@ func (h *Handler) DeleteLevel(c echo.Context) error {
 		return err
 	}
 	if err := h.deleteLevel.Handle(c.Request().Context(), application.DeleteLevelCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		LevelID:           id,
 	}); err != nil {
@@ -209,7 +209,7 @@ func (h *Handler) CreateClass(c echo.Context) error {
 		return response.BadRequest(c, "invalid level_id")
 	}
 	class, err := h.createClass.Handle(c.Request().Context(), application.CreateClassCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		LevelID:           levelID,
 		Name:              req.Name,
@@ -231,7 +231,7 @@ func (h *Handler) CreateClass(c echo.Context) error {
 //	@Router       /academic/classes [get]
 func (h *Handler) ListClasses(c echo.Context) error {
 	q := application.ListClassesQuery{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 	}
 	if raw := c.QueryParam("level_id"); raw != "" {
@@ -271,7 +271,7 @@ func (h *Handler) UpdateClass(c echo.Context) error {
 		return err
 	}
 	class, err := h.updateClass.Handle(c.Request().Context(), application.UpdateClassCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		ClassID:           id,
 		Name:              req.Name,
@@ -297,7 +297,7 @@ func (h *Handler) DeleteClass(c echo.Context) error {
 		return err
 	}
 	if err := h.deleteClass.Handle(c.Request().Context(), application.DeleteClassCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		ClassID:           id,
 	}); err != nil {
@@ -326,7 +326,7 @@ func (h *Handler) CreateSubClass(c echo.Context) error {
 		return response.BadRequest(c, "invalid class_id")
 	}
 	sub, err := h.createSubClass.Handle(c.Request().Context(), application.CreateSubClassCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		ClassID:           classID,
 		Name:              req.Name,
@@ -348,7 +348,7 @@ func (h *Handler) CreateSubClass(c echo.Context) error {
 //	@Router       /academic/sub-classes [get]
 func (h *Handler) ListSubClasses(c echo.Context) error {
 	q := application.ListSubClassesQuery{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 	}
 	if raw := c.QueryParam("class_id"); raw != "" {
@@ -388,7 +388,7 @@ func (h *Handler) UpdateSubClass(c echo.Context) error {
 		return err
 	}
 	sub, err := h.updateSubClass.Handle(c.Request().Context(), application.UpdateSubClassCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		SubClassID:        id,
 		Name:              req.Name,
@@ -414,7 +414,7 @@ func (h *Handler) DeleteSubClass(c echo.Context) error {
 		return err
 	}
 	if err := h.deleteSubClass.Handle(c.Request().Context(), application.DeleteSubClassCommand{
-		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterSchoolID: getSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		SubClassID:        id,
 	}); err != nil {
@@ -453,6 +453,23 @@ func toSubClassResponse(s *domain.SubClass) SubClassResponse {
 		CreatedAt: s.CreatedAt,
 		UpdatedAt: s.UpdatedAt,
 	}
+}
+
+// getSchoolID returns the school UUID for the current request.
+// For superadmin (whose JWT has no school_id) it falls back to the
+// ?school_id=<uuid> query parameter so they can target a specific school.
+func getSchoolID(c echo.Context) *uuid.UUID {
+	if id := authmw.GetSchoolID(c); id != nil {
+		return id
+	}
+	if authmw.GetRole(c) == "superadmin" {
+		if raw := c.QueryParam("school_id"); raw != "" {
+			if id, err := uuid.Parse(raw); err == nil {
+				return &id
+			}
+		}
+	}
+	return nil
 }
 
 func parseUUID(c echo.Context, param string) (uuid.UUID, error) {

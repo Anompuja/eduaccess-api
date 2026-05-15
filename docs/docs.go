@@ -1075,6 +1075,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a school summary with counts for users, academics, attendance, and subscription status.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dashboard"
+                ],
+                "summary": "Get dashboard stats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.DashboardStatsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/headmasters": {
             "get": {
                 "security": [
@@ -3414,6 +3477,139 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 191,
                     "minLength": 1
+                }
+            }
+        },
+        "http.DashboardAttendanceResponse": {
+            "type": "object",
+            "properties": {
+                "absent": {
+                    "type": "integer"
+                },
+                "excused": {
+                    "type": "integer"
+                },
+                "late": {
+                    "type": "integer"
+                },
+                "present": {
+                    "type": "integer"
+                },
+                "rate": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.DashboardCountsResponse": {
+            "type": "object",
+            "properties": {
+                "academic_years": {
+                    "type": "integer"
+                },
+                "active_enrollments": {
+                    "type": "integer"
+                },
+                "active_students": {
+                    "type": "integer"
+                },
+                "admins": {
+                    "type": "integer"
+                },
+                "classes": {
+                    "type": "integer"
+                },
+                "classrooms": {
+                    "type": "integer"
+                },
+                "education_levels": {
+                    "type": "integer"
+                },
+                "enrollments": {
+                    "type": "integer"
+                },
+                "headmasters": {
+                    "type": "integer"
+                },
+                "parents": {
+                    "type": "integer"
+                },
+                "schedules": {
+                    "type": "integer"
+                },
+                "school_users": {
+                    "type": "integer"
+                },
+                "staff": {
+                    "type": "integer"
+                },
+                "students": {
+                    "type": "integer"
+                },
+                "sub_classes": {
+                    "type": "integer"
+                },
+                "subjects": {
+                    "type": "integer"
+                },
+                "teachers": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.DashboardSchoolResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "time_zone": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.DashboardStatsResponse": {
+            "type": "object",
+            "properties": {
+                "attendance": {
+                    "$ref": "#/definitions/http.DashboardAttendanceResponse"
+                },
+                "counts": {
+                    "$ref": "#/definitions/http.DashboardCountsResponse"
+                },
+                "school": {
+                    "$ref": "#/definitions/http.DashboardSchoolResponse"
+                },
+                "subscription": {
+                    "$ref": "#/definitions/http.DashboardSubscriptionResponse"
+                }
+            }
+        },
+        "http.DashboardSubscriptionResponse": {
+            "type": "object",
+            "properties": {
+                "cycle": {
+                    "type": "string"
+                },
+                "ends_at": {
+                    "type": "string"
+                },
+                "plan_name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },

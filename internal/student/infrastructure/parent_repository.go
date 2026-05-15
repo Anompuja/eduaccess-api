@@ -236,10 +236,17 @@ JOIN users u ON u.id = pp.user_id
 WHERE spl.student_id = ?`
 
 	type linkRow struct {
-		parentLinkModel
-		PpID           uuid.UUID `gorm:"column:pp_id"`
-		PpSchoolID     uuid.UUID `gorm:"column:pp_school_id"`
-		PpUserID       uuid.UUID `gorm:"column:pp_user_id"`
+		ID           uuid.UUID `gorm:"column:id"`
+		SchoolID     uuid.UUID `gorm:"column:school_id"`
+		StudentID    uuid.UUID `gorm:"column:student_id"`
+		ParentID     uuid.UUID `gorm:"column:parent_id"`
+		Relationship string    `gorm:"column:relationship"`
+		IsPrimary    bool      `gorm:"column:is_primary"`
+		CreatedAt    time.Time `gorm:"column:created_at"`
+		UpdatedAt    time.Time `gorm:"column:updated_at"`
+		PpID         uuid.UUID `gorm:"column:pp_id"`
+		PpSchoolID   uuid.UUID `gorm:"column:pp_school_id"`
+		PpUserID     uuid.UUID `gorm:"column:pp_user_id"`
 		FatherName     string    `gorm:"column:father_name"`
 		MotherName     string    `gorm:"column:mother_name"`
 		PpPhone        string    `gorm:"column:pp_phone"`
