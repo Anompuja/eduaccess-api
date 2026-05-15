@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
+	authDomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
@@ -16,11 +17,12 @@ import (
 type Handler struct {
 	register *authApp.RegisterHandler
 	supabase *supabasePkg.Client
+	userRepo authDomain.UserRepository
 }
 
 // NewHandler registers auth routes on the given group.
-func NewHandler(v1 *echo.Group, register *authApp.RegisterHandler, supabase *supabasePkg.Client) *Handler {
-	h := &Handler{register: register, supabase: supabase}
+func NewHandler(v1 *echo.Group, register *authApp.RegisterHandler, supabase *supabasePkg.Client, userRepo authDomain.UserRepository) *Handler {
+	h := &Handler{register: register, supabase: supabase, userRepo: userRepo}
 
 	auth := v1.Group("/auth")
 	auth.POST("/register", h.Register)
@@ -92,11 +94,29 @@ func (h *Handler) Login(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 
+	user, err := h.userRepo.FindByEmail(c.Request().Context(), req.Email)
+	if err != nil {
+		return handleAppError(c, err)
+	}
+
+	userInfo := LoginUserInfo{
+		ID:     user.ID.String(),
+		Name:   user.Name,
+		Email:  user.Email,
+		Role:   user.Role,
+		Avatar: user.Avatar,
+	}
+	if user.SchoolID != nil {
+		s := user.SchoolID.String()
+		userInfo.SchoolID = &s
+	}
+
 	return response.OK(c, "login successful", LoginResponse{
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 		TokenType:    token.TokenType,
 		ExpiresIn:    token.ExpiresIn,
+		User:         userInfo,
 	})
 }
 

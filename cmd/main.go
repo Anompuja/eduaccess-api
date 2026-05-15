@@ -108,7 +108,7 @@ func main() {
 	// on the frontend. The backend validates Supabase JWTs in middleware.
 	userRepo := authInfra.NewSupabaseUserRepository(db, supabase)
 	registerHandler := authApp.NewRegisterHandler(userRepo)
-	authHTTP.NewHandler(v1, registerHandler, supabase)
+	authHTTP.NewHandler(v1, registerHandler, supabase, userRepo)
 
 	// ── User management module ────────────────────────────────────────────────
 	userMgmtRepo := userInfra.NewGormUserManagementRepository(db)
