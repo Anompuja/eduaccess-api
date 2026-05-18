@@ -93,9 +93,19 @@ func (h *Handler) ListParents(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
 
+	var schoolFilter *uuid.UUID
+	if raw := c.QueryParam("school_id"); raw != "" {
+		parsed, err := uuid.Parse(raw)
+		if err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+		schoolFilter = &parsed
+	}
+
 	result, err := h.listParents.Handle(c.Request().Context(), application.ListParentsQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
+		SchoolIDFilter:    schoolFilter,
 		Search:            c.QueryParam("search"),
 		Page:              page,
 		PerPage:           perPage,

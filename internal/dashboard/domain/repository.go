@@ -8,8 +8,9 @@ import (
 )
 
 // Repository defines the dashboard statistics use case.
+// A nil schoolID means "aggregate across all schools" — only valid for superadmin.
 type Repository interface {
-	GetStats(ctx context.Context, schoolID uuid.UUID) (*Stats, error)
+	GetStats(ctx context.Context, schoolID *uuid.UUID) (*Stats, error)
 }
 
 // Stats is the aggregated dashboard payload for one school.

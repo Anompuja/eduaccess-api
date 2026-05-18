@@ -34,6 +34,10 @@ func (r *SupabaseUserRepository) FindByEmail(ctx context.Context, email string) 
 	return r.gorm.FindByEmail(ctx, email)
 }
 
+func (r *SupabaseUserRepository) FindByEmailIncludingDeleted(ctx context.Context, email string) (*domain.User, error) {
+	return r.gorm.FindByEmailIncludingDeleted(ctx, email)
+}
+
 func (r *SupabaseUserRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	return r.gorm.FindByID(ctx, id)
 }

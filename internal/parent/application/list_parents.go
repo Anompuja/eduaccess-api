@@ -12,9 +12,12 @@ import (
 type ListParentsQuery struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
-	Search            string
-	Page              int
-	PerPage           int
+	// SchoolIDFilter is honored only for superadmin to scope the listing
+	// to a single school. Ignored for non-superadmin (their JWT school is enforced).
+	SchoolIDFilter *uuid.UUID
+	Search         string
+	Page           int
+	PerPage        int
 }
 
 type ListParentsResult struct {
@@ -43,7 +46,9 @@ func (h *ListParentsHandler) Handle(ctx context.Context, q ListParentsQuery) (*L
 	}
 
 	var schoolID *uuid.UUID
-	if q.RequesterRole != authdomain.RoleSuperadmin {
+	if q.RequesterRole == authdomain.RoleSuperadmin {
+		schoolID = q.SchoolIDFilter // optional; nil = all schools
+	} else {
 		if q.RequesterSchoolID == nil {
 			return nil, apperror.New(apperror.ErrForbidden, "school context required")
 		}

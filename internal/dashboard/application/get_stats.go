@@ -27,15 +27,14 @@ func NewGetStatsHandler(repo dashboarddomain.Repository) *GetStatsHandler {
 }
 
 // Handle resolves the school scope and returns the dashboard snapshot.
+// Superadmin: schoolID is optional; nil means aggregate across all schools.
+// Scoped roles: schoolID always derived from JWT; query param must match if provided.
 func (h *GetStatsHandler) Handle(ctx context.Context, q GetStatsQuery) (*dashboarddomain.Stats, error) {
 	var schoolID *uuid.UUID
 
 	switch q.RequesterRole {
 	case authdomain.RoleSuperadmin:
-		if q.SchoolID == nil {
-			return nil, apperror.New(apperror.ErrBadRequest, "school_id is required for superadmin")
-		}
-		schoolID = q.SchoolID
+		schoolID = q.SchoolID // nil = aggregate all schools
 	default:
 		if q.RequesterSchoolID == nil {
 			return nil, apperror.New(apperror.ErrForbidden, "school_id is missing from the token")
@@ -46,5 +45,5 @@ func (h *GetStatsHandler) Handle(ctx context.Context, q GetStatsQuery) (*dashboa
 		schoolID = q.RequesterSchoolID
 	}
 
-	return h.repo.GetStats(ctx, *schoolID)
+	return h.repo.GetStats(ctx, schoolID)
 }

@@ -3,6 +3,8 @@ package http
 import (
 	"errors"
 	"net/http"
+	"net/mail"
+	"strings"
 
 	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
 	authDomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
@@ -85,17 +87,39 @@ func (h *Handler) Login(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
 	}
-	if err := c.Validate(&req); err != nil {
-		return response.BadRequest(c, err.Error())
+	if validationErr := validateLoginRequest(req); validationErr != nil {
+		return c.JSON(validationErr.status, response.Response{
+			Success: false,
+			Message: validationErr.message,
+			Errors:  validationErr.errors,
+		})
 	}
 
-	token, err := h.supabase.SignIn(c.Request().Context(), req.Email, req.Password)
+	email := strings.TrimSpace(req.Email)
+	user, err := h.userRepo.FindByEmailIncludingDeleted(c.Request().Context(), email)
 	if err != nil {
+		if errors.Is(err, apperror.ErrNotFound) {
+			return response.Unauthorized(c, "login failed", map[string]string{
+				"Email": "tidak ditemukan",
+			})
+		}
 		return handleAppError(c, err)
 	}
 
-	user, err := h.userRepo.FindByEmail(c.Request().Context(), req.Email)
+	if !user.IsActive() {
+		return response.Forbidden(c, "akun tidak aktif", map[string]string{
+			"Account": "tidak aktif",
+		})
+	}
+
+	token, err := h.supabase.SignIn(c.Request().Context(), email, req.Password)
 	if err != nil {
+		var appErr *apperror.AppError
+		if errors.As(err, &appErr) && errors.Is(appErr.Err, apperror.ErrUnauthorized) {
+			return response.Unauthorized(c, "login failed", map[string]string{
+				"Password": "salah",
+			})
+		}
 		return handleAppError(c, err)
 	}
 
@@ -200,4 +224,41 @@ func handleAppError(c echo.Context, err error) error {
 		Success: false,
 		Message: "internal server error",
 	})
+}
+
+type loginValidationError struct {
+	status  int
+	message string
+	errors  map[string]string
+}
+
+func validateLoginRequest(req LoginRequest) *loginValidationError {
+	fieldErrors := map[string]string{}
+	status := http.StatusBadRequest
+
+	email := strings.TrimSpace(req.Email)
+	if email == "" {
+		fieldErrors["email"] = "Email wajib diisi"
+	} else if _, err := mail.ParseAddress(email); err != nil {
+		fieldErrors["email"] = "Format email tidak valid"
+		status = http.StatusUnprocessableEntity
+	}
+
+	if strings.TrimSpace(req.Password) == "" {
+		fieldErrors["password"] = "Password wajib diisi"
+	}
+
+	if len(fieldErrors) == 0 {
+		return nil
+	}
+
+	if fieldErrors["email"] == "Format email tidak valid" {
+		status = http.StatusUnprocessableEntity
+	}
+
+	return &loginValidationError{
+		status:  status,
+		message: "validasi login gagal",
+		errors:  fieldErrors,
+	}
 }
