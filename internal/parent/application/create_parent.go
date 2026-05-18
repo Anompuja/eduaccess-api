@@ -24,12 +24,9 @@ type CreateParentCommand struct {
 	Username string
 	Password string
 	// Profile fields
-	FatherName     string
-	MotherName     string
-	FatherReligion string
-	MotherReligion string
-	PhoneNumber    string
-	Address        string
+	Religion    string
+	PhoneNumber string
+	Address     string
 }
 
 // CreateParentHandler creates a user (role=orangtua) + parent_profile atomically.
@@ -109,21 +106,18 @@ func (h *CreateParentHandler) Handle(ctx context.Context, cmd CreateParentComman
 	userID := user.ID
 
 	profile := &domain.ParentProfile{
-		ID:             uuid.New(),
-		UserID:         userID,
-		SchoolID:       *schoolID,
-		FatherName:     cmd.FatherName,
-		MotherName:     cmd.MotherName,
-		FatherReligion: cmd.FatherReligion,
-		MotherReligion: cmd.MotherReligion,
-		PhoneNumber:    cmd.PhoneNumber,
-		Address:        cmd.Address,
-		Name:           cmd.Name,
-		Email:          cmd.Email,
-		Username:       username,
-		Avatar:         "default.png",
-		CreatedAt:      now,
-		UpdatedAt:      now,
+		ID:          uuid.New(),
+		UserID:      userID,
+		SchoolID:    *schoolID,
+		Religion:    cmd.Religion,
+		PhoneNumber: cmd.PhoneNumber,
+		Address:     cmd.Address,
+		Name:        cmd.Name,
+		Email:       cmd.Email,
+		Username:    username,
+		Avatar:      "default.png",
+		CreatedAt:   now,
+		UpdatedAt:   now,
 	}
 	if err := h.repo.CreateParentProfile(ctx, profile); err != nil {
 		return nil, err

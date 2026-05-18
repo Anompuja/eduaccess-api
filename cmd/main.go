@@ -196,7 +196,7 @@ func main() {
 		parentApp.NewCreateParentHandler(userRepo, parentRepo),
 		parentApp.NewListParentsHandler(parentRepo),
 		parentApp.NewGetParentHandler(parentRepo),
-		parentApp.NewUpdateParentHandler(parentRepo),
+		parentApp.NewUpdateParentHandler(userMgmtRepo, parentRepo),
 		parentApp.NewDeactivateParentHandler(parentRepo),
 	)
 

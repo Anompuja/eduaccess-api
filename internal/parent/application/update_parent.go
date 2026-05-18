@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
@@ -14,20 +15,20 @@ type UpdateParentCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
 	ParentID          uuid.UUID
-	FatherName        *string
-	MotherName        *string
-	FatherReligion    *string
-	MotherReligion    *string
+	Name              *string
+	Email             *string
+	Religion          *string
 	PhoneNumber       *string
 	Address           *string
 }
 
 type UpdateParentHandler struct {
-	repo domain.ParentRepository
+	users UserUpdater
+	repo  domain.ParentRepository
 }
 
-func NewUpdateParentHandler(repo domain.ParentRepository) *UpdateParentHandler {
-	return &UpdateParentHandler{repo: repo}
+func NewUpdateParentHandler(users UserUpdater, repo domain.ParentRepository) *UpdateParentHandler {
+	return &UpdateParentHandler{users: users, repo: repo}
 }
 
 func (h *UpdateParentHandler) Handle(ctx context.Context, cmd UpdateParentCommand) (*domain.ParentProfile, error) {
@@ -45,17 +46,30 @@ func (h *UpdateParentHandler) Handle(ctx context.Context, cmd UpdateParentComman
 		}
 	}
 
-	if cmd.FatherName != nil {
-		profile.FatherName = *cmd.FatherName
+	user, err := h.users.FindByID(ctx, profile.UserID)
+	if err != nil {
+		return nil, apperror.New(apperror.ErrNotFound, "user not found")
 	}
-	if cmd.MotherName != nil {
-		profile.MotherName = *cmd.MotherName
+
+	if cmd.Email != nil && !strings.EqualFold(user.Email, *cmd.Email) {
+		exists, err := h.users.ExistsByEmail(ctx, *cmd.Email)
+		if err != nil {
+			return nil, err
+		}
+		if exists {
+			return nil, apperror.New(apperror.ErrConflict, "email already in use")
+		}
+		user.Email = *cmd.Email
+		profile.Email = *cmd.Email
 	}
-	if cmd.FatherReligion != nil {
-		profile.FatherReligion = *cmd.FatherReligion
+
+	if cmd.Name != nil {
+		user.Name = *cmd.Name
+		profile.Name = *cmd.Name
 	}
-	if cmd.MotherReligion != nil {
-		profile.MotherReligion = *cmd.MotherReligion
+
+	if cmd.Religion != nil {
+		profile.Religion = *cmd.Religion
 	}
 	if cmd.PhoneNumber != nil {
 		profile.PhoneNumber = *cmd.PhoneNumber
@@ -64,7 +78,13 @@ func (h *UpdateParentHandler) Handle(ctx context.Context, cmd UpdateParentComman
 		profile.Address = *cmd.Address
 	}
 
-	profile.UpdatedAt = time.Now()
+	now := time.Now()
+	user.UpdatedAt = now
+	profile.UpdatedAt = now
+
+	if err := h.users.Update(ctx, user); err != nil {
+		return nil, err
+	}
 	if err := h.repo.UpdateParentProfile(ctx, profile); err != nil {
 		return nil, err
 	}
