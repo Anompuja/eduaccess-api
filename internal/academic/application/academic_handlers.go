@@ -57,10 +57,7 @@ func NewListLevelsHandler(repo domain.AcademicRepository) *ListLevelsHandler {
 
 func (h *ListLevelsHandler) Handle(ctx context.Context, q ListLevelsQuery) ([]*domain.EducationLevel, error) {
 	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
-	if schoolID == nil {
-		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
-	}
-	return h.repo.ListLevels(ctx, *schoolID)
+	return h.repo.ListLevels(ctx, schoolID)
 }
 
 type UpdateLevelCommand struct {
@@ -172,10 +169,7 @@ func NewListClassesHandler(repo domain.AcademicRepository) *ListClassesHandler {
 
 func (h *ListClassesHandler) Handle(ctx context.Context, q ListClassesQuery) ([]*domain.Class, error) {
 	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
-	if schoolID == nil {
-		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
-	}
-	return h.repo.ListClasses(ctx, *schoolID, q.LevelID)
+	return h.repo.ListClasses(ctx, schoolID, q.LevelID)
 }
 
 type UpdateClassCommand struct {
@@ -287,10 +281,7 @@ func NewListSubClassesHandler(repo domain.AcademicRepository) *ListSubClassesHan
 
 func (h *ListSubClassesHandler) Handle(ctx context.Context, q ListSubClassesQuery) ([]*domain.SubClass, error) {
 	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
-	if schoolID == nil {
-		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
-	}
-	return h.repo.ListSubClasses(ctx, *schoolID, q.ClassID)
+	return h.repo.ListSubClasses(ctx, schoolID, q.ClassID)
 }
 
 type UpdateSubClassCommand struct {
@@ -349,6 +340,491 @@ func (h *DeleteSubClassHandler) Handle(ctx context.Context, cmd DeleteSubClassCo
 		return err
 	}
 	return h.repo.SoftDeleteSubClass(ctx, cmd.SubClassID)
+}
+
+// ── Academic Years ────────────────────────────────────────────────────────────
+
+type CreateAcademicYearCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	Name              string
+	StartDate         time.Time
+	EndDate           time.Time
+	Description       string
+}
+
+type CreateAcademicYearHandler struct{ repo domain.AcademicRepository }
+
+func NewCreateAcademicYearHandler(repo domain.AcademicRepository) *CreateAcademicYearHandler {
+	return &CreateAcademicYearHandler{repo: repo}
+}
+
+func (h *CreateAcademicYearHandler) Handle(ctx context.Context, cmd CreateAcademicYearCommand) (*domain.AcademicYear, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	schoolID := resolveSchoolID(cmd.RequesterRole, cmd.RequesterSchoolID)
+	if schoolID == nil {
+		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
+	}
+	ay := &domain.AcademicYear{
+		ID: uuid.New(), SchoolID: *schoolID, Name: cmd.Name, StartDate: cmd.StartDate,
+		EndDate: cmd.EndDate, Description: cmd.Description, CreatedAt: time.Now(), UpdatedAt: time.Now(),
+	}
+	if err := h.repo.CreateAcademicYear(ctx, ay); err != nil {
+		return nil, err
+	}
+	return ay, nil
+}
+
+type ListAcademicYearsQuery struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+}
+
+type ListAcademicYearsHandler struct{ repo domain.AcademicRepository }
+
+func NewListAcademicYearsHandler(repo domain.AcademicRepository) *ListAcademicYearsHandler {
+	return &ListAcademicYearsHandler{repo: repo}
+}
+
+func (h *ListAcademicYearsHandler) Handle(ctx context.Context, q ListAcademicYearsQuery) ([]*domain.AcademicYear, error) {
+	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
+	return h.repo.ListAcademicYears(ctx, schoolID)
+}
+
+type UpdateAcademicYearCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	AcademicYearID    uuid.UUID
+	Name              string
+	StartDate         time.Time
+	EndDate           time.Time
+	Description       string
+}
+
+type UpdateAcademicYearHandler struct{ repo domain.AcademicRepository }
+
+func NewUpdateAcademicYearHandler(repo domain.AcademicRepository) *UpdateAcademicYearHandler {
+	return &UpdateAcademicYearHandler{repo: repo}
+}
+
+func (h *UpdateAcademicYearHandler) Handle(ctx context.Context, cmd UpdateAcademicYearCommand) (*domain.AcademicYear, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	ay, err := h.repo.FindAcademicYearByID(ctx, cmd.AcademicYearID)
+	if err != nil {
+		return nil, err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, ay.SchoolID); err != nil {
+		return nil, err
+	}
+	ay.Name = cmd.Name
+	ay.StartDate = cmd.StartDate
+	ay.EndDate = cmd.EndDate
+	ay.Description = cmd.Description
+	ay.UpdatedAt = time.Now()
+	if err := h.repo.UpdateAcademicYear(ctx, ay); err != nil {
+		return nil, err
+	}
+	return ay, nil
+}
+
+type DeleteAcademicYearCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	AcademicYearID    uuid.UUID
+}
+
+type DeleteAcademicYearHandler struct{ repo domain.AcademicRepository }
+
+func NewDeleteAcademicYearHandler(repo domain.AcademicRepository) *DeleteAcademicYearHandler {
+	return &DeleteAcademicYearHandler{repo: repo}
+}
+
+func (h *DeleteAcademicYearHandler) Handle(ctx context.Context, cmd DeleteAcademicYearCommand) error {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return err
+	}
+	ay, err := h.repo.FindAcademicYearByID(ctx, cmd.AcademicYearID)
+	if err != nil {
+		return err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, ay.SchoolID); err != nil {
+		return err
+	}
+	return h.repo.SoftDeleteAcademicYear(ctx, cmd.AcademicYearID)
+}
+
+type ActivateAcademicYearCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	AcademicYearID    uuid.UUID
+}
+
+type ActivateAcademicYearHandler struct{ repo domain.AcademicRepository }
+
+func NewActivateAcademicYearHandler(repo domain.AcademicRepository) *ActivateAcademicYearHandler {
+	return &ActivateAcademicYearHandler{repo: repo}
+}
+
+func (h *ActivateAcademicYearHandler) Handle(ctx context.Context, cmd ActivateAcademicYearCommand) error {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return err
+	}
+	schoolID := resolveSchoolID(cmd.RequesterRole, cmd.RequesterSchoolID)
+	if schoolID == nil {
+		return apperror.New(apperror.ErrBadRequest, "school context required")
+	}
+	ay, err := h.repo.FindAcademicYearByID(ctx, cmd.AcademicYearID)
+	if err != nil {
+		return err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, ay.SchoolID); err != nil {
+		return err
+	}
+	return h.repo.ActivateAcademicYear(ctx, cmd.AcademicYearID, *schoolID)
+}
+
+// ── Subjects ──────────────────────────────────────────────────────────────────
+
+type CreateSubjectCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	Name              string
+	Category          string
+}
+
+type CreateSubjectHandler struct{ repo domain.AcademicRepository }
+
+func NewCreateSubjectHandler(repo domain.AcademicRepository) *CreateSubjectHandler {
+	return &CreateSubjectHandler{repo: repo}
+}
+
+func (h *CreateSubjectHandler) Handle(ctx context.Context, cmd CreateSubjectCommand) (*domain.Subject, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	schoolID := resolveSchoolID(cmd.RequesterRole, cmd.RequesterSchoolID)
+	if schoolID == nil {
+		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
+	}
+	s := &domain.Subject{ID: uuid.New(), SchoolID: *schoolID, Name: cmd.Name, Category: cmd.Category, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	if err := h.repo.CreateSubject(ctx, s); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+type ListSubjectsQuery struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+}
+
+type ListSubjectsHandler struct{ repo domain.AcademicRepository }
+
+func NewListSubjectsHandler(repo domain.AcademicRepository) *ListSubjectsHandler {
+	return &ListSubjectsHandler{repo: repo}
+}
+
+func (h *ListSubjectsHandler) Handle(ctx context.Context, q ListSubjectsQuery) ([]*domain.Subject, error) {
+	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
+	return h.repo.ListSubjects(ctx, schoolID)
+}
+
+type UpdateSubjectCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	SubjectID         uuid.UUID
+	Name              string
+	Category          string
+}
+
+type UpdateSubjectHandler struct{ repo domain.AcademicRepository }
+
+func NewUpdateSubjectHandler(repo domain.AcademicRepository) *UpdateSubjectHandler {
+	return &UpdateSubjectHandler{repo: repo}
+}
+
+func (h *UpdateSubjectHandler) Handle(ctx context.Context, cmd UpdateSubjectCommand) (*domain.Subject, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	s, err := h.repo.FindSubjectByID(ctx, cmd.SubjectID)
+	if err != nil {
+		return nil, err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, s.SchoolID); err != nil {
+		return nil, err
+	}
+	s.Name = cmd.Name
+	s.Category = cmd.Category
+	s.UpdatedAt = time.Now()
+	if err := h.repo.UpdateSubject(ctx, s); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+type DeleteSubjectCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	SubjectID         uuid.UUID
+}
+
+type DeleteSubjectHandler struct{ repo domain.AcademicRepository }
+
+func NewDeleteSubjectHandler(repo domain.AcademicRepository) *DeleteSubjectHandler {
+	return &DeleteSubjectHandler{repo: repo}
+}
+
+func (h *DeleteSubjectHandler) Handle(ctx context.Context, cmd DeleteSubjectCommand) error {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return err
+	}
+	s, err := h.repo.FindSubjectByID(ctx, cmd.SubjectID)
+	if err != nil {
+		return err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, s.SchoolID); err != nil {
+		return err
+	}
+	return h.repo.SoftDeleteSubject(ctx, cmd.SubjectID)
+}
+
+// ── Classrooms ────────────────────────────────────────────────────────────────
+
+type CreateClassroomCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	Name              string
+	Capacity          int
+	Floor             int
+	Building          string
+	RoomType          string
+	Status            string
+	Facilities        string
+}
+
+type CreateClassroomHandler struct{ repo domain.AcademicRepository }
+
+func NewCreateClassroomHandler(repo domain.AcademicRepository) *CreateClassroomHandler {
+	return &CreateClassroomHandler{repo: repo}
+}
+
+func (h *CreateClassroomHandler) Handle(ctx context.Context, cmd CreateClassroomCommand) (*domain.Classroom, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	schoolID := resolveSchoolID(cmd.RequesterRole, cmd.RequesterSchoolID)
+	if schoolID == nil {
+		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
+	}
+	status := cmd.Status
+	if status == "" {
+		status = "available"
+	}
+	c := &domain.Classroom{ID: uuid.New(), SchoolID: *schoolID, Name: cmd.Name, Capacity: cmd.Capacity, Floor: cmd.Floor, Building: cmd.Building, RoomType: cmd.RoomType, Status: status, Facilities: cmd.Facilities, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	if err := h.repo.CreateClassroom(ctx, c); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+type ListClassroomsQuery struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+}
+
+type ListClassroomsHandler struct{ repo domain.AcademicRepository }
+
+func NewListClassroomsHandler(repo domain.AcademicRepository) *ListClassroomsHandler {
+	return &ListClassroomsHandler{repo: repo}
+}
+
+func (h *ListClassroomsHandler) Handle(ctx context.Context, q ListClassroomsQuery) ([]*domain.Classroom, error) {
+	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
+	return h.repo.ListClassrooms(ctx, schoolID)
+}
+
+type UpdateClassroomCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	ClassroomID       uuid.UUID
+	Name              string
+	Capacity          int
+	Floor             int
+	Building          string
+	RoomType          string
+	Status            string
+	Facilities        string
+}
+
+type UpdateClassroomHandler struct{ repo domain.AcademicRepository }
+
+func NewUpdateClassroomHandler(repo domain.AcademicRepository) *UpdateClassroomHandler {
+	return &UpdateClassroomHandler{repo: repo}
+}
+
+func (h *UpdateClassroomHandler) Handle(ctx context.Context, cmd UpdateClassroomCommand) (*domain.Classroom, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	c, err := h.repo.FindClassroomByID(ctx, cmd.ClassroomID)
+	if err != nil {
+		return nil, err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, c.SchoolID); err != nil {
+		return nil, err
+	}
+	c.Name = cmd.Name
+	c.Capacity = cmd.Capacity
+	c.Floor = cmd.Floor
+	c.Building = cmd.Building
+	c.RoomType = cmd.RoomType
+	c.Status = cmd.Status
+	c.Facilities = cmd.Facilities
+	c.UpdatedAt = time.Now()
+	if err := h.repo.UpdateClassroom(ctx, c); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+type DeleteClassroomCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	ClassroomID       uuid.UUID
+}
+
+type DeleteClassroomHandler struct{ repo domain.AcademicRepository }
+
+func NewDeleteClassroomHandler(repo domain.AcademicRepository) *DeleteClassroomHandler {
+	return &DeleteClassroomHandler{repo: repo}
+}
+
+func (h *DeleteClassroomHandler) Handle(ctx context.Context, cmd DeleteClassroomCommand) error {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return err
+	}
+	c, err := h.repo.FindClassroomByID(ctx, cmd.ClassroomID)
+	if err != nil {
+		return err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, c.SchoolID); err != nil {
+		return err
+	}
+	return h.repo.SoftDeleteClassroom(ctx, cmd.ClassroomID)
+}
+
+// ── Schedules ─────────────────────────────────────────────────────────────────
+
+type CreateScheduleCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	ShiftType         string
+	StartTime         string
+	EndTime           string
+}
+
+type CreateScheduleHandler struct{ repo domain.AcademicRepository }
+
+func NewCreateScheduleHandler(repo domain.AcademicRepository) *CreateScheduleHandler {
+	return &CreateScheduleHandler{repo: repo}
+}
+
+func (h *CreateScheduleHandler) Handle(ctx context.Context, cmd CreateScheduleCommand) (*domain.Schedule, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	schoolID := resolveSchoolID(cmd.RequesterRole, cmd.RequesterSchoolID)
+	if schoolID == nil {
+		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
+	}
+	s := &domain.Schedule{ID: uuid.New(), SchoolID: *schoolID, ShiftType: cmd.ShiftType, StartTime: cmd.StartTime, EndTime: cmd.EndTime, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	if err := h.repo.CreateSchedule(ctx, s); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+type ListSchedulesQuery struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+}
+
+type ListSchedulesHandler struct{ repo domain.AcademicRepository }
+
+func NewListSchedulesHandler(repo domain.AcademicRepository) *ListSchedulesHandler {
+	return &ListSchedulesHandler{repo: repo}
+}
+
+func (h *ListSchedulesHandler) Handle(ctx context.Context, q ListSchedulesQuery) ([]*domain.Schedule, error) {
+	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
+	return h.repo.ListSchedules(ctx, schoolID)
+}
+
+type UpdateScheduleCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	ScheduleID        uuid.UUID
+	ShiftType         string
+	StartTime         string
+	EndTime           string
+}
+
+type UpdateScheduleHandler struct{ repo domain.AcademicRepository }
+
+func NewUpdateScheduleHandler(repo domain.AcademicRepository) *UpdateScheduleHandler {
+	return &UpdateScheduleHandler{repo: repo}
+}
+
+func (h *UpdateScheduleHandler) Handle(ctx context.Context, cmd UpdateScheduleCommand) (*domain.Schedule, error) {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return nil, err
+	}
+	s, err := h.repo.FindScheduleByID(ctx, cmd.ScheduleID)
+	if err != nil {
+		return nil, err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, s.SchoolID); err != nil {
+		return nil, err
+	}
+	s.ShiftType = cmd.ShiftType
+	s.StartTime = cmd.StartTime
+	s.EndTime = cmd.EndTime
+	s.UpdatedAt = time.Now()
+	if err := h.repo.UpdateSchedule(ctx, s); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+type DeleteScheduleCommand struct {
+	RequesterSchoolID *uuid.UUID
+	RequesterRole     string
+	ScheduleID        uuid.UUID
+}
+
+type DeleteScheduleHandler struct{ repo domain.AcademicRepository }
+
+func NewDeleteScheduleHandler(repo domain.AcademicRepository) *DeleteScheduleHandler {
+	return &DeleteScheduleHandler{repo: repo}
+}
+
+func (h *DeleteScheduleHandler) Handle(ctx context.Context, cmd DeleteScheduleCommand) error {
+	if err := guardWrite(cmd.RequesterRole); err != nil {
+		return err
+	}
+	s, err := h.repo.FindScheduleByID(ctx, cmd.ScheduleID)
+	if err != nil {
+		return err
+	}
+	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, s.SchoolID); err != nil {
+		return err
+	}
+	return h.repo.SoftDeleteSchedule(ctx, cmd.ScheduleID)
 }
 
 // ── helpers ───────────────────────────────────────────────────────────────────

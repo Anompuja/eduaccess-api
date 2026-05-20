@@ -187,6 +187,23 @@ func main() {
 		academicApp.NewListSubClassesHandler(academicRepo),
 		academicApp.NewUpdateSubClassHandler(academicRepo),
 		academicApp.NewDeleteSubClassHandler(academicRepo),
+		academicApp.NewCreateAcademicYearHandler(academicRepo),
+		academicApp.NewListAcademicYearsHandler(academicRepo),
+		academicApp.NewUpdateAcademicYearHandler(academicRepo),
+		academicApp.NewDeleteAcademicYearHandler(academicRepo),
+		academicApp.NewActivateAcademicYearHandler(academicRepo),
+		academicApp.NewCreateSubjectHandler(academicRepo),
+		academicApp.NewListSubjectsHandler(academicRepo),
+		academicApp.NewUpdateSubjectHandler(academicRepo),
+		academicApp.NewDeleteSubjectHandler(academicRepo),
+		academicApp.NewCreateClassroomHandler(academicRepo),
+		academicApp.NewListClassroomsHandler(academicRepo),
+		academicApp.NewUpdateClassroomHandler(academicRepo),
+		academicApp.NewDeleteClassroomHandler(academicRepo),
+		academicApp.NewCreateScheduleHandler(academicRepo),
+		academicApp.NewListSchedulesHandler(academicRepo),
+		academicApp.NewUpdateScheduleHandler(academicRepo),
+		academicApp.NewDeleteScheduleHandler(academicRepo),
 	)
 
 	// ── Parent module ─────────────────────────────────────────────────────────
