@@ -48,6 +48,11 @@ func (h *ListStaffHandler) Handle(ctx context.Context, q ListStaffQuery) (*ListS
 		q.PerPage = 100
 	}
 
+	// Check authorization: requester must have a school assigned
+	if q.RequesterSchoolID == nil {
+		return nil, apperror.New(apperror.ErrForbidden, "user not assigned to a school")
+	}
+
 	// Build filter
 	filter := domain.StaffFilter{
 		SchoolID: *q.RequesterSchoolID,
