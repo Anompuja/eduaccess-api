@@ -47,6 +47,12 @@ import (
 	"github.com/eduaccess/eduaccess-api/pkg/database"
 	supabasePkg "github.com/eduaccess/eduaccess-api/pkg/supabase"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	teacherApp "github.com/eduaccess/eduaccess-api/internal/teacher/application"
+	teacherHTTP "github.com/eduaccess/eduaccess-api/internal/teacher/delivery/http"
+	teacherInfra "github.com/eduaccess/eduaccess-api/internal/teacher/infrastructure"
+	staffApp "github.com/eduaccess/eduaccess-api/internal/staff/application"
+	staffHTTP "github.com/eduaccess/eduaccess-api/internal/staff/delivery/http"
+	staffInfra "github.com/eduaccess/eduaccess-api/internal/staff/infrastructure"
 )
 
 // @title           EduAccess API
@@ -226,6 +232,28 @@ func main() {
 		adminApp.NewListAdminsHandler(adminRepo),
 		adminApp.NewUpdateAdminHandler(userMgmtRepo, adminRepo),
 		adminApp.NewDeactivateAdminHandler(adminRepo),
+	)
+
+	// ── Teacher module ────────────────────────────────────────────────────────
+	teacherRepo := teacherInfra.NewTeacherRepository(db)
+	teacherHTTP.NewHandler(
+		v1,
+		teacherApp.NewCreateTeacherHandler(teacherRepo, userRepo),
+		teacherApp.NewGetTeacherHandler(teacherRepo),
+		teacherApp.NewListTeachersHandler(teacherRepo),
+		teacherApp.NewUpdateTeacherHandler(teacherRepo, userMgmtRepo),
+		teacherApp.NewDeactivateTeacherHandler(teacherRepo),
+	)
+
+	// ── Staff module ──────────────────────────────────────────────────────────
+	staffRepo := staffInfra.NewStaffRepository(db)
+	staffHTTP.NewHandler(
+		v1,
+		staffApp.NewCreateStaffHandler(staffRepo, userRepo),
+		staffApp.NewGetStaffHandler(staffRepo),
+		staffApp.NewListStaffHandler(staffRepo),
+		staffApp.NewUpdateStaffHandler(staffRepo, userMgmtRepo),
+		staffApp.NewDeactivateStaffHandler(staffRepo),
 	)
 
 	// ── Storage module ────────────────────────────────────────────────────────
