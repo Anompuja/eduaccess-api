@@ -18,6 +18,9 @@ import (
 	academicApp "github.com/eduaccess/eduaccess-api/internal/academic/application"
 	academicHTTP "github.com/eduaccess/eduaccess-api/internal/academic/delivery/http"
 	academicInfra "github.com/eduaccess/eduaccess-api/internal/academic/infrastructure"
+	classScheduleApp "github.com/eduaccess/eduaccess-api/internal/class_schedule/application"
+	classScheduleHTTP "github.com/eduaccess/eduaccess-api/internal/class_schedule/delivery/http"
+	classScheduleInfra "github.com/eduaccess/eduaccess-api/internal/class_schedule/infrastructure"
 	adminApp "github.com/eduaccess/eduaccess-api/internal/admin/application"
 	adminHTTP "github.com/eduaccess/eduaccess-api/internal/admin/delivery/http"
 	adminInfra "github.com/eduaccess/eduaccess-api/internal/admin/infrastructure"
@@ -226,6 +229,23 @@ func main() {
 		adminApp.NewListAdminsHandler(adminRepo),
 		adminApp.NewUpdateAdminHandler(userMgmtRepo, adminRepo),
 		adminApp.NewDeactivateAdminHandler(adminRepo),
+	)
+
+	// ── Class Schedule module ─────────────────────────────────────────────────
+	classScheduleRepo := classScheduleInfra.NewGormClassScheduleRepository(db)
+	classScheduleHTTP.NewHandler(
+		v1,
+		classScheduleApp.NewCreateClassScheduleHandler(classScheduleRepo),
+		classScheduleApp.NewListClassSchedulesHandler(classScheduleRepo),
+		classScheduleApp.NewGetClassScheduleHandler(classScheduleRepo),
+		classScheduleApp.NewUpdateClassScheduleHandler(classScheduleRepo),
+		classScheduleApp.NewDeleteClassScheduleHandler(classScheduleRepo),
+		classScheduleApp.NewStartClassScheduleHandler(classScheduleRepo),
+		classScheduleApp.NewCompleteClassScheduleHandler(classScheduleRepo),
+		classScheduleApp.NewCancelClassScheduleHandler(classScheduleRepo),
+		classScheduleApp.NewSyncStudentsHandler(classScheduleRepo),
+		classScheduleApp.NewListAttendancesHandler(classScheduleRepo),
+		classScheduleApp.NewUpdateAttendanceHandler(classScheduleRepo),
 	)
 
 	// ── Storage module ────────────────────────────────────────────────────────

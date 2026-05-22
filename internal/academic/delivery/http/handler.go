@@ -224,7 +224,7 @@ func (h *Handler) ListLevels(c echo.Context) error {
 func (h *Handler) UpdateLevel(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	var req AcademicNameRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
@@ -254,7 +254,7 @@ func (h *Handler) UpdateLevel(c echo.Context) error {
 func (h *Handler) DeleteLevel(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.deleteLevel.Handle(c.Request().Context(), application.DeleteLevelCommand{
 		RequesterSchoolID: getSchoolID(c),
@@ -341,7 +341,7 @@ func (h *Handler) ListClasses(c echo.Context) error {
 func (h *Handler) UpdateClass(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	var req AcademicNameRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
@@ -371,7 +371,7 @@ func (h *Handler) UpdateClass(c echo.Context) error {
 func (h *Handler) DeleteClass(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.deleteClass.Handle(c.Request().Context(), application.DeleteClassCommand{
 		RequesterSchoolID: getSchoolID(c),
@@ -458,7 +458,7 @@ func (h *Handler) ListSubClasses(c echo.Context) error {
 func (h *Handler) UpdateSubClass(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	var req AcademicNameRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
@@ -488,7 +488,7 @@ func (h *Handler) UpdateSubClass(c echo.Context) error {
 func (h *Handler) DeleteSubClass(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.deleteSubClass.Handle(c.Request().Context(), application.DeleteSubClassCommand{
 		RequesterSchoolID: getSchoolID(c),
@@ -542,7 +542,7 @@ func (h *Handler) ListAcademicYears(c echo.Context) error {
 func (h *Handler) UpdateAcademicYear(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	var req UpdateAcademicYearRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
@@ -569,7 +569,7 @@ func (h *Handler) UpdateAcademicYear(c echo.Context) error {
 func (h *Handler) DeleteAcademicYear(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.deleteAcademicYear.Handle(c.Request().Context(), application.DeleteAcademicYearCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), AcademicYearID: id,
@@ -582,7 +582,7 @@ func (h *Handler) DeleteAcademicYear(c echo.Context) error {
 func (h *Handler) ActivateAcademicYear(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.activateAcademicYear.Handle(c.Request().Context(), application.ActivateAcademicYearCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), AcademicYearID: id,
@@ -599,9 +599,16 @@ func (h *Handler) CreateSubject(c echo.Context) error {
 	if err := validator.BindAndValidate(c, &req); err != nil {
 		return err
 	}
-	s, err := h.createSubject.Handle(c.Request().Context(), application.CreateSubjectCommand{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), Name: req.Name, Category: req.Category,
-	})
+	cmd := application.CreateSubjectCommand{
+		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+		Name: req.Name, Code: req.Code, Category: req.Category,
+	}
+	if req.EducationLevelID != "" {
+		if id, err := uuid.Parse(req.EducationLevelID); err == nil {
+			cmd.EducationLevelID = &id
+		}
+	}
+	s, err := h.createSubject.Handle(c.Request().Context(), cmd)
 	if err != nil {
 		return handleAppError(c, err)
 	}
@@ -625,15 +632,22 @@ func (h *Handler) ListSubjects(c echo.Context) error {
 func (h *Handler) UpdateSubject(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	var req UpdateSubjectRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
 		return err
 	}
-	s, err := h.updateSubject.Handle(c.Request().Context(), application.UpdateSubjectCommand{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), SubjectID: id, Name: req.Name, Category: req.Category,
-	})
+	cmd := application.UpdateSubjectCommand{
+		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+		SubjectID: id, Name: req.Name, Code: req.Code, Category: req.Category,
+	}
+	if req.EducationLevelID != "" {
+		if lid, err := uuid.Parse(req.EducationLevelID); err == nil {
+			cmd.EducationLevelID = &lid
+		}
+	}
+	s, err := h.updateSubject.Handle(c.Request().Context(), cmd)
 	if err != nil {
 		return handleAppError(c, err)
 	}
@@ -643,7 +657,7 @@ func (h *Handler) UpdateSubject(c echo.Context) error {
 func (h *Handler) DeleteSubject(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.deleteSubject.Handle(c.Request().Context(), application.DeleteSubjectCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), SubjectID: id,
@@ -660,11 +674,25 @@ func (h *Handler) CreateClassroom(c echo.Context) error {
 	if err := validator.BindAndValidate(c, &req); err != nil {
 		return err
 	}
-	cr, err := h.createClassroom.Handle(c.Request().Context(), application.CreateClassroomCommand{
+	cmd := application.CreateClassroomCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
-		Name: req.Name, Capacity: req.Capacity, Floor: req.Floor, Building: req.Building,
-		RoomType: req.RoomType, Status: req.Status, Facilities: req.Facilities,
-	})
+		Name: req.Name, CodeRoom: req.CodeRoom, Capacity: req.Capacity,
+		Floor: req.Floor, Building: req.Building, RoomType: req.RoomType,
+		Status: req.Status, Facilities: req.Facilities,
+	}
+	if id, err := uuid.Parse(req.ClassID); err == nil {
+		cmd.ClassID = &id
+	}
+	if id, err := uuid.Parse(req.SubClassID); err == nil {
+		cmd.SubClassID = &id
+	}
+	if id, err := uuid.Parse(req.AcademicYearID); err == nil {
+		cmd.AcademicYearID = &id
+	}
+	if id, err := uuid.Parse(req.HomeroomTeacherID); err == nil {
+		cmd.HomeroomTeacherID = &id
+	}
+	cr, err := h.createClassroom.Handle(c.Request().Context(), cmd)
 	if err != nil {
 		return handleAppError(c, err)
 	}
@@ -688,17 +716,31 @@ func (h *Handler) ListClassrooms(c echo.Context) error {
 func (h *Handler) UpdateClassroom(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	var req UpdateClassroomRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
 		return err
 	}
-	cr, err := h.updateClassroom.Handle(c.Request().Context(), application.UpdateClassroomCommand{
+	cmd := application.UpdateClassroomCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), ClassroomID: id,
-		Name: req.Name, Capacity: req.Capacity, Floor: req.Floor, Building: req.Building,
-		RoomType: req.RoomType, Status: req.Status, Facilities: req.Facilities,
-	})
+		Name: req.Name, CodeRoom: req.CodeRoom, Capacity: req.Capacity,
+		Floor: req.Floor, Building: req.Building, RoomType: req.RoomType,
+		Status: req.Status, Facilities: req.Facilities,
+	}
+	if cid, err := uuid.Parse(req.ClassID); err == nil {
+		cmd.ClassID = &cid
+	}
+	if sid, err := uuid.Parse(req.SubClassID); err == nil {
+		cmd.SubClassID = &sid
+	}
+	if aid, err := uuid.Parse(req.AcademicYearID); err == nil {
+		cmd.AcademicYearID = &aid
+	}
+	if hid, err := uuid.Parse(req.HomeroomTeacherID); err == nil {
+		cmd.HomeroomTeacherID = &hid
+	}
+	cr, err := h.updateClassroom.Handle(c.Request().Context(), cmd)
 	if err != nil {
 		return handleAppError(c, err)
 	}
@@ -708,7 +750,7 @@ func (h *Handler) UpdateClassroom(c echo.Context) error {
 func (h *Handler) DeleteClassroom(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.deleteClassroom.Handle(c.Request().Context(), application.DeleteClassroomCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), ClassroomID: id,
@@ -727,7 +769,8 @@ func (h *Handler) CreateSchedule(c echo.Context) error {
 	}
 	s, err := h.createSchedule.Handle(c.Request().Context(), application.CreateScheduleCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
-		ShiftType: req.ShiftType, StartTime: req.StartTime, EndTime: req.EndTime,
+		DayOfWeek: req.DayOfWeek, PeriodNumber: req.PeriodNumber, Label: req.Label,
+		StartTime: req.StartTime, EndTime: req.EndTime, IsBreak: req.IsBreak,
 	})
 	if err != nil {
 		return handleAppError(c, err)
@@ -736,9 +779,17 @@ func (h *Handler) CreateSchedule(c echo.Context) error {
 }
 
 func (h *Handler) ListSchedules(c echo.Context) error {
-	list, err := h.listSchedules.Handle(c.Request().Context(), application.ListSchedulesQuery{
+	q := application.ListSchedulesQuery{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
-	})
+	}
+	if raw := c.QueryParam("day_of_week"); raw != "" {
+		validDays := map[string]bool{"monday": true, "tuesday": true, "wednesday": true, "thursday": true, "friday": true, "saturday": true, "sunday": true}
+		if !validDays[raw] {
+			return response.BadRequest(c, "invalid day_of_week: must be monday, tuesday, wednesday, thursday, friday, saturday, or sunday")
+		}
+		q.DayOfWeek = &raw
+	}
+	list, err := h.listSchedules.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
 	}
@@ -752,7 +803,7 @@ func (h *Handler) ListSchedules(c echo.Context) error {
 func (h *Handler) UpdateSchedule(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	var req UpdateScheduleRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
@@ -760,7 +811,8 @@ func (h *Handler) UpdateSchedule(c echo.Context) error {
 	}
 	s, err := h.updateSchedule.Handle(c.Request().Context(), application.UpdateScheduleCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), ScheduleID: id,
-		ShiftType: req.ShiftType, StartTime: req.StartTime, EndTime: req.EndTime,
+		DayOfWeek: req.DayOfWeek, PeriodNumber: req.PeriodNumber, Label: req.Label,
+		StartTime: req.StartTime, EndTime: req.EndTime, IsBreak: req.IsBreak,
 	})
 	if err != nil {
 		return handleAppError(c, err)
@@ -771,7 +823,7 @@ func (h *Handler) UpdateSchedule(c echo.Context) error {
 func (h *Handler) DeleteSchedule(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
-		return err
+		return handleAppError(c, err)
 	}
 	if err := h.deleteSchedule.Handle(c.Request().Context(), application.DeleteScheduleCommand{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), ScheduleID: id,
@@ -792,24 +844,44 @@ func toAcademicYearResponse(ay *domain.AcademicYear) AcademicYearResponse {
 }
 
 func toSubjectResponse(s *domain.Subject) SubjectResponse {
+	var levelID *string
+	if s.EducationLevelID != nil {
+		v := s.EducationLevelID.String()
+		levelID = &v
+	}
 	return SubjectResponse{
-		ID: s.ID.String(), SchoolID: s.SchoolID.String(), Name: s.Name,
-		Category: s.Category, CreatedAt: s.CreatedAt, UpdatedAt: s.UpdatedAt,
+		ID: s.ID.String(), SchoolID: s.SchoolID.String(),
+		EducationLevelID: levelID,
+		Name: s.Name, Code: s.Code, Category: s.Category,
+		CreatedAt: s.CreatedAt, UpdatedAt: s.UpdatedAt,
 	}
 }
 
 func toClassroomResponse(c *domain.Classroom) ClassroomResponse {
+	uuidPtrToStr := func(u *uuid.UUID) *string {
+		if u == nil {
+			return nil
+		}
+		v := u.String()
+		return &v
+	}
 	return ClassroomResponse{
-		ID: c.ID.String(), SchoolID: c.SchoolID.String(), Name: c.Name,
-		Capacity: c.Capacity, Floor: c.Floor, Building: c.Building, RoomType: c.RoomType,
-		Status: c.Status, Facilities: c.Facilities, CreatedAt: c.CreatedAt, UpdatedAt: c.UpdatedAt,
+		ID: c.ID.String(), SchoolID: c.SchoolID.String(),
+		ClassID: uuidPtrToStr(c.ClassID), SubClassID: uuidPtrToStr(c.SubClassID),
+		AcademicYearID: uuidPtrToStr(c.AcademicYearID), HomeroomTeacherID: uuidPtrToStr(c.HomeroomTeacherID),
+		Name: c.Name, CodeRoom: c.CodeRoom, Capacity: c.Capacity,
+		Floor: c.Floor, Building: c.Building, RoomType: c.RoomType,
+		Status: c.Status, Facilities: c.Facilities,
+		CreatedAt: c.CreatedAt, UpdatedAt: c.UpdatedAt,
 	}
 }
 
 func toScheduleResponse(s *domain.Schedule) ScheduleResponse {
 	return ScheduleResponse{
-		ID: s.ID.String(), SchoolID: s.SchoolID.String(), ShiftType: s.ShiftType,
-		StartTime: s.StartTime, EndTime: s.EndTime, CreatedAt: s.CreatedAt, UpdatedAt: s.UpdatedAt,
+		ID: s.ID.String(), SchoolID: s.SchoolID.String(),
+		DayOfWeek: s.DayOfWeek, PeriodNumber: s.PeriodNumber, Label: s.Label,
+		StartTime: s.StartTime, EndTime: s.EndTime, IsBreak: s.IsBreak,
+		CreatedAt: s.CreatedAt, UpdatedAt: s.UpdatedAt,
 	}
 }
 
@@ -866,11 +938,7 @@ func parseUUID(c echo.Context, param string) (uuid.UUID, error) {
 	raw := c.Param(param)
 	id, err := uuid.Parse(raw)
 	if err != nil {
-		_ = c.JSON(http.StatusBadRequest, response.Response{
-			Success: false,
-			Message: "invalid UUID: " + param,
-		})
-		return uuid.UUID{}, echo.ErrBadRequest
+		return uuid.UUID{}, apperror.New(apperror.ErrBadRequest, "invalid UUID: "+param)
 	}
 	return id, nil
 }
