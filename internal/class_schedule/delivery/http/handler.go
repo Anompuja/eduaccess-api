@@ -8,6 +8,7 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/class_schedule/application"
 	"github.com/eduaccess/eduaccess-api/internal/class_schedule/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
+	"github.com/eduaccess/eduaccess-api/internal/shared/httpcache"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
@@ -53,7 +54,7 @@ func NewHandler(
 	}
 
 	auth := authmw.RequireAuth
-	cs := v1.Group("/class-schedules", auth)
+	cs := v1.Group("/class-schedules", auth, httpcache.Middleware(httpcache.AlwaysRevalidate))
 	cs.POST("", h.CreateClassSchedule)
 	cs.GET("", h.ListClassSchedules)
 	cs.GET("/:id", h.GetClassSchedule)

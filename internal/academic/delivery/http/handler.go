@@ -8,6 +8,7 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/academic/application"
 	"github.com/eduaccess/eduaccess-api/internal/academic/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
+	"github.com/eduaccess/eduaccess-api/internal/shared/httpcache"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
@@ -114,45 +115,46 @@ func NewHandler(
 	}
 
 	auth := authmw.RequireAuth
+	cache := httpcache.Middleware(httpcache.Reference)
 
-	levels := v1.Group("/academic/levels", auth)
+	levels := v1.Group("/academic/levels", auth, cache)
 	levels.POST("", h.CreateLevel)
 	levels.GET("", h.ListLevels)
 	levels.PUT("/:id", h.UpdateLevel)
 	levels.DELETE("/:id", h.DeleteLevel)
 
-	classes := v1.Group("/academic/classes", auth)
+	classes := v1.Group("/academic/classes", auth, cache)
 	classes.POST("", h.CreateClass)
 	classes.GET("", h.ListClasses)
 	classes.PUT("/:id", h.UpdateClass)
 	classes.DELETE("/:id", h.DeleteClass)
 
-	subClasses := v1.Group("/academic/sub-classes", auth)
+	subClasses := v1.Group("/academic/sub-classes", auth, cache)
 	subClasses.POST("", h.CreateSubClass)
 	subClasses.GET("", h.ListSubClasses)
 	subClasses.PUT("/:id", h.UpdateSubClass)
 	subClasses.DELETE("/:id", h.DeleteSubClass)
 
-	academicYears := v1.Group("/academic/academic-years", auth)
+	academicYears := v1.Group("/academic/academic-years", auth, cache)
 	academicYears.POST("", h.CreateAcademicYear)
 	academicYears.GET("", h.ListAcademicYears)
 	academicYears.PUT("/:id", h.UpdateAcademicYear)
 	academicYears.DELETE("/:id", h.DeleteAcademicYear)
 	academicYears.PATCH("/:id/activate", h.ActivateAcademicYear)
 
-	subjects := v1.Group("/academic/subjects", auth)
+	subjects := v1.Group("/academic/subjects", auth, cache)
 	subjects.POST("", h.CreateSubject)
 	subjects.GET("", h.ListSubjects)
 	subjects.PUT("/:id", h.UpdateSubject)
 	subjects.DELETE("/:id", h.DeleteSubject)
 
-	classrooms := v1.Group("/academic/classrooms", auth)
+	classrooms := v1.Group("/academic/classrooms", auth, cache)
 	classrooms.POST("", h.CreateClassroom)
 	classrooms.GET("", h.ListClassrooms)
 	classrooms.PUT("/:id", h.UpdateClassroom)
 	classrooms.DELETE("/:id", h.DeleteClassroom)
 
-	schedules := v1.Group("/academic/schedules", auth)
+	schedules := v1.Group("/academic/schedules", auth, cache)
 	schedules.POST("", h.CreateSchedule)
 	schedules.GET("", h.ListSchedules)
 	schedules.PUT("/:id", h.UpdateSchedule)
