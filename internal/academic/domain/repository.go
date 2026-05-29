@@ -54,7 +54,7 @@ type AcademicRepository interface {
 	// Schedules
 	CreateSchedule(ctx context.Context, s *Schedule) error
 	FindScheduleByID(ctx context.Context, id uuid.UUID) (*Schedule, error)
-	ListSchedules(ctx context.Context, schoolID *uuid.UUID) ([]*Schedule, error)
+	ListSchedules(ctx context.Context, schoolID *uuid.UUID, dayOfWeek *string) ([]*Schedule, error)
 	UpdateSchedule(ctx context.Context, s *Schedule) error
 	SoftDeleteSchedule(ctx context.Context, id uuid.UUID) error
 }

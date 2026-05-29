@@ -25,4 +25,10 @@ type StudentProfileRepository interface {
 	ListStudents(ctx context.Context, f StudentFilter) ([]*StudentProfile, int64, error)
 	UpdateStudentProfile(ctx context.Context, profile *StudentProfile) error
 	SoftDeleteStudent(ctx context.Context, id uuid.UUID) error
+
+	// AutoEnrollStudent opens an active student_studies record for a freshly
+	// created student by matching their class/sub-class to a classroom in the
+	// school's active academic year. Best-effort: returns nil (no-op) when no
+	// active year or matching classroom exists.
+	AutoEnrollStudent(ctx context.Context, schoolID, studentUserID uuid.UUID, classID, subClassID *uuid.UUID) error
 }

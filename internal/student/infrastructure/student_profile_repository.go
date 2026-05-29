@@ -86,6 +86,80 @@ func (r *GormStudentRepository) CreateStudentProfile(ctx context.Context, p *dom
 	return r.db.WithContext(ctx).Create(&m).Error
 }
 
+func (r *GormStudentRepository) AutoEnrollStudent(ctx context.Context, schoolID, studentUserID uuid.UUID, classID, subClassID *uuid.UUID) error {
+	if classID == nil {
+		return nil // no grade to enroll into — nothing to track yet
+	}
+
+	// Active academic year for the school.
+	var year struct {
+		ID uuid.UUID `gorm:"column:id"`
+	}
+	if err := r.db.WithContext(ctx).
+		Table("school_academic_years").
+		Select("id").
+		Where("school_id = ? AND is_active = TRUE AND deleted_at IS NULL", schoolID).
+		Order("created_at DESC").
+		Limit(1).
+		Scan(&year).Error; err != nil {
+		return err
+	}
+	if year.ID == uuid.Nil {
+		return nil // no active year configured — skip
+	}
+
+	// Classroom matching the student's class (+ sub-class) in that year.
+	q := r.db.WithContext(ctx).
+		Table("school_classrooms").
+		Select("id, homeroom_teacher_id").
+		Where("school_id = ? AND school_academic_year_id = ? AND school_class_id = ? AND deleted_at IS NULL", schoolID, year.ID, *classID)
+	if subClassID != nil {
+		q = q.Where("school_sub_class_id = ?", *subClassID)
+	}
+	var classroom struct {
+		ID                uuid.UUID  `gorm:"column:id"`
+		HomeroomTeacherID *uuid.UUID `gorm:"column:homeroom_teacher_id"`
+	}
+	if err := q.Order("created_at ASC").Limit(1).Scan(&classroom).Error; err != nil {
+		return err
+	}
+	if classroom.ID == uuid.Nil {
+		return nil // no matching classroom — skip
+	}
+
+	// Idempotency: don't double-enroll for the same academic year.
+	var existing struct {
+		ID uuid.UUID `gorm:"column:id"`
+	}
+	if err := r.db.WithContext(ctx).
+		Table("student_studies").
+		Select("id").
+		Where("school_id = ? AND student_id = ? AND school_academic_year_id = ? AND deleted_at IS NULL", schoolID, studentUserID, year.ID).
+		Limit(1).
+		Scan(&existing).Error; err != nil {
+		return err
+	}
+	if existing.ID != uuid.Nil {
+		return nil
+	}
+
+	now := time.Now()
+	return r.db.WithContext(ctx).Table("student_studies").Create(map[string]any{
+		"id":                      uuid.New(),
+		"school_id":               schoolID,
+		"student_id":              studentUserID,
+		"school_classroom_id":     classroom.ID,
+		"school_academic_year_id": year.ID,
+		"school_class_id":         classID,
+		"school_sub_class_id":     subClassID,
+		"homeroom_teacher_id":     classroom.HomeroomTeacherID,
+		"status":                  "active",
+		"enrollment_date":         now,
+		"created_at":              now,
+		"updated_at":              now,
+	}).Error
+}
+
 func (r *GormStudentRepository) FindStudentByID(ctx context.Context, id uuid.UUID) (*domain.StudentProfile, error) {
 	var row studentWithUser
 	sql := `

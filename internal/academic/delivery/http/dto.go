@@ -73,80 +73,110 @@ type AcademicYearResponse struct {
 // ── Subject DTOs ──────────────────────────────────────────────────────────────
 
 type CreateSubjectRequest struct {
-	Name     string `json:"name"     validate:"required,min=1,max=191"`
-	Category string `json:"category" validate:"required,oneof=core elective extracurricular specialized vocational"`
+	EducationLevelID string  `json:"education_level_id" validate:"omitempty,uuid"`
+	Name             string  `json:"name"               validate:"required,min=1,max=191"`
+	Code             *string `json:"code"               validate:"omitempty,max=50"`
+	Category         string  `json:"category"           validate:"required,oneof=core elective extracurricular specialized vocational"`
 }
 
 type UpdateSubjectRequest struct {
-	Name     string `json:"name"     validate:"required,min=1,max=191"`
-	Category string `json:"category" validate:"required,oneof=core elective extracurricular specialized vocational"`
+	EducationLevelID string  `json:"education_level_id" validate:"omitempty,uuid"`
+	Name             string  `json:"name"               validate:"required,min=1,max=191"`
+	Code             *string `json:"code"               validate:"omitempty,max=50"`
+	Category         string  `json:"category"           validate:"required,oneof=core elective extracurricular specialized vocational"`
 }
 
 type SubjectResponse struct {
-	ID        string    `json:"id"`
-	SchoolID  string    `json:"school_id"`
-	Name      string    `json:"name"`
-	Category  string    `json:"category"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID               string    `json:"id"`
+	SchoolID         string    `json:"school_id"`
+	EducationLevelID *string   `json:"education_level_id"`
+	Name             string    `json:"name"`
+	Code             *string   `json:"code"`
+	Category         string    `json:"category"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 // ── Classroom DTOs ────────────────────────────────────────────────────────────
 
 type CreateClassroomRequest struct {
-	Name       string `json:"name"       validate:"required,min=1,max=191"`
-	Capacity   int    `json:"capacity"   validate:"min=0"`
-	Floor      int    `json:"floor"      validate:"min=0"`
-	Building   string `json:"building"`
-	RoomType   string `json:"room_type"`
-	Status     string `json:"status"     validate:"omitempty,oneof=available occupied maintenance"`
-	Facilities string `json:"facilities"`
+	ClassID           string `json:"class_id"            validate:"omitempty,uuid"`
+	SubClassID        string `json:"sub_class_id"        validate:"omitempty,uuid"`
+	AcademicYearID    string `json:"academic_year_id"    validate:"omitempty,uuid"`
+	HomeroomTeacherID string `json:"homeroom_teacher_id" validate:"omitempty,uuid"`
+	Name              string `json:"name"                validate:"required,min=1,max=191"`
+	CodeRoom          string `json:"code_room"           validate:"omitempty,max=50"`
+	Capacity          int    `json:"capacity"            validate:"min=0"`
+	Floor             string `json:"floor"               validate:"omitempty,max=50"`
+	Building          string `json:"building"`
+	RoomType          string `json:"room_type"`
+	Status            string `json:"status"              validate:"omitempty,oneof=unknown available occupied maintenance"`
+	Facilities        string `json:"facilities"`
 }
 
 type UpdateClassroomRequest struct {
-	Name       string `json:"name"       validate:"required,min=1,max=191"`
-	Capacity   int    `json:"capacity"   validate:"min=0"`
-	Floor      int    `json:"floor"      validate:"min=0"`
-	Building   string `json:"building"`
-	RoomType   string `json:"room_type"`
-	Status     string `json:"status"     validate:"omitempty,oneof=available occupied maintenance"`
-	Facilities string `json:"facilities"`
+	ClassID           string `json:"class_id"            validate:"omitempty,uuid"`
+	SubClassID        string `json:"sub_class_id"        validate:"omitempty,uuid"`
+	AcademicYearID    string `json:"academic_year_id"    validate:"omitempty,uuid"`
+	HomeroomTeacherID string `json:"homeroom_teacher_id" validate:"omitempty,uuid"`
+	Name              string `json:"name"                validate:"required,min=1,max=191"`
+	CodeRoom          string `json:"code_room"           validate:"omitempty,max=50"`
+	Capacity          int    `json:"capacity"            validate:"min=0"`
+	Floor             string `json:"floor"               validate:"omitempty,max=50"`
+	Building          string `json:"building"`
+	RoomType          string `json:"room_type"`
+	Status            string `json:"status"              validate:"omitempty,oneof=unknown available occupied maintenance"`
+	Facilities        string `json:"facilities"`
 }
 
 type ClassroomResponse struct {
-	ID         string    `json:"id"`
-	SchoolID   string    `json:"school_id"`
-	Name       string    `json:"name"`
-	Capacity   int       `json:"capacity"`
-	Floor      int       `json:"floor"`
-	Building   string    `json:"building"`
-	RoomType   string    `json:"room_type"`
-	Status     string    `json:"status"`
-	Facilities string    `json:"facilities"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID                string    `json:"id"`
+	SchoolID          string    `json:"school_id"`
+	ClassID           *string   `json:"class_id"`
+	SubClassID        *string   `json:"sub_class_id"`
+	AcademicYearID    *string   `json:"academic_year_id"`
+	HomeroomTeacherID *string   `json:"homeroom_teacher_id"`
+	Name              string    `json:"name"`
+	CodeRoom          string    `json:"code_room"`
+	Capacity          int       `json:"capacity"`
+	Floor             string    `json:"floor"`
+	Building          string    `json:"building"`
+	RoomType          string    `json:"room_type"`
+	Status            string    `json:"status"`
+	Facilities        string    `json:"facilities"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 // ── Schedule DTOs ─────────────────────────────────────────────────────────────
 
 type CreateScheduleRequest struct {
-	ShiftType string `json:"shift_type" validate:"required,oneof=morning afternoon full_day"`
-	StartTime string `json:"start_time" validate:"required"`
-	EndTime   string `json:"end_time"   validate:"required"`
+	DayOfWeek    string `json:"day_of_week"   validate:"required,oneof=monday tuesday wednesday thursday friday saturday sunday"`
+	PeriodNumber int    `json:"period_number" validate:"required,min=1"`
+	Label        string `json:"label"         validate:"required,min=1,max=50"`
+	StartTime    string `json:"start_time"    validate:"required,datetime=15:04"`
+	EndTime      string `json:"end_time"      validate:"required,datetime=15:04"`
+	IsBreak      bool   `json:"is_break"`
 }
 
 type UpdateScheduleRequest struct {
-	ShiftType string `json:"shift_type" validate:"required,oneof=morning afternoon full_day"`
-	StartTime string `json:"start_time" validate:"required"`
-	EndTime   string `json:"end_time"   validate:"required"`
+	DayOfWeek    string `json:"day_of_week"   validate:"required,oneof=monday tuesday wednesday thursday friday saturday sunday"`
+	PeriodNumber int    `json:"period_number" validate:"required,min=1"`
+	Label        string `json:"label"         validate:"required,min=1,max=50"`
+	StartTime    string `json:"start_time"    validate:"required,datetime=15:04"`
+	EndTime      string `json:"end_time"      validate:"required,datetime=15:04"`
+	IsBreak      bool   `json:"is_break"`
 }
 
 type ScheduleResponse struct {
-	ID        string    `json:"id"`
-	SchoolID  string    `json:"school_id"`
-	ShiftType string    `json:"shift_type"`
-	StartTime string    `json:"start_time"`
-	EndTime   string    `json:"end_time"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           string    `json:"id"`
+	SchoolID     string    `json:"school_id"`
+	DayOfWeek    string    `json:"day_of_week"`
+	PeriodNumber int       `json:"period_number"`
+	Label        string    `json:"label"`
+	StartTime    string    `json:"start_time"`
+	EndTime      string    `json:"end_time"`
+	IsBreak      bool      `json:"is_break"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }

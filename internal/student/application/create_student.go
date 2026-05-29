@@ -158,5 +158,10 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 	if err := h.repo.CreateStudentProfile(ctx, profile); err != nil {
 		return nil, err
 	}
+
+	// Open an initial enrollment so the student is tracked immediately. Best-effort:
+	// a missing active year or matching classroom must not fail student creation.
+	_ = h.repo.AutoEnrollStudent(ctx, *schoolID, userID, cmd.ClassID, cmd.SubClassID)
+
 	return profile, nil
 }

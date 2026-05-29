@@ -492,7 +492,9 @@ func (h *ActivateAcademicYearHandler) Handle(ctx context.Context, cmd ActivateAc
 type CreateSubjectCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	EducationLevelID  *uuid.UUID
 	Name              string
+	Code              *string
 	Category          string
 }
 
@@ -510,7 +512,12 @@ func (h *CreateSubjectHandler) Handle(ctx context.Context, cmd CreateSubjectComm
 	if schoolID == nil {
 		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
 	}
-	s := &domain.Subject{ID: uuid.New(), SchoolID: *schoolID, Name: cmd.Name, Category: cmd.Category, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	s := &domain.Subject{
+		ID: uuid.New(), SchoolID: *schoolID,
+		EducationLevelID: cmd.EducationLevelID,
+		Name: cmd.Name, Code: cmd.Code, Category: cmd.Category,
+		CreatedAt: time.Now(), UpdatedAt: time.Now(),
+	}
 	if err := h.repo.CreateSubject(ctx, s); err != nil {
 		return nil, err
 	}
@@ -537,7 +544,9 @@ type UpdateSubjectCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
 	SubjectID         uuid.UUID
+	EducationLevelID  *uuid.UUID
 	Name              string
+	Code              *string
 	Category          string
 }
 
@@ -558,7 +567,9 @@ func (h *UpdateSubjectHandler) Handle(ctx context.Context, cmd UpdateSubjectComm
 	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, s.SchoolID); err != nil {
 		return nil, err
 	}
+	s.EducationLevelID = cmd.EducationLevelID
 	s.Name = cmd.Name
+	s.Code = cmd.Code
 	s.Category = cmd.Category
 	s.UpdatedAt = time.Now()
 	if err := h.repo.UpdateSubject(ctx, s); err != nil {
@@ -598,9 +609,14 @@ func (h *DeleteSubjectHandler) Handle(ctx context.Context, cmd DeleteSubjectComm
 type CreateClassroomCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	ClassID           *uuid.UUID
+	SubClassID        *uuid.UUID
+	AcademicYearID    *uuid.UUID
+	HomeroomTeacherID *uuid.UUID
 	Name              string
+	CodeRoom          string
 	Capacity          int
-	Floor             int
+	Floor             string
 	Building          string
 	RoomType          string
 	Status            string
@@ -623,9 +639,17 @@ func (h *CreateClassroomHandler) Handle(ctx context.Context, cmd CreateClassroom
 	}
 	status := cmd.Status
 	if status == "" {
-		status = "available"
+		status = "unknown"
 	}
-	c := &domain.Classroom{ID: uuid.New(), SchoolID: *schoolID, Name: cmd.Name, Capacity: cmd.Capacity, Floor: cmd.Floor, Building: cmd.Building, RoomType: cmd.RoomType, Status: status, Facilities: cmd.Facilities, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	c := &domain.Classroom{
+		ID: uuid.New(), SchoolID: *schoolID,
+		ClassID: cmd.ClassID, SubClassID: cmd.SubClassID,
+		AcademicYearID: cmd.AcademicYearID, HomeroomTeacherID: cmd.HomeroomTeacherID,
+		Name: cmd.Name, CodeRoom: cmd.CodeRoom, Capacity: cmd.Capacity,
+		Floor: cmd.Floor, Building: cmd.Building, RoomType: cmd.RoomType,
+		Status: status, Facilities: cmd.Facilities,
+		CreatedAt: time.Now(), UpdatedAt: time.Now(),
+	}
 	if err := h.repo.CreateClassroom(ctx, c); err != nil {
 		return nil, err
 	}
@@ -652,9 +676,14 @@ type UpdateClassroomCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
 	ClassroomID       uuid.UUID
+	ClassID           *uuid.UUID
+	SubClassID        *uuid.UUID
+	AcademicYearID    *uuid.UUID
+	HomeroomTeacherID *uuid.UUID
 	Name              string
+	CodeRoom          string
 	Capacity          int
-	Floor             int
+	Floor             string
 	Building          string
 	RoomType          string
 	Status            string
@@ -678,7 +707,12 @@ func (h *UpdateClassroomHandler) Handle(ctx context.Context, cmd UpdateClassroom
 	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, c.SchoolID); err != nil {
 		return nil, err
 	}
+	c.ClassID = cmd.ClassID
+	c.SubClassID = cmd.SubClassID
+	c.AcademicYearID = cmd.AcademicYearID
+	c.HomeroomTeacherID = cmd.HomeroomTeacherID
 	c.Name = cmd.Name
+	c.CodeRoom = cmd.CodeRoom
 	c.Capacity = cmd.Capacity
 	c.Floor = cmd.Floor
 	c.Building = cmd.Building
@@ -723,9 +757,12 @@ func (h *DeleteClassroomHandler) Handle(ctx context.Context, cmd DeleteClassroom
 type CreateScheduleCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
-	ShiftType         string
+	DayOfWeek         string
+	PeriodNumber      int
+	Label             string
 	StartTime         string
 	EndTime           string
+	IsBreak           bool
 }
 
 type CreateScheduleHandler struct{ repo domain.AcademicRepository }
@@ -742,7 +779,18 @@ func (h *CreateScheduleHandler) Handle(ctx context.Context, cmd CreateScheduleCo
 	if schoolID == nil {
 		return nil, apperror.New(apperror.ErrBadRequest, "school context required")
 	}
-	s := &domain.Schedule{ID: uuid.New(), SchoolID: *schoolID, ShiftType: cmd.ShiftType, StartTime: cmd.StartTime, EndTime: cmd.EndTime, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	s := &domain.Schedule{
+		ID:           uuid.New(),
+		SchoolID:     *schoolID,
+		DayOfWeek:    cmd.DayOfWeek,
+		PeriodNumber: cmd.PeriodNumber,
+		Label:        cmd.Label,
+		StartTime:    cmd.StartTime,
+		EndTime:      cmd.EndTime,
+		IsBreak:      cmd.IsBreak,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
 	if err := h.repo.CreateSchedule(ctx, s); err != nil {
 		return nil, err
 	}
@@ -752,6 +800,7 @@ func (h *CreateScheduleHandler) Handle(ctx context.Context, cmd CreateScheduleCo
 type ListSchedulesQuery struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	DayOfWeek         *string
 }
 
 type ListSchedulesHandler struct{ repo domain.AcademicRepository }
@@ -762,16 +811,19 @@ func NewListSchedulesHandler(repo domain.AcademicRepository) *ListSchedulesHandl
 
 func (h *ListSchedulesHandler) Handle(ctx context.Context, q ListSchedulesQuery) ([]*domain.Schedule, error) {
 	schoolID := resolveSchoolID(q.RequesterRole, q.RequesterSchoolID)
-	return h.repo.ListSchedules(ctx, schoolID)
+	return h.repo.ListSchedules(ctx, schoolID, q.DayOfWeek)
 }
 
 type UpdateScheduleCommand struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
 	ScheduleID        uuid.UUID
-	ShiftType         string
+	DayOfWeek         string
+	PeriodNumber      int
+	Label             string
 	StartTime         string
 	EndTime           string
+	IsBreak           bool
 }
 
 type UpdateScheduleHandler struct{ repo domain.AcademicRepository }
@@ -791,9 +843,12 @@ func (h *UpdateScheduleHandler) Handle(ctx context.Context, cmd UpdateScheduleCo
 	if err := guardSchoolIDMatch(cmd.RequesterRole, cmd.RequesterSchoolID, s.SchoolID); err != nil {
 		return nil, err
 	}
-	s.ShiftType = cmd.ShiftType
+	s.DayOfWeek = cmd.DayOfWeek
+	s.PeriodNumber = cmd.PeriodNumber
+	s.Label = cmd.Label
 	s.StartTime = cmd.StartTime
 	s.EndTime = cmd.EndTime
+	s.IsBreak = cmd.IsBreak
 	s.UpdatedAt = time.Now()
 	if err := h.repo.UpdateSchedule(ctx, s); err != nil {
 		return nil, err
@@ -847,7 +902,10 @@ func guardSchoolIDMatch(role string, requesterID *uuid.UUID, targetID uuid.UUID)
 	if role == "superadmin" {
 		return nil
 	}
-	if requesterID != nil && *requesterID != targetID {
+	if requesterID == nil {
+		return apperror.New(apperror.ErrForbidden, "school context required")
+	}
+	if *requesterID != targetID {
 		return apperror.New(apperror.ErrForbidden, "access denied to this resource")
 	}
 	return nil

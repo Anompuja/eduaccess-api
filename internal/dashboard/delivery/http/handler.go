@@ -6,6 +6,7 @@ import (
 
 	"github.com/eduaccess/eduaccess-api/internal/dashboard/application"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
+	"github.com/eduaccess/eduaccess-api/internal/shared/httpcache"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	"github.com/google/uuid"
@@ -22,7 +23,7 @@ func NewHandler(v1 *echo.Group, getStats *application.GetStatsHandler) *Handler 
 	h := &Handler{getStats: getStats}
 
 	dashboard := v1.Group("/dashboard", authmw.RequireAuth)
-	dashboard.GET("/stats", h.GetStats)
+	dashboard.GET("/stats", h.GetStats, httpcache.Middleware(httpcache.Stats))
 
 	return h
 }
