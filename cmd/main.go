@@ -44,6 +44,12 @@ import (
 	studentApp "github.com/eduaccess/eduaccess-api/internal/student/application"
 	studentHTTP "github.com/eduaccess/eduaccess-api/internal/student/delivery/http"
 	studentInfra "github.com/eduaccess/eduaccess-api/internal/student/infrastructure"
+	studentPromotionApp "github.com/eduaccess/eduaccess-api/internal/student_promotion/application"
+	studentPromotionHTTP "github.com/eduaccess/eduaccess-api/internal/student_promotion/delivery/http"
+	studentPromotionInfra "github.com/eduaccess/eduaccess-api/internal/student_promotion/infrastructure"
+	studentTrackingApp "github.com/eduaccess/eduaccess-api/internal/student_tracking/application"
+	studentTrackingHTTP "github.com/eduaccess/eduaccess-api/internal/student_tracking/delivery/http"
+	studentTrackingInfra "github.com/eduaccess/eduaccess-api/internal/student_tracking/infrastructure"
 	userApp "github.com/eduaccess/eduaccess-api/internal/user/application"
 	userHTTP "github.com/eduaccess/eduaccess-api/internal/user/delivery/http"
 	userInfra "github.com/eduaccess/eduaccess-api/internal/user/infrastructure"
@@ -247,6 +253,22 @@ func main() {
 		classScheduleApp.NewSyncStudentsHandler(classScheduleRepo),
 		classScheduleApp.NewListAttendancesHandler(classScheduleRepo),
 		classScheduleApp.NewUpdateAttendanceHandler(classScheduleRepo),
+	)
+
+	// ── Student Tracking module ───────────────────────────────────────────────
+	studentTrackingRepo := studentTrackingInfra.NewGormRepository(db)
+	studentTrackingHTTP.NewHandler(
+		v1,
+		studentTrackingApp.NewListStudiesHandler(studentTrackingRepo),
+		studentTrackingApp.NewGetStudentDetailHandler(studentTrackingRepo),
+	)
+
+	// ── Student Promotion module (kenaikan kelas) ─────────────────────────────
+	studentPromotionRepo := studentPromotionInfra.NewGormRepository(db)
+	studentPromotionHTTP.NewHandler(
+		v1,
+		studentPromotionApp.NewListPromotionsHandler(studentPromotionRepo),
+		studentPromotionApp.NewPromoteHandler(studentPromotionRepo),
 	)
 
 	// ── Storage module ────────────────────────────────────────────────────────
