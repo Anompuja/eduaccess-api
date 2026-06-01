@@ -1,11 +1,11 @@
-package application
+﻿package application
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
+	academicdomain "github.com/eduaccess/eduaccess-api/internal/academic/domain"
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/student/domain"
@@ -40,77 +40,43 @@ type CreateStudentCommand struct {
 
 // CreateStudentHandler creates a user (role=siswa) + student_profile atomically.
 type CreateStudentHandler struct {
-	users UserCreator
-	repo  domain.StudentRepository
+	users    UserCreator
+	repo     domain.StudentRepository
+	academic academicdomain.AcademicRepository
 }
 
-func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository) *CreateStudentHandler {
-	return &CreateStudentHandler{users: users, repo: repo}
+func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository, academic academicdomain.AcademicRepository) *CreateStudentHandler {
+	return &CreateStudentHandler{users: users, repo: repo, academic: academic}
 }
 
 func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentCommand) (*domain.StudentProfile, error) {
 	if cmd.RequesterRole != "superadmin" && cmd.RequesterRole != "admin_sekolah" {
 		return nil, apperror.New(apperror.ErrForbidden, "only admin_sekolah or superadmin can create students")
 	}
-	if cmd.RequesterRole != "superadmin" && cmd.RequesterSchoolID == nil {
-		return nil, apperror.New(apperror.ErrForbidden, "school context required")
-	}
 
-	// Resolve school ID
+	// Resolve school ID from requester context; if missing, fallback to referenced academic entities.
 	schoolID := cmd.RequesterSchoolID
-<<<<<<< Updated upstream
-
-=======
-	
->>>>>>> Stashed changes
-	if cmd.SubClassID != nil {
+	if schoolID == nil && cmd.SubClassID != nil {
 		subClass, err := h.academic.FindSubClassByID(ctx, *cmd.SubClassID)
 		if err != nil {
-			return nil, apperror.New(apperror.ErrBadRequest, "invalid sub_class_id")
+			return nil, err
 		}
-		if schoolID == nil {
-			schoolID = &subClass.SchoolID
-		} else if *schoolID != subClass.SchoolID {
-			return nil, apperror.New(apperror.ErrBadRequest, "sub_class_id does not belong to the correct school")
-		}
+		schoolID = &subClass.SchoolID
 	}
-<<<<<<< Updated upstream
-
-=======
-	
->>>>>>> Stashed changes
-	if cmd.ClassID != nil {
+	if schoolID == nil && cmd.ClassID != nil {
 		class, err := h.academic.FindClassByID(ctx, *cmd.ClassID)
 		if err != nil {
-			return nil, apperror.New(apperror.ErrBadRequest, "invalid class_id")
+			return nil, err
 		}
-		if schoolID == nil {
-			schoolID = &class.SchoolID
-		} else if *schoolID != class.SchoolID {
-			return nil, apperror.New(apperror.ErrBadRequest, "class_id does not belong to the correct school")
-		}
+		schoolID = &class.SchoolID
 	}
-<<<<<<< Updated upstream
-
-=======
-	
->>>>>>> Stashed changes
-	if cmd.EducationLevelID != nil {
+	if schoolID == nil && cmd.EducationLevelID != nil {
 		level, err := h.academic.FindLevelByID(ctx, *cmd.EducationLevelID)
 		if err != nil {
-			return nil, apperror.New(apperror.ErrBadRequest, "invalid education_level_id")
+			return nil, err
 		}
-		if schoolID == nil {
-			schoolID = &level.SchoolID
-		} else if *schoolID != level.SchoolID {
-			return nil, apperror.New(apperror.ErrBadRequest, "education_level_id does not belong to the correct school")
-		}
+		schoolID = &level.SchoolID
 	}
-<<<<<<< Updated upstream
-
-=======
-	
->>>>>>> Stashed changes
 	if schoolID == nil {
 		return nil, apperror.New(apperror.ErrBadRequest, "unable to resolve school context; provide class_id, sub_class_id, or education_level_id")
 	}
@@ -140,16 +106,15 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 	// Hash password
 	pwd := cmd.Password
 	if pwd == "" {
-		pwd = "Siswa@12345" // default — must be changed on first login
+		pwd = "Siswa@12345" // default ΓÇö must be changed on first login
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
-	userID := uuid.New()
 	user := &authdomain.User{
-		ID:        userID,
+		ID:        uuid.New(),
 		SchoolID:  schoolID,
 		Role:      authdomain.RoleSiswa,
 		Name:      cmd.Name,
@@ -164,6 +129,7 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 	if err := h.users.Create(ctx, user); err != nil {
 		return nil, err
 	}
+	userID := user.ID
 
 	profile := &domain.StudentProfile{
 		ID:                uuid.New(),
@@ -190,10 +156,12 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 		UpdatedAt:         time.Now(),
 	}
 	if err := h.repo.CreateStudentProfile(ctx, profile); err != nil {
-		if rollbackErr := h.users.SoftDelete(ctx, user.ID); rollbackErr != nil {
-			return nil, fmt.Errorf("create student failed: %w (rollback failed: %v)", err, rollbackErr)
-		}
 		return nil, err
 	}
+
+	// Open an initial enrollment so the student is tracked immediately. Best-effort:
+	// a missing active year or matching classroom must not fail student creation.
+	_ = h.repo.AutoEnrollStudent(ctx, *schoolID, userID, cmd.ClassID, cmd.SubClassID)
+
 	return profile, nil
 }

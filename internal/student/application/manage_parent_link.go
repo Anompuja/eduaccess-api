@@ -38,7 +38,7 @@ func (h *LinkParentHandler) Handle(ctx context.Context, cmd LinkParentCommand) e
 		return err
 	}
 	if cmd.RequesterRole != "superadmin" {
-		if cmd.RequesterSchoolID == nil || student.SchoolID != *cmd.RequesterSchoolID {
+		if cmd.RequesterSchoolID != nil && student.SchoolID != *cmd.RequesterSchoolID {
 			return apperror.New(apperror.ErrForbidden, "access denied to this student")
 		}
 	}
@@ -92,7 +92,7 @@ func (h *UnlinkParentHandler) Handle(ctx context.Context, cmd UnlinkParentComman
 		return err
 	}
 	if cmd.RequesterRole != "superadmin" {
-		if cmd.RequesterSchoolID == nil || student.SchoolID != *cmd.RequesterSchoolID {
+		if cmd.RequesterSchoolID != nil && student.SchoolID != *cmd.RequesterSchoolID {
 			return apperror.New(apperror.ErrForbidden, "access denied to this student")
 		}
 	}

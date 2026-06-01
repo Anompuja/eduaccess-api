@@ -12,14 +12,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// userJoinQuery is the reusable JOIN SQL for loading a user with their role and school.
+// userJoinQueryBase is the reusable JOIN SQL for loading a user with their role and school.
 //
 // Strategy for users linked to multiple schools:
 // - Prefer schools with status = 'active'
 // - If more than one remains, pick the most recently linked membership
 //
 // This keeps school context deterministic for JWT generation.
-const userJoinQuery = `
+const userJoinQueryBase = `
 SELECT
     u.*,
     r.id   AS role_id,
@@ -41,7 +41,6 @@ LEFT JOIN LATERAL (
 			su.school_id
 		LIMIT 1
 ) preferred_school ON TRUE
-WHERE u.deleted_at IS NULL
 `
 
 // GormUserRepository implements domain.UserRepository using GORM.
@@ -54,8 +53,20 @@ func NewGormUserRepository(db *gorm.DB) *GormUserRepository {
 }
 
 func (r *GormUserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
+	return r.findByEmail(ctx, email, false)
+}
+
+func (r *GormUserRepository) FindByEmailIncludingDeleted(ctx context.Context, email string) (*domain.User, error) {
+	return r.findByEmail(ctx, email, true)
+}
+
+func (r *GormUserRepository) findByEmail(ctx context.Context, email string, includeDeleted bool) (*domain.User, error) {
 	var row userWithRole
-	sql := fmt.Sprintf("%s AND u.email = ? LIMIT 1", userJoinQuery)
+	where := "u.deleted_at IS NULL AND u.email = ?"
+	if includeDeleted {
+		where = "u.email = ?"
+	}
+	sql := fmt.Sprintf("%s WHERE %s LIMIT 1", userJoinQueryBase, where)
 	if err := r.db.WithContext(ctx).Raw(sql, email).Scan(&row).Error; err != nil {
 		return nil, err
 	}
@@ -67,7 +78,7 @@ func (r *GormUserRepository) FindByEmail(ctx context.Context, email string) (*do
 
 func (r *GormUserRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	var row userWithRole
-	sql := fmt.Sprintf("%s AND u.id = ? LIMIT 1", userJoinQuery)
+	sql := fmt.Sprintf("%s WHERE u.deleted_at IS NULL AND u.id = ? LIMIT 1", userJoinQueryBase)
 	if err := r.db.WithContext(ctx).Raw(sql, id).Scan(&row).Error; err != nil {
 		return nil, err
 	}
@@ -86,7 +97,6 @@ func (r *GormUserRepository) Create(ctx context.Context, user *domain.User) erro
 			Name:      user.Name,
 			Username:  user.Username,
 			Email:     user.Email,
-			Password:  user.Password,
 			Avatar:    user.Avatar,
 			Verified:  user.Verified,
 			CreatedAt: user.CreatedAt,

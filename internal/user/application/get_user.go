@@ -10,6 +10,7 @@ import (
 
 // GetUserQuery is the input for fetching a single user.
 type GetUserQuery struct {
+	RequesterID       uuid.UUID
 	RequesterSchoolID *uuid.UUID // nil = superadmin
 	RequesterRole     string
 	UserID            uuid.UUID
@@ -28,6 +29,11 @@ func (h *GetUserHandler) Handle(ctx context.Context, q GetUserQuery) (*domain.Us
 	user, err := h.users.FindByID(ctx, q.UserID)
 	if err != nil {
 		return nil, apperror.New(apperror.ErrNotFound, "user not found")
+	}
+
+	// Authenticated users can always read their own profile.
+	if q.RequesterID != uuid.Nil && q.RequesterID == user.ID {
+		return user, nil
 	}
 
 	// Tenant guard: non-superadmin can only see users in their own school

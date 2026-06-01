@@ -10,6 +10,7 @@ type Response struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
+	Errors  interface{} `json:"errors,omitempty"`
 }
 
 type PaginatedResponse struct {
@@ -46,46 +47,32 @@ func NoContent(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func BadRequest(c echo.Context, message string) error {
-	return c.JSON(http.StatusBadRequest, Response{
-		Success: false,
-		Message: message,
-	})
+func BadRequest(c echo.Context, message string, errors ...interface{}) error {
+	return respondError(c, http.StatusBadRequest, message, errors...)
 }
 
-func Unauthorized(c echo.Context, message string) error {
-	return c.JSON(http.StatusUnauthorized, Response{
-		Success: false,
-		Message: message,
-	})
+func Unauthorized(c echo.Context, message string, errors ...interface{}) error {
+	return respondError(c, http.StatusUnauthorized, message, errors...)
 }
 
-func Forbidden(c echo.Context, message string) error {
-	return c.JSON(http.StatusForbidden, Response{
-		Success: false,
-		Message: message,
-	})
+func Forbidden(c echo.Context, message string, errors ...interface{}) error {
+	return respondError(c, http.StatusForbidden, message, errors...)
 }
 
-func NotFound(c echo.Context, message string) error {
-	return c.JSON(http.StatusNotFound, Response{
-		Success: false,
-		Message: message,
-	})
+func NotFound(c echo.Context, message string, errors ...interface{}) error {
+	return respondError(c, http.StatusNotFound, message, errors...)
 }
 
-func Conflict(c echo.Context, message string) error {
-	return c.JSON(http.StatusConflict, Response{
-		Success: false,
-		Message: message,
-	})
+func Conflict(c echo.Context, message string, errors ...interface{}) error {
+	return respondError(c, http.StatusConflict, message, errors...)
 }
 
-func InternalError(c echo.Context, message string) error {
-	return c.JSON(http.StatusInternalServerError, Response{
-		Success: false,
-		Message: message,
-	})
+func UnprocessableEntity(c echo.Context, message string, errors ...interface{}) error {
+	return respondError(c, http.StatusUnprocessableEntity, message, errors...)
+}
+
+func InternalError(c echo.Context, message string, errors ...interface{}) error {
+	return respondError(c, http.StatusInternalServerError, message, errors...)
 }
 
 func Paginated(c echo.Context, message string, data interface{}, page, perPage int, total int64) error {
@@ -104,4 +91,15 @@ func Paginated(c echo.Context, message string, data interface{}, page, perPage i
 			TotalPages: totalPages,
 		},
 	})
+}
+
+func respondError(c echo.Context, status int, message string, errors ...interface{}) error {
+	resp := Response{
+		Success: false,
+		Message: message,
+	}
+	if len(errors) > 0 {
+		resp.Errors = errors[0]
+	}
+	return c.JSON(status, resp)
 }

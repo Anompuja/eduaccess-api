@@ -49,7 +49,7 @@ func (h *UpdateStudentHandler) Handle(ctx context.Context, cmd UpdateStudentComm
 	}
 
 	if cmd.RequesterRole != "superadmin" {
-		if cmd.RequesterSchoolID == nil || profile.SchoolID != *cmd.RequesterSchoolID {
+		if cmd.RequesterSchoolID != nil && profile.SchoolID != *cmd.RequesterSchoolID {
 			return nil, apperror.New(apperror.ErrForbidden, "access denied to this student")
 		}
 	}

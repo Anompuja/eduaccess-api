@@ -86,7 +86,6 @@ WHERE u.deleted_at IS NULL`
 		Name      string     `gorm:"column:name"`
 		Username  string     `gorm:"column:username"`
 		Email     string     `gorm:"column:email"`
-		Password  string     `gorm:"column:password"`
 		Avatar    string     `gorm:"column:avatar"`
 		Verified  bool       `gorm:"column:verified"`
 		DeletedAt *time.Time `gorm:"column:deleted_at"`
@@ -96,7 +95,7 @@ WHERE u.deleted_at IS NULL`
 
 	dataSQL := fmt.Sprintf(`
 SELECT DISTINCT ON (u.id)
-    u.id, u.name, u.username, u.email, u.password, u.avatar, u.verified,
+    u.id, u.name, u.username, u.email, u.avatar, u.verified,
     u.deleted_at, u.created_at, u.updated_at,
     r.id AS role_id, r.name AS role_name, su.school_id
 %s%s
@@ -118,7 +117,6 @@ LIMIT ? OFFSET ?`, base, where)
 			Name:      rw.Name,
 			Username:  rw.Username,
 			Email:     rw.Email,
-			Password:  rw.Password,
 			Avatar:    rw.Avatar,
 			Verified:  rw.Verified,
 			DeletedAt: rw.DeletedAt,
@@ -141,7 +139,6 @@ func (r *GormUserManagementRepository) Update(ctx context.Context, user *domain.
 		Updates(map[string]interface{}{
 			"name":       user.Name,
 			"avatar":     user.Avatar,
-			"password":   user.Password,
 			"updated_at": user.UpdatedAt,
 			"username":   user.Username,
 			"email":      user.Email,

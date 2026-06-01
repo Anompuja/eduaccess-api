@@ -1,4 +1,4 @@
-package infrastructure
+﻿package infrastructure
 
 import (
 	"context"
@@ -62,7 +62,7 @@ func (r *SupabaseUserRepository) SoftDelete(ctx context.Context, id uuid.UUID) e
 }
 
 // Create registers the user in Supabase Auth then inserts the profile row,
-// assigns the role, and links to a school — all in one transaction.
+// assigns the role, and links to a school ΓÇö all in one transaction.
 // If the GORM transaction fails, we attempt to roll back the Supabase Auth user.
 func (r *SupabaseUserRepository) Create(ctx context.Context, user *domain.User) error {
 	// 1. Create the identity record in Supabase Auth. user.Password holds the

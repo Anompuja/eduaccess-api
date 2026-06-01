@@ -21,8 +21,91 @@ func (h *Handler) registerStudentRoutes(v1 *echo.Group, auth echo.MiddlewareFunc
 	students.GET("/:id", h.GetStudent)
 	students.PUT("/:id", h.UpdateStudent)
 	students.DELETE("/:id", h.DeactivateStudent)
-	// students.POST("/:id/parents", h.LinkParent)
-	// students.DELETE("/:id/parents/:parent_id", h.UnlinkParent)
+	students.POST("/:id/parents", h.LinkParent)
+	students.DELETE("/:id/parents/:parent_id", h.UnlinkParent)
+}
+
+// LinkParent godoc
+//
+//	@Summary      Link parent to student
+//	@Description  Links an existing parent profile to a student.
+//	@Tags         students
+//	@Accept       json
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        id    path      string            true  "Student profile UUID"
+//	@Param        body  body      LinkParentRequest true  "Parent link data"
+//	@Success      200   {object}  response.Response
+//	@Failure      400   {object}  response.Response
+//	@Failure      403   {object}  response.Response
+//	@Failure      404   {object}  response.Response
+//	@Router       /students/{id}/parents [post]
+func (h *Handler) LinkParent(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+	var req LinkParentRequest
+	if err := validator.BindAndValidate(c, &req); err != nil {
+		return err
+	}
+	parentID, err := uuid.Parse(req.ParentID)
+	if err != nil {
+		return response.BadRequest(c, "invalid parent_id")
+	}
+	if err := h.linkParent.Handle(c.Request().Context(), application.LinkParentCommand{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		StudentID:         id,
+		ParentID:          parentID,
+		Relationship:      req.Relationship,
+		IsPrimary:         req.IsPrimary,
+	}); err != nil {
+		return handleAppError(c, err)
+	}
+	return response.OK(c, "parent linked", nil)
+}
+
+// UnlinkParent godoc
+//
+//	@Summary      Unlink parent from student
+//	@Description  Removes a parent-student link.
+//	@Tags         students
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        id         path      string  true  "Student profile UUID"
+//	@Param        parent_id  path      string  true  "Parent profile UUID"
+//	@Success      200        {object}  response.Response
+//	@Failure      403        {object}  response.Response
+//	@Failure      404        {object}  response.Response
+//	@Router       /students/{id}/parents/{parent_id} [delete]
+func (h *Handler) UnlinkParent(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+	parentID, err := parseUUID(c, "parent_id")
+	if err != nil {
+		return err
+	}
+	if err := h.unlinkParent.Handle(c.Request().Context(), application.UnlinkParentCommand{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		StudentID:         id,
+		ParentID:          parentID,
+	}); err != nil {
+		return handleAppError(c, err)
+	}
+	return response.OK(c, "parent unlinked", nil)
+}
+
+func (h *Handler) registerParentRoutes(v1 *echo.Group, auth echo.MiddlewareFunc) {
+	parents := v1.Group("/parents", auth)
+	parents.POST("", h.CreateParent)
+	parents.GET("", h.ListParents)
+	parents.GET("/:id", h.GetParent)
+	parents.PUT("/:id", h.UpdateParent)
+	parents.DELETE("/:id", h.DeactivateParent)
 }
 
 // ── Students ──────────────────────────────────────────────────────────────────

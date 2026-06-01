@@ -1,10 +1,16 @@
 # EduAccess API
 
+---
+
+BIG DISCLAIMER
+THE FIRST INITIAL COMMIT WE USE A TEMPLATE USING GO SAAS TEMPLATE AND MERGE IT WITH OUR INTERN PROJECT INSPIRATION THE FIRST INITIAL COMMIT IS NOT FULLY COMPLETED ITS BASE REFRENCE FOR OUR TEAM TO WORK ON
 Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and PostgreSQL (Supabase-ready).
 
 ---
 
 ## Table of Contents
+
+-[Midtermneeds](#midtermneeds)
 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
@@ -33,6 +39,44 @@ Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and Postg
 
 ---
 
+## Midtermneeds
+
+**Auth is enabled on all routes. You MUST send a Bearer token on every request (except login and registration). Here's the only thing you need to do:**
+
+## Step 1 — Login
+
+````json
+POST /api/v1/auth/login
+{
+  "email": "superadmin@eduaccess.com",
+  "password": "Test1234!"
+}
+```(this is not a superadmin account for a better case this is admin_sekolah account)
+
+Copy the `access_token` from the response.
+
+## Step 2 — Use the Token on Every Request
+
+In every subsequent request, set the Authorization header:
+
+````
+
+Authorization: Bearer <paste_your_access_token_here>
+
+```
+
+In Swagger UI: click the **Authorize** button (lock icon) on the most upper right, type `Bearer <token>`, click Authorize.
+
+## That's It. You Do NOT Need to Pass school_id Anywhere(except if your a superadmin account).
+
+The `school_id` is **automatically embedded in your token** when you log in. The server reads it from the token you never include it manually in request bodies or headers. (except for superadmin)
+
+> **Two account types you:**
+>
+> - **superadmin** — for platform-level routes: creating schools, listing all users, etc due to this roles it not attach to any schools, this roles need to inclue school_id on spesific request.
+> - **admin_sekolah** (linked to a school) — for school-scoped routes: headmasters, students, etc.
+
+---
 ## Overview
 
 EduAccess is a multi-tenant API that powers school management for multiple schools from a single deployment. Each school is a tenant; data is scoped by `school_id`. A **superadmin** manages the platform across all tenants; each school has its own **admin_sekolah**.
@@ -56,40 +100,173 @@ EduAccess is a multi-tenant API that powers school management for multiple schoo
 ## Project Structure
 
 ```
+
 eduaccess-api/
 ├── cmd/
-│   └── main.go                  # Entrypoint — wires all modules
+│ └── main.go # Entrypoint — wires all modules
 ├── database/
-│   └── migrations/
-│       └── 001_initial_schema.sql
-├── docs/                        # Auto-generated Swagger docs
+│ └── migrations/
+│ └── 001_initial_schema.sql # Full schema + seed data (roles, plans)
+├── docs/ # Auto-generated Swagger docs
+│ ├── docs.go
+│ ├── swagger.json
+│ └── swagger.yaml
 ├── internal/
-│   ├── auth/                    # Register, login, refresh, logout
-│   ├── school/                  # School CRUD, rules, subscriptions
-│   ├── student/                 # Students, parents, academic structure
-│   ├── user/                    # User management & profile
-│   └── shared/
-│       ├── apperror/            # Domain error types
-│       ├── middleware/          # JWT auth middleware
-│       ├── response/            # Consistent JSON response helpers
-│       └── validator/           # Request binding & validation
+│ ├── admin/ # Admin sekolah CRUD
+│ │ ├── application/
+│ │ │ ├── create_admin.go
+│ │ │ ├── deactivate_admin.go
+│ │ │ ├── get_admin.go
+│ │ │ ├── list_admins.go
+│ │ │ ├── update_admin.go
+│ │ │ ├── user_creator.go
+│ │ │ └── user_updater.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── admin.go
+│ │ │ └── repository.go
+│ │ └── infrastructure/
+│ │ └── admin_repository.go
+│ ├── auth/ # Register, login, refresh, logout
+│ │ ├── application/
+│ │ │ ├── login.go
+│ │ │ ├── logout.go
+│ │ │ ├── refresh.go
+│ │ │ └── register.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── repository.go
+│ │ │ └── user.go
+│ │ └── infrastructure/
+│ │ ├── refresh_token_repository.go
+│ │ ├── user_model.go
+│ │ └── user_repository.go
+│ ├── headmaster/ # Kepala sekolah CRUD
+│ │ ├── application/
+│ │ │ ├── create_headmaster.go
+│ │ │ ├── deactivate_headmaster.go
+│ │ │ ├── get_headmaster.go
+│ │ │ ├── list_headmasters.go
+│ │ │ ├── school_updater.go
+│ │ │ ├── update_headmaster.go
+│ │ │ └── user_creator.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── headmaster.go
+│ │ │ └── repository.go
+│ │ └── infrastructure/
+│ │ └── headmaster_repository.go
+│ ├── parent/ # Parent CRUD
+│ │ ├── application/
+│ │ │ ├── create_parent.go
+│ │ │ ├── deactivate_parent.go
+│ │ │ ├── get_parent.go
+│ │ │ ├── list_parents.go
+│ │ │ ├── update_parent.go
+│ │ │ └── user_creator.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── parent.go
+│ │ │ └── repository.go
+│ │ └── infrastructure/
+│ │ └── parent_repository.go
+│ ├── school/ # School CRUD, rules, subscriptions
+│ │ ├── application/
+│ │ │ ├── create_school.go
+│ │ │ ├── deactivate_school.go
+│ │ │ ├── get_school.go
+│ │ │ ├── get_subscription.go
+│ │ │ ├── list_schools.go
+│ │ │ ├── manage_rules.go
+│ │ │ └── update_school.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ └── handler.go
+│ │ ├── domain/
+│ │ │ ├── repository.go
+│ │ │ └── school.go
+│ │ └── infrastructure/
+│ │ └── school_repository.go
+│ ├── shared/ # Cross-cutting utilities
+│ │ ├── apperror/
+│ │ │ └── apperror.go # Domain error types
+│ │ ├── middleware/
+│ │ │ └── auth.go # JWT auth middleware
+│ │ ├── response/
+│ │ │ └── response.go # Consistent JSON response helpers
+│ │ └── validator/
+│ │ └── validator.go # Request binding & validation
+│ ├── student/ # Students, parents (linked), academic structure
+│ │ ├── application/
+│ │ │ ├── academic_handlers.go # Level / class / sub-class CRUD
+│ │ │ ├── create_parent.go
+│ │ │ ├── create_student.go
+│ │ │ ├── deactivate_student.go
+│ │ │ ├── get_student.go
+│ │ │ ├── list_students.go
+│ │ │ ├── manage_parent_link.go # Link / unlink parent ↔ student
+│ │ │ ├── parent_handlers.go
+│ │ │ ├── update_student.go
+│ │ │ └── user_creator.go
+│ │ ├── delivery/http/
+│ │ │ ├── dto.go
+│ │ │ ├── handler.go
+│ │ │ └── student_handler.go
+│ │ ├── domain/
+│ │ │ ├── academic.go
+│ │ │ ├── parent.go
+│ │ │ ├── repository.go
+│ │ │ ├── student_profile.go
+│ │ │ └── student_repository.go
+│ │ └── infrastructure/
+│ │ ├── academic_repository.go
+│ │ ├── parent_repository.go
+│ │ └── student_profile_repository.go
+│ └── user/ # Platform user management & profile
+│ ├── application/
+│ │ ├── change_password.go
+│ │ ├── deactivate_user.go
+│ │ ├── get_user.go
+│ │ ├── list_users.go
+│ │ ├── repository.go
+│ │ └── update_user.go
+│ ├── delivery/http/
+│ │ ├── dto.go
+│ │ └── handler.go
+│ └── infrastructure/
+│ └── user_repository.go
 ├── pkg/
-│   ├── database/                # GORM connection setup
-│   └── jwt/                     # Token generation & parsing
-├── .env.example                 # Copy this to .env
+│ ├── database/
+│ │ └── database.go # GORM connection setup
+│ └── jwt/
+│ └── jwt.go # Token generation & parsing
+├── .env.example
 ├── docker-compose.yml
-└── Dockerfile
+├── Dockerfile
+├── go.mod
+└── go.sum
+
 ```
 
-Each domain follows a clean architecture layout:
+Each domain module follows the same clean architecture layout:
 
 ```
+
 internal/<domain>/
-├── application/   # Use-case handlers (business logic)
-├── delivery/http/ # HTTP handlers & DTOs
-├── domain/        # Entities, interfaces, constants
-└── infrastructure/# GORM repositories
-```
+├── application/ # Use-case handlers — business logic, no HTTP concerns
+├── delivery/http/ # Echo handlers + request/response DTOs
+├── domain/ # Entities, repository interfaces, domain constants
+└── infrastructure/ # GORM repository implementations
+
+````
 
 ---
 
@@ -107,28 +284,27 @@ Copy the example file and fill in the values:
 
 ```bash
 cp .env.example .env
-```
+````
 
-| Variable            | Required | Description                                            |
-| ------------------- | -------- | ------------------------------------------------------ |
-| `APP_ENV`           | No       | `development` (enables SQL logging) or `production`    |
-| `APP_PORT`          | No       | HTTP port, default `8080`                              |
-| `DATABASE_URL`      | Either   | Full Postgres DSN — use this for Supabase / Railway    |
-| `DB_HOST`           | Either   | Individual DB connection vars (alternative to above)   |
-| `DB_PORT`           | Either   | Default `5432`                                         |
-| `DB_USER`           | Either   | Database user                                          |
-| `DB_PASSWORD`       | Either   | Database password                                      |
-| `DB_NAME`           | Either   | Database name                                          |
-| `DB_SSLMODE`        | No       | `disable` (local) or `require` (Supabase)              |
-| `DB_MAX_OPEN_CONNS` | No       | Max open DB connections, default `25`                  |
-| `DB_MAX_IDLE_CONNS` | No       | Max idle DB connections, default `5`                   |
-| `JWT_SECRET`        | **Yes**  | Secret key for signing JWTs — use a long random string |
-
-> **Never commit your `.env` file.** It is already in `.gitignore`. Share secrets through a password manager or your team's secrets vault.
+| Variable             | Required | Description                                            |
+| -------------------- | -------- | ------------------------------------------------------ |
+| `APP_ENV`            | No       | `development` (enables SQL logging) or `production`    |
+| `APP_PORT`           | No       | HTTP port, default `8080`                              |
+| `CORS_ALLOW_ORIGINS` | No       | Comma-separated allowlist of origins (default `*`)     |
+| `DATABASE_URL`       | Either   | Full Postgres DSN — use this for Supabase / Railway    |
+| `DB_HOST`            | Either   | Individual DB connection vars (alternative to above)   |
+| `DB_PORT`            | Either   | Default `5432`                                         |
+| `DB_USER`            | Either   | Database user                                          |
+| `DB_PASSWORD`        | Either   | Database password                                      |
+| `DB_NAME`            | Either   | Database name                                          |
+| `DB_SSLMODE`         | No       | `disable` (local) or `require` (Supabase)              |
+| `DB_MAX_OPEN_CONNS`  | No       | Max open DB connections, default `25`                  |
+| `DB_MAX_IDLE_CONNS`  | No       | Max idle DB connections, default `5`                   |
+| `JWT_SECRET`         | **Yes**  | Secret key for signing JWTs — use a long random string |
 
 ---
 
-### Option A — Local PostgreSQL (Docker Compose)
+<!-- ### Option A — Local PostgreSQL (Docker Compose)
 
 This spins up both the API and a local Postgres instance:
 
@@ -144,49 +320,60 @@ docker compose up --build
 # Swagger UI at        http://localhost:8080/swagger/index.html
 ```
 
-The compose file mounts `database/migrations/` into Postgres so the schema is applied automatically on first start.
-
----
-
-### Option B — Connect to Supabase
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. In the Supabase dashboard go to **Settings → Database → Connection string → URI** and copy the connection string.
-3. Set it in your `.env`:
-
-```dotenv
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require
-JWT_SECRET=your-long-random-secret
-```
-
-4. Apply the initial migration. You can paste the contents of `database/migrations/001_initial_schema.sql` into the Supabase SQL editor, or run it via `psql`:
-
-```bash
-psql "$DATABASE_URL" -f database/migrations/001_initial_schema.sql
-```
-
-5. Start the API:
-
-```bash
-go run ./cmd/main.go
-```
-
-> Supabase passwords and connection strings are secrets. Store them only in `.env` (which is gitignored) or your CI/CD secrets store. Never paste them in chat or commit history.
+The compose file mounts `database/migrations/` into Postgres so the schema is applied automatically on first start. --> Work in progress for midterm assedment use option b, we will provide the lecture the env on the lms.
 
 ---
 
 ### Run Without Docker
 
-```bash
-# Install dependencies
-go mod download
+Steps for anyone cloning this repo for the first time:
 
-# (Optional) Regenerate Swagger docs after changing annotations
-go install github.com/swaggo/swag/cmd/swag@latest
+```bash
+# 1. Clone the repo
+git clone https://github.com/your-org/eduaccess-api.git
+cd eduaccess-api
+
+# Install / tidy Go dependencies
+go mod tidy
+
+# Copy the environment file and fill in your values
+cp .env.example .env
+# Open .env and set DATABASE_URL and JWT_SECRET at minimum
+
 swag init -g cmd/main.go --output docs
 
-# Run
+# 6. Run the server
 go run ./cmd/main.go
+```
+
+The server starts at `http://localhost:8080` and Swagger UI is at `http://localhost:8080/swagger/index.html`.
+
+### Run Together With Flutter Frontend
+
+Backend base API path is `/api/v1`, and Flutter should point to this base URL.
+
+1. Run backend:
+
+```bash
+cp .env.example .env
+# set JWT_SECRET before running
+go run ./cmd/main.go
+```
+
+2. Run Flutter with the correct API base URL:
+
+```bash
+# Web/Desktop
+flutter run --dart-define=EDUACCESS_BASE_URL=http://localhost:8080/api/v1
+
+# Android emulator
+flutter run --dart-define=EDUACCESS_BASE_URL=http://10.0.2.2:8080/api/v1
+```
+
+For Flutter Web in development, you can restrict CORS safely instead of `*`:
+
+```dotenv
+CORS_ALLOW_ORIGINS=http://localhost:3000,http://localhost:5000
 ```
 
 ---
@@ -194,6 +381,8 @@ go run ./cmd/main.go
 ## Database Setup
 
 The full schema lives in [database/migrations/001_initial_schema.sql](database/migrations/001_initial_schema.sql).
+this is the ERD we plan to impelment (their might be changes in the future)
+https://drive.google.com/file/d/1Rt9KfwXE1S2RZ9Zu3CM6iX4B6pqTg5y0/view?usp=sharing
 
 Key tables:
 
@@ -212,6 +401,7 @@ Key tables:
 | `academic_levels`      | Grade levels (e.g. SD, SMP)                     |
 | `classrooms`           | Classes within a level                          |
 | `sub_classrooms`       | Sub-classes / sections                          |
+| `headmaster_profiles`  | head master data                                |
 
 When using **Docker Compose**, the schema is applied automatically on first start. When using **Supabase**, apply it once via the SQL editor or `psql`.
 
@@ -228,8 +418,6 @@ When using **Docker Compose**, the schema is applied automatically on first star
 | `staff`          | `RoleStaff`                 | Staff access                       |
 | `orangtua`       | `RoleOrangTua`              | Parent (linked to students)        |
 | `siswa`          | `RoleSiswa`                 | Student                            |
-
-Role-based rules are enforced at the application layer (use-case handlers), not just at the route level. The JWT payload carries the role, so each handler can check it without a DB round-trip.
 
 ---
 
@@ -504,7 +692,7 @@ swag init -g cmd/main.go --output docs
 
 ---
 
-## Docker
+<!-- ## Docker
 
 **Build and run with Docker Compose (recommended for local dev):**
 
@@ -527,7 +715,7 @@ docker run -p 8080:8080 \
   eduaccess-api
 ```
 
-The Dockerfile is multi-stage (Go builder → Alpine runtime) and generates Swagger docs during the build. Timezone is set to `Asia/Jakarta`.
+The Dockerfile is multi-stage (Go builder → Alpine runtime) and generates Swagger docs during the build. Timezone is set to `Asia/Jakarta`. -->still work in progress
 
 ---
 
