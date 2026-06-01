@@ -1,4 +1,4 @@
-﻿package application
+package application
 
 import (
 	"context"
@@ -106,7 +106,7 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 	// Hash password
 	pwd := cmd.Password
 	if pwd == "" {
-		pwd = "Siswa@12345" // default ΓÇö must be changed on first login
+		pwd = "Siswa@12345" // default ??? must be changed on first login
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
