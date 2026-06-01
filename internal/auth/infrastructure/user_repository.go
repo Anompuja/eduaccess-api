@@ -148,3 +148,9 @@ func (r *GormUserRepository) ExistsByUsername(ctx context.Context, username stri
 	}
 	return count > 0, nil
 }
+
+func (r *GormUserRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
+	return r.db.WithContext(ctx).Model(&userModel{}).
+		Where("id = ? AND deleted_at IS NULL", id).
+		Update("deleted_at", time.Now()).Error
+}

@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -39,8 +40,8 @@ type CreateStudentCommand struct {
 
 // CreateStudentHandler creates a user (role=siswa) + student_profile atomically.
 type CreateStudentHandler struct {
-	users   UserCreator
-	repo    domain.StudentRepository
+	users UserCreator
+	repo  domain.StudentRepository
 }
 
 func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository) *CreateStudentHandler {
@@ -57,8 +58,45 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 
 	// Resolve school ID
 	schoolID := cmd.RequesterSchoolID
-	if cmd.RequesterRole == "superadmin" && schoolID == nil {
-		return nil, apperror.New(apperror.ErrBadRequest, "school_id required for superadmin")
+
+	if cmd.SubClassID != nil {
+		subClass, err := h.academic.FindSubClassByID(ctx, *cmd.SubClassID)
+		if err != nil {
+			return nil, apperror.New(apperror.ErrBadRequest, "invalid sub_class_id")
+		}
+		if schoolID == nil {
+			schoolID = &subClass.SchoolID
+		} else if *schoolID != subClass.SchoolID {
+			return nil, apperror.New(apperror.ErrBadRequest, "sub_class_id does not belong to the correct school")
+		}
+	}
+
+	if cmd.ClassID != nil {
+		class, err := h.academic.FindClassByID(ctx, *cmd.ClassID)
+		if err != nil {
+			return nil, apperror.New(apperror.ErrBadRequest, "invalid class_id")
+		}
+		if schoolID == nil {
+			schoolID = &class.SchoolID
+		} else if *schoolID != class.SchoolID {
+			return nil, apperror.New(apperror.ErrBadRequest, "class_id does not belong to the correct school")
+		}
+	}
+
+	if cmd.EducationLevelID != nil {
+		level, err := h.academic.FindLevelByID(ctx, *cmd.EducationLevelID)
+		if err != nil {
+			return nil, apperror.New(apperror.ErrBadRequest, "invalid education_level_id")
+		}
+		if schoolID == nil {
+			schoolID = &level.SchoolID
+		} else if *schoolID != level.SchoolID {
+			return nil, apperror.New(apperror.ErrBadRequest, "education_level_id does not belong to the correct school")
+		}
+	}
+
+	if schoolID == nil {
+		return nil, apperror.New(apperror.ErrBadRequest, "unable to resolve school context; provide class_id, sub_class_id, or education_level_id")
 	}
 
 	// Check email uniqueness
@@ -136,6 +174,9 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 		UpdatedAt:         time.Now(),
 	}
 	if err := h.repo.CreateStudentProfile(ctx, profile); err != nil {
+		if rollbackErr := h.users.SoftDelete(ctx, user.ID); rollbackErr != nil {
+			return nil, fmt.Errorf("create student failed: %w (rollback failed: %v)", err, rollbackErr)
+		}
 		return nil, err
 	}
 	return profile, nil

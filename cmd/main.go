@@ -13,7 +13,14 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+<<<<<<< Updated upstream
 	_ "github.com/eduaccess/eduaccess-api/docs"
+=======
+	docs "github.com/eduaccess/eduaccess-api/docs"
+	academicApp "github.com/eduaccess/eduaccess-api/internal/academic/application"
+	academicHTTP "github.com/eduaccess/eduaccess-api/internal/academic/delivery/http"
+	academicInfra "github.com/eduaccess/eduaccess-api/internal/academic/infrastructure"
+>>>>>>> Stashed changes
 	adminApp "github.com/eduaccess/eduaccess-api/internal/admin/application"
 	adminHTTP "github.com/eduaccess/eduaccess-api/internal/admin/delivery/http"
 	adminInfra "github.com/eduaccess/eduaccess-api/internal/admin/infrastructure"
@@ -164,6 +171,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+	docs.SwaggerInfo.Host = fmt.Sprintf("localhost:%s", port)
 
 	// Graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)

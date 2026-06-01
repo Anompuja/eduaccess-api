@@ -11,6 +11,7 @@ import (
 type ListStudentsQuery struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	SchoolID          *uuid.UUID
 	EducationLevelID  *uuid.UUID
 	ClassID           *uuid.UUID
 	SubClassID        *uuid.UUID
@@ -47,7 +48,9 @@ func (h *ListStudentsHandler) Handle(ctx context.Context, q ListStudentsQuery) (
 	}
 
 	var schoolID *uuid.UUID
-	if q.RequesterRole != "superadmin" {
+	if q.RequesterRole == "superadmin" {
+		schoolID = q.SchoolID
+	} else {
 		schoolID = q.RequesterSchoolID
 	}
 

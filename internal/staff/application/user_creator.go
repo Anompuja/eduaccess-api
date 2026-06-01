@@ -7,8 +7,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// UserCreator abstracts user creation so the student/parent handlers
-// don't depend directly on auth infrastructure.
+// UserCreator abstracts user creation so staff use-cases don't depend
+// directly on auth infrastructure.
 type UserCreator interface {
 	Create(ctx context.Context, user *authdomain.User) error
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
