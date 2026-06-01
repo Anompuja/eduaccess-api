@@ -58,7 +58,11 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 
 	// Resolve school ID
 	schoolID := cmd.RequesterSchoolID
+<<<<<<< Updated upstream
 
+=======
+	
+>>>>>>> Stashed changes
 	if cmd.SubClassID != nil {
 		subClass, err := h.academic.FindSubClassByID(ctx, *cmd.SubClassID)
 		if err != nil {
@@ -70,7 +74,11 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 			return nil, apperror.New(apperror.ErrBadRequest, "sub_class_id does not belong to the correct school")
 		}
 	}
+<<<<<<< Updated upstream
 
+=======
+	
+>>>>>>> Stashed changes
 	if cmd.ClassID != nil {
 		class, err := h.academic.FindClassByID(ctx, *cmd.ClassID)
 		if err != nil {
@@ -82,7 +90,11 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 			return nil, apperror.New(apperror.ErrBadRequest, "class_id does not belong to the correct school")
 		}
 	}
+<<<<<<< Updated upstream
 
+=======
+	
+>>>>>>> Stashed changes
 	if cmd.EducationLevelID != nil {
 		level, err := h.academic.FindLevelByID(ctx, *cmd.EducationLevelID)
 		if err != nil {
@@ -94,7 +106,11 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 			return nil, apperror.New(apperror.ErrBadRequest, "education_level_id does not belong to the correct school")
 		}
 	}
+<<<<<<< Updated upstream
 
+=======
+	
+>>>>>>> Stashed changes
 	if schoolID == nil {
 		return nil, apperror.New(apperror.ErrBadRequest, "unable to resolve school context; provide class_id, sub_class_id, or education_level_id")
 	}

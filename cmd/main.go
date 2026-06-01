@@ -14,8 +14,11 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	_ "github.com/eduaccess/eduaccess-api/docs"
 =======
+=======
+>>>>>>> Stashed changes
 	docs "github.com/eduaccess/eduaccess-api/docs"
 	academicApp "github.com/eduaccess/eduaccess-api/internal/academic/application"
 	academicHTTP "github.com/eduaccess/eduaccess-api/internal/academic/delivery/http"
