@@ -2332,6 +2332,313 @@ const docTemplate = `{
                 }
             }
         },
+        "/staff": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a paginated list of staff. Tenant-scoped.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "staff"
+                ],
+                "summary": "List staff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search by name, email or username",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20)",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.StaffResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a user account (role=staff) and staff profile atomically.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "staff"
+                ],
+                "summary": "Create staff",
+                "parameters": [
+                    {
+                        "description": "Staff data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateStaffRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.StaffResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/staff/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "staff"
+                ],
+                "summary": "Get staff by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Staff profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.StaffResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates mutable fields in users and staff_profiles.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "staff"
+                ],
+                "summary": "Update staff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Staff profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Staff fields to update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateStaffRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.StaffResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "staff"
+                ],
+                "summary": "Deactivate staff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Staff profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/storage/signed-url": {
             "get": {
                 "security": [
@@ -2746,6 +3053,430 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Student profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/{id}/parents": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Links an existing parent profile to a student.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Link parent to student",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Student profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Parent link data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.LinkParentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/{id}/parents/{parent_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Removes a parent-student link.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Unlink parent from student",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Student profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Parent profile UUID",
+                        "name": "parent_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a paginated list of teachers. Tenant-scoped.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "List teachers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search by name, email or username",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20)",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.TeacherResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a user account (role=teacher) and teacher profile atomically.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Create teacher",
+                "parameters": [
+                    {
+                        "description": "Teacher data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateTeacherRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.TeacherResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Get teacher by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Teacher profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.TeacherResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates mutable fields in users and teacher_profiles.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Update teacher",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Teacher profile UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Teacher fields to update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateTeacherRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.TeacherResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Deactivate teacher",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Teacher profile UUID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3305,8 +4036,8 @@ const docTemplate = `{
                 "gender": {
                     "type": "string",
                     "enum": [
-                        "male",
-                        "female"
+                        "L",
+                        "P"
                     ]
                 },
                 "ktp_image_path": {
@@ -3378,6 +4109,66 @@ const docTemplate = `{
                 "time_zone": {
                     "type": "string",
                     "maxLength": 100
+                }
+            }
+        },
+        "http.CreateStaffRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 3
                 }
             }
         },
@@ -3477,6 +4268,111 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 191,
                     "minLength": 1
+                }
+            }
+        },
+        "http.CreateTeacherRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "berat_badan": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
+                },
+                "golongan_darah": {
+                    "type": "string"
+                },
+                "jurusan": {
+                    "type": "string"
+                },
+                "kelainan_jasmani": {
+                    "type": "string"
+                },
+                "kewarganegaraan": {
+                    "type": "string"
+                },
+                "kode_pos": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "nip": {
+                    "type": "string"
+                },
+                "nuptk": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "pendidikan_terakhir": {
+                    "type": "string"
+                },
+                "penyakit_kronis_yang_pernah_diderita": {
+                    "type": "string"
+                },
+                "penyakit_yang_sering_kambuh": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "rt_rw": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "tahun_lulus": {
+                    "type": "string"
+                },
+                "tahun_masuk": {
+                    "type": "string"
+                },
+                "tinggi_badan": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 3
                 }
             }
         },
@@ -3689,6 +4585,30 @@ const docTemplate = `{
                 }
             }
         },
+        "http.LinkParentRequest": {
+            "type": "object",
+            "required": [
+                "parent_id",
+                "relationship"
+            ],
+            "properties": {
+                "is_primary": {
+                    "type": "boolean"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "relationship": {
+                    "type": "string",
+                    "enum": [
+                        "father",
+                        "mother",
+                        "guardian",
+                        "other"
+                    ]
+                }
+            }
+        },
         "http.LoginRequest": {
             "type": "object",
             "required": [
@@ -3717,6 +4637,32 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token_type": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/http.LoginUserInfo"
+                }
+            }
+        },
+        "http.LoginUserInfo": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "school_id": {
                     "type": "string"
                 }
             }
@@ -3926,6 +4872,62 @@ const docTemplate = `{
                 }
             }
         },
+        "http.StaffResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "http.StudentResponse": {
             "type": "object",
             "properties": {
@@ -4061,6 +5063,107 @@ const docTemplate = `{
                 }
             }
         },
+        "http.TeacherResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "berat_badan": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "golongan_darah": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jurusan": {
+                    "type": "string"
+                },
+                "kelainan_jasmani": {
+                    "type": "string"
+                },
+                "kewarganegaraan": {
+                    "type": "string"
+                },
+                "kode_pos": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "nip": {
+                    "type": "string"
+                },
+                "nuptk": {
+                    "type": "string"
+                },
+                "pendidikan_terakhir": {
+                    "type": "string"
+                },
+                "penyakit_kronis_yang_pernah_diderita": {
+                    "type": "string"
+                },
+                "penyakit_yang_sering_kambuh": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "rt_rw": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "tahun_lulus": {
+                    "type": "string"
+                },
+                "tahun_masuk": {
+                    "type": "string"
+                },
+                "tinggi_badan": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "http.UpdateAdminRequest": {
             "type": "object",
             "properties": {
@@ -4130,8 +5233,8 @@ const docTemplate = `{
                 "gender": {
                     "type": "string",
                     "enum": [
-                        "male",
-                        "female"
+                        "L",
+                        "P"
                     ]
                 },
                 "ktp_image_path": {
@@ -4192,6 +5295,53 @@ const docTemplate = `{
                 }
             }
         },
+        "http.UpdateStaffRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 3
+                }
+            }
+        },
         "http.UpdateStudentRequest": {
             "type": "object",
             "properties": {
@@ -4249,6 +5399,98 @@ const docTemplate = `{
                 "tahun_masuk": {
                     "type": "string",
                     "maxLength": 10
+                }
+            }
+        },
+        "http.UpdateTeacherRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "berat_badan": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
+                },
+                "golongan_darah": {
+                    "type": "string"
+                },
+                "jurusan": {
+                    "type": "string"
+                },
+                "kelainan_jasmani": {
+                    "type": "string"
+                },
+                "kewarganegaraan": {
+                    "type": "string"
+                },
+                "kode_pos": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "nip": {
+                    "type": "string"
+                },
+                "nuptk": {
+                    "type": "string"
+                },
+                "pendidikan_terakhir": {
+                    "type": "string"
+                },
+                "penyakit_kronis_yang_pernah_diderita": {
+                    "type": "string"
+                },
+                "penyakit_yang_sering_kambuh": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "rt_rw": {
+                    "type": "string"
+                },
+                "tahun_lulus": {
+                    "type": "string"
+                },
+                "tahun_masuk": {
+                    "type": "string"
+                },
+                "tinggi_badan": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 3
                 }
             }
         },
@@ -4503,6 +5745,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {},
+                "errors": {},
                 "message": {
                     "type": "string"
                 },

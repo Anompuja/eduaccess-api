@@ -3,9 +3,9 @@
 import (
 	"context"
 
+	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/staff/domain"
-	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/google/uuid"
 )
 
