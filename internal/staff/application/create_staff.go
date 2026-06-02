@@ -1,7 +1,8 @@
-package application
+﻿package application
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -109,9 +110,8 @@ func (h *CreateStaffHandler) Handle(ctx context.Context, cmd CreateStaffCommand)
 	}
 
 	now := time.Now()
-	userID := uuid.New()
 	user := &authdomain.User{
-		ID:        userID,
+		ID:        uuid.New(),
 		SchoolID:  schoolID,
 		Role:      authdomain.RoleStaff,
 		Name:      cmd.Name,
@@ -129,7 +129,7 @@ func (h *CreateStaffHandler) Handle(ctx context.Context, cmd CreateStaffCommand)
 
 	staff := &domain.StaffProfile{
 		ID:           uuid.New(),
-		UserID:       userID,
+		UserID:       user.ID,
 		SchoolID:     *schoolID,
 		Name:         cmd.Name,
 		Email:        cmd.Email,
@@ -147,6 +147,9 @@ func (h *CreateStaffHandler) Handle(ctx context.Context, cmd CreateStaffCommand)
 		UpdatedAt:    now,
 	}
 	if err := h.staffRepo.CreateStaffProfile(ctx, staff); err != nil {
+		if rollbackErr := h.userCreator.SoftDelete(ctx, user.ID); rollbackErr != nil {
+			return nil, fmt.Errorf("create staff failed: %w (rollback failed: %v)", err, rollbackErr)
+		}
 		return nil, err
 	}
 

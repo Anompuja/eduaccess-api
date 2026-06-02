@@ -1,8 +1,9 @@
-package application
+﻿package application
 
 import (
 	"context"
 
+	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/staff/domain"
 	"github.com/google/uuid"
@@ -12,6 +13,7 @@ import (
 type ListStaffQuery struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	SchoolID          *uuid.UUID
 	Search            string
 	Page              int
 	PerPage           int
@@ -48,14 +50,26 @@ func (h *ListStaffHandler) Handle(ctx context.Context, q ListStaffQuery) (*ListS
 		q.PerPage = 100
 	}
 
-	// Check authorization: requester must have a school assigned
-	if q.RequesterSchoolID == nil {
-		return nil, apperror.New(apperror.ErrForbidden, "user not assigned to a school")
+	// Authorization: superadmin can list all staff, admin_sekolah must have school_id
+	var schoolID *uuid.UUID
+	if q.RequesterRole == authdomain.RoleSuperadmin {
+		// Superadmin can list all staff from all schools.
+		// If a school_id is supplied, scope to that school; otherwise fetch all schools.
+		schoolID = q.SchoolID
+	} else if q.RequesterRole == authdomain.RoleAdminSekolah {
+		// Admin sekolah must have a school assigned
+		if q.RequesterSchoolID == nil {
+			return nil, apperror.New(apperror.ErrForbidden, "user not assigned to a school")
+		}
+		schoolID = q.RequesterSchoolID
+	} else {
+		// Other roles cannot list staff
+		return nil, apperror.New(apperror.ErrForbidden, "insufficient permissions")
 	}
 
 	// Build filter
 	filter := domain.StaffFilter{
-		SchoolID: *q.RequesterSchoolID,
+		SchoolID: schoolID,
 		Search:   q.Search,
 		Offset:   (q.Page - 1) * q.PerPage,
 		Limit:    q.PerPage,

@@ -1,4 +1,4 @@
-package infrastructure
+﻿package infrastructure
 
 import (
 	"context"
@@ -119,8 +119,14 @@ func (r *StaffRepository) ListStaff(ctx context.Context, filter domain.StaffFilt
 	var models []staffProfileModel
 	var total int64
 
-	query := r.db.WithContext(ctx).
-		Where("school_id = ? AND deleted_at IS NULL", filter.SchoolID)
+	query := r.db.WithContext(ctx)
+
+	// Apply school filter only when present.
+	if filter.SchoolID != nil {
+		query = query.Where("staff_profiles.school_id = ?", *filter.SchoolID)
+	}
+
+	query = query.Where("staff_profiles.deleted_at IS NULL")
 
 	// Apply search filter
 	if filter.Search != "" {

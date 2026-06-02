@@ -1,8 +1,9 @@
-package application
+﻿package application
 
 import (
 	"context"
 
+	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/teacher/domain"
 	"github.com/google/uuid"
@@ -12,6 +13,7 @@ import (
 type ListTeachersQuery struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	SchoolID          *uuid.UUID
 	Search            string
 	Page              int
 	PerPage           int
@@ -48,17 +50,24 @@ func (h *ListTeachersHandler) Handle(ctx context.Context, q ListTeachersQuery) (
 		q.PerPage = 100
 	}
 
-	// Build filter
+	var schoolID *uuid.UUID
+	switch q.RequesterRole {
+	case authdomain.RoleSuperadmin:
+		schoolID = q.SchoolID
+	case authdomain.RoleAdminSekolah:
+		if q.RequesterSchoolID == nil {
+			return nil, apperror.New(apperror.ErrForbidden, "user not assigned to a school")
+		}
+		schoolID = q.RequesterSchoolID
+	default:
+		return nil, apperror.New(apperror.ErrForbidden, "insufficient permissions")
+	}
+
 	filter := domain.TeacherFilter{
-		SchoolID: *q.RequesterSchoolID,
+		SchoolID: schoolID,
 		Search:   q.Search,
 		Offset:   (q.Page - 1) * q.PerPage,
 		Limit:    q.PerPage,
-	}
-
-	// Authorization: admin_sekolah can only list teachers in their school
-	if q.RequesterRole == "admin_sekolah" {
-		filter.SchoolID = *q.RequesterSchoolID
 	}
 
 	teachers, total, err := h.teacherRepo.ListTeachers(ctx, filter)

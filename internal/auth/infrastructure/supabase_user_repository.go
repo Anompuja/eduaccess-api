@@ -1,4 +1,4 @@
-package infrastructure
+﻿package infrastructure
 
 import (
 	"context"
@@ -50,8 +50,19 @@ func (r *SupabaseUserRepository) ExistsByUsername(ctx context.Context, username 
 	return r.gorm.ExistsByUsername(ctx, username)
 }
 
+func (r *SupabaseUserRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
+	if err := r.db.WithContext(ctx).Model(&userModel{}).
+		Where("id = ? AND deleted_at IS NULL", id).
+		Update("deleted_at", time.Now()).Error; err != nil {
+		return err
+	}
+
+	r.supabase.DeleteUser(ctx, id)
+	return nil
+}
+
 // Create registers the user in Supabase Auth then inserts the profile row,
-// assigns the role, and links to a school — all in one transaction.
+// assigns the role, and links to a school ΓÇö all in one transaction.
 // If the GORM transaction fails, we attempt to roll back the Supabase Auth user.
 func (r *SupabaseUserRepository) Create(ctx context.Context, user *domain.User) error {
 	// 1. Create the identity record in Supabase Auth. user.Password holds the

@@ -1,4 +1,4 @@
-package domain
+﻿package domain
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type StaffRepository interface {
 
 // StaffFilter is used for filtering and pagination in list operations.
 type StaffFilter struct {
-	SchoolID uuid.UUID
+	SchoolID *uuid.UUID
 	Search   string // searches by name, email, or username
 	Offset   int
 	Limit    int

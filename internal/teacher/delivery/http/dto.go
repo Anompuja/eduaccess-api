@@ -1,4 +1,4 @@
-package http
+﻿package http
 
 import "time"
 
@@ -80,7 +80,7 @@ type TeacherResponse struct {
 	Gender                          *string    `json:"gender"`
 	Religion                        *string    `json:"religion"`
 	BirthPlace                      *string    `json:"birth_place"`
-	BirthDate                       *time.Time `json:"birth_date"`
+	BirthDate                       *string    `json:"birth_date"`
 	NIK                             *string    `json:"nik"`
 	KTPImagePath                    *string    `json:"ktp_image_path"`
 	Kewarganegaraan                 *string    `json:"kewarganegaraan"`
