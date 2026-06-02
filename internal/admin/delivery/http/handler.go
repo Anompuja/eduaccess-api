@@ -97,9 +97,19 @@ func (h *Handler) ListAdmins(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
 
+	var schoolID *uuid.UUID
+	if authmw.GetRole(c) == "superadmin" {
+		if err := parseUUIDField(queryUUIDParam(c, "school_id"), &schoolID); err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+	} else {
+		schoolID = authmw.GetSchoolID(c)
+	}
+
 	q := application.ListAdminsQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
+		SchoolID:          schoolID,
 		Search:            c.QueryParam("search"),
 		Page:              page,
 		PerPage:           perPage,
@@ -297,6 +307,14 @@ func parseUUIDField(src *string, dst **uuid.UUID) error {
 	}
 	*dst = &id
 	return nil
+}
+
+func queryUUIDParam(c echo.Context, key string) *string {
+	value := c.QueryParam(key)
+	if value == "" {
+		return nil
+	}
+	return &value
 }
 
 func handleAppError(c echo.Context, err error) error {

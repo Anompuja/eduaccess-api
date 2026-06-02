@@ -11,6 +11,7 @@ import (
 type ListAdminsQuery struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	SchoolID          *uuid.UUID
 	Search            string // name, email, username
 	Page              int
 	PerPage           int
@@ -43,13 +44,8 @@ func (h *ListAdminsHandler) Handle(ctx context.Context, q ListAdminsQuery) (*Lis
 		perPage = 20
 	}
 
-	var schoolID *uuid.UUID
-	if q.RequesterRole != "superadmin" {
-		schoolID = q.RequesterSchoolID
-	}
-
 	admins, total, err := h.repo.ListAdmins(ctx, domain.AdminFilter{
-		SchoolID: schoolID,
+		SchoolID: q.SchoolID,
 		Search:   q.Search,
 		Offset:   (page - 1) * perPage,
 		Limit:    perPage,
