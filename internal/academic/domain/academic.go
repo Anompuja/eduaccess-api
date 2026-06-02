@@ -54,39 +54,48 @@ type AcademicYear struct {
 
 // Subject represents a school subject (Mata Pelajaran).
 type Subject struct {
-	ID        uuid.UUID
-	SchoolID  uuid.UUID
-	Name      string
-	Category  string // core, elective, extracurricular, specialized, vocational
-	DeletedAt *time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID               uuid.UUID
+	SchoolID         uuid.UUID
+	EducationLevelID *uuid.UUID // optional: scope subject to a specific education level
+	Name             string
+	Code             *string
+	Category         string // core, elective, extracurricular, specialized, vocational
+	DeletedAt        *time.Time
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }
 
 // Classroom represents a physical classroom (Ruang Kelas).
 type Classroom struct {
-	ID         uuid.UUID
-	SchoolID   uuid.UUID
-	Name       string
-	Capacity   int
-	Floor      int
-	Building   string
-	RoomType   string
-	Status     string // available, occupied, maintenance
-	Facilities string
-	DeletedAt  *time.Time
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	ID                uuid.UUID
+	SchoolID          uuid.UUID
+	ClassID           *uuid.UUID // FK school_classes
+	SubClassID        *uuid.UUID // FK school_sub_classes
+	AcademicYearID    *uuid.UUID // FK school_academic_years
+	HomeroomTeacherID *uuid.UUID // FK users (wali kelas)
+	Name              string
+	CodeRoom          string
+	Capacity          int
+	Floor             string
+	Building          string
+	RoomType          string
+	Status            string // unknown, available, occupied, maintenance
+	Facilities        string
+	DeletedAt         *time.Time
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
 }
 
-// Schedule represents a school shift template (Jadwal / shift pagi/siang/full_day).
 type Schedule struct {
-	ID        uuid.UUID
-	SchoolID  uuid.UUID
-	ShiftType string // morning, afternoon, full_day
-	StartTime string // e.g. "07:00"
-	EndTime   string // e.g. "13:00"
-	DeletedAt *time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           uuid.UUID
+	SchoolID     uuid.UUID
+	DayOfWeek    string // monday, tuesday, wednesday, thursday, friday, saturday, sunday
+	PeriodNumber int
+	Label        string // "Jam 1", "Istirahat", "Jam 4"
+	StartTime    string // "07:00"
+	EndTime      string // "07:45"
+	IsBreak      bool
+	DeletedAt    *time.Time
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

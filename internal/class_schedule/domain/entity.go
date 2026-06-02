@@ -12,6 +12,8 @@ type ClassSchedule struct {
 	ClassroomID           uuid.UUID
 	SubjectID             uuid.UUID
 	TeacherID             uuid.UUID
+	StartPeriodID         *uuid.UUID
+	EndPeriodID           *uuid.UUID
 	Date                  time.Time
 	StartTime             string
 	EndTime               string

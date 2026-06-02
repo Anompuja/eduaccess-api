@@ -8,6 +8,7 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/parent/application"
 	"github.com/eduaccess/eduaccess-api/internal/parent/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
+	"github.com/eduaccess/eduaccess-api/internal/shared/httpcache"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
@@ -41,7 +42,7 @@ func NewHandler(
 		deactivate:   deactivate,
 	}
 
-	parents := v1.Group("/parents", authmw.RequireAuth)
+	parents := v1.Group("/parents", authmw.RequireAuth, httpcache.Middleware(httpcache.ShortLived))
 	parents.POST("", h.CreateParent)
 	parents.GET("", h.ListParents)
 	parents.GET("/:id", h.GetParent)

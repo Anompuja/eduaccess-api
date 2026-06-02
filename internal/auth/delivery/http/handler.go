@@ -9,6 +9,7 @@ import (
 	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
 	authDomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
+	"github.com/eduaccess/eduaccess-api/internal/shared/httpcache"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	supabasePkg "github.com/eduaccess/eduaccess-api/pkg/supabase"
@@ -30,7 +31,7 @@ func NewHandler(v1 *echo.Group, register *authApp.RegisterHandler, supabase *sup
 	auth.POST("/register", h.Register)
 	auth.POST("/login", h.Login)
 	auth.POST("/refresh", h.Refresh)
-	auth.GET("/me", h.Me, authmw.RequireAuth)
+	auth.GET("/me", h.Me, authmw.RequireAuth, httpcache.Middleware(httpcache.Profile))
 
 	return h
 }
