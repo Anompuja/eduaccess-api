@@ -10,7 +10,6 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/teacher/domain"
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateTeacherCommand represents the command to create a new teacher.
@@ -104,14 +103,9 @@ func (h *CreateTeacherHandler) Handle(ctx context.Context, cmd CreateTeacherComm
 		return nil, apperror.New(apperror.ErrConflict, "username already in use")
 	}
 
-	// Hash password
 	pwd := cmd.Password
 	if pwd == "" {
 		pwd = "Teacher@12345" // default - must be changed after first login
-	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
 	}
 
 	// Parse birth date if provided
@@ -133,7 +127,7 @@ func (h *CreateTeacherHandler) Handle(ctx context.Context, cmd CreateTeacherComm
 		Name:      cmd.Name,
 		Username:  username,
 		Email:     cmd.Email,
-		Password:  string(hash),
+		Password:  pwd,
 		Avatar:    "default.png",
 		Verified:  false,
 		CreatedAt: now,

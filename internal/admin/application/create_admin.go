@@ -9,7 +9,6 @@ import (
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateAdminCommand holds data needed to register a new admin sekolah.
@@ -86,14 +85,9 @@ func (h *CreateAdminHandler) Handle(ctx context.Context, cmd CreateAdminCommand)
 		return nil, apperror.New(apperror.ErrConflict, "username already in use")
 	}
 
-	// Hash password
 	pwd := cmd.Password
 	if pwd == "" {
 		pwd = "Admin@12345" // default - must be changed after first login
-	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
 	}
 
 	now := time.Now()
@@ -104,7 +98,7 @@ func (h *CreateAdminHandler) Handle(ctx context.Context, cmd CreateAdminCommand)
 		Name:      cmd.Name,
 		Username:  username,
 		Email:     cmd.Email,
-		Password:  string(hash),
+		Password:  pwd,
 		Avatar:    "default.png",
 		Verified:  false,
 		CreatedAt: now,

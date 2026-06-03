@@ -10,7 +10,6 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/student/domain"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateStudentCommand holds data needed to register a new student.
@@ -103,14 +102,9 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 		return nil, apperror.New(apperror.ErrConflict, "username already in use")
 	}
 
-	// Hash password
 	pwd := cmd.Password
 	if pwd == "" {
-		pwd = "Siswa@12345" // default ??? must be changed on first login
-	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
+		pwd = "Siswa@12345" // default — must be changed on first login
 	}
 
 	user := &authdomain.User{
@@ -120,7 +114,7 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 		Name:      cmd.Name,
 		Username:  username,
 		Email:     cmd.Email,
-		Password:  string(hash),
+		Password:  pwd,
 		Avatar:    "default.png",
 		Verified:  false,
 		CreatedAt: time.Now(),

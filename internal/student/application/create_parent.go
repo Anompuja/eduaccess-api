@@ -9,7 +9,6 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/student/domain"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateParentCommand holds data needed to register a new parent.
@@ -77,10 +76,6 @@ func (h *CreateParentHandler) Handle(ctx context.Context, cmd CreateParentComman
 	if pwd == "" {
 		pwd = "Ortu@12345"
 	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
 
 	userID := uuid.New()
 	user := &authdomain.User{
@@ -90,7 +85,7 @@ func (h *CreateParentHandler) Handle(ctx context.Context, cmd CreateParentComman
 		Name:      cmd.Name,
 		Username:  username,
 		Email:     cmd.Email,
-		Password:  string(hash),
+		Password:  pwd,
 		Avatar:    "default.png",
 		Verified:  false,
 		CreatedAt: time.Now(),

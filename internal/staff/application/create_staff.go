@@ -10,7 +10,6 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/staff/domain"
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateStaffCommand represents the command to create a new staff.
@@ -89,14 +88,9 @@ func (h *CreateStaffHandler) Handle(ctx context.Context, cmd CreateStaffCommand)
 		return nil, apperror.New(apperror.ErrConflict, "username already in use")
 	}
 
-	// Hash password
 	pwd := cmd.Password
 	if pwd == "" {
 		pwd = "Staff@12345" // default - must be changed after first login
-	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
 	}
 
 	// Parse birth date if provided
@@ -117,7 +111,7 @@ func (h *CreateStaffHandler) Handle(ctx context.Context, cmd CreateStaffCommand)
 		Name:      cmd.Name,
 		Username:  username,
 		Email:     cmd.Email,
-		Password:  string(hash),
+		Password:  pwd,
 		Avatar:    "default.png",
 		Verified:  false,
 		CreatedAt: now,
