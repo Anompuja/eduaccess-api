@@ -9,6 +9,27 @@ definitions:
     required:
     - name
     type: object
+  http.AcademicYearResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      school_id:
+        type: string
+      start_date:
+        type: string
+      updated_at:
+        type: string
+    type: object
   http.AdminResponse:
     properties:
       address:
@@ -68,6 +89,72 @@ definitions:
       name:
         type: string
       school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.ClassScheduleResponse:
+    properties:
+      classroom_id:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      end_period_id:
+        type: string
+      end_time:
+        type: string
+      id:
+        type: string
+      school_id:
+        type: string
+      start_period_id:
+        type: string
+      start_time:
+        type: string
+      status:
+        type: string
+      subject_id:
+        type: string
+      teacher_attendance_time:
+        type: string
+      teacher_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.ClassroomResponse:
+    properties:
+      academic_year_id:
+        type: string
+      building:
+        type: string
+      capacity:
+        type: integer
+      class_id:
+        type: string
+      code_room:
+        type: string
+      created_at:
+        type: string
+      facilities:
+        type: string
+      floor:
+        type: string
+      homeroom_teacher_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      room_type:
+        type: string
+      school_id:
+        type: string
+      status:
+        type: string
+      sub_class_id:
         type: string
       updated_at:
         type: string
@@ -624,6 +711,35 @@ definitions:
       yearly_price:
         type: integer
     type: object
+  http.PromotionResponse:
+    properties:
+      academic_year_id:
+        type: string
+      academic_year_name:
+        type: string
+      from_classroom_id:
+        type: string
+      from_classroom_name:
+        type: string
+      id:
+        type: string
+      nis:
+        type: string
+      notes:
+        type: string
+      promotion_date:
+        type: string
+      status:
+        type: string
+      student_id:
+        type: string
+      student_name:
+        type: string
+      to_classroom_id:
+        type: string
+      to_classroom_name:
+        type: string
+    type: object
   http.RefreshRequest:
     properties:
       refresh_token:
@@ -671,6 +787,29 @@ definitions:
     required:
     - key
     - value
+    type: object
+  http.ScheduleResponse:
+    properties:
+      created_at:
+        type: string
+      day_of_week:
+        type: string
+      end_time:
+        type: string
+      id:
+        type: string
+      is_break:
+        type: boolean
+      label:
+        type: string
+      period_number:
+        type: integer
+      school_id:
+        type: string
+      start_time:
+        type: string
+      updated_at:
+        type: string
     type: object
   http.SchoolResponse:
     properties:
@@ -809,11 +948,59 @@ definitions:
       username:
         type: string
     type: object
+  http.StudyResponse:
+    properties:
+      academic_year_id:
+        type: string
+      academic_year_name:
+        type: string
+      class_id:
+        type: string
+      class_name:
+        type: string
+      classroom_id:
+        type: string
+      classroom_name:
+        type: string
+      enrollment_date:
+        type: string
+      id:
+        type: string
+      nis:
+        type: string
+      status:
+        type: string
+      student_id:
+        type: string
+      student_name:
+        type: string
+      sub_class_name:
+        type: string
+    type: object
   http.SubClassResponse:
     properties:
       class_id:
         type: string
       created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  http.SubjectResponse:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      education_level_id:
         type: string
       id:
         type: string
@@ -1207,6 +1394,81 @@ definitions:
       verified:
         type: boolean
     type: object
+  internal_parent_delivery_http.CreateParentRequest:
+    properties:
+      address:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      religion:
+        maxLength: 50
+        type: string
+      school_id:
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  internal_parent_delivery_http.ParentResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      religion:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_parent_delivery_http.UpdateParentRequest:
+    properties:
+      address:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      religion:
+        maxLength: 50
+        type: string
+    type: object
   internal_student_delivery_http.CreateParentRequest:
     properties:
       address:
@@ -1341,7 +1603,13 @@ info:
 paths:
   /academic/classes:
     get:
+      description: Returns classes. Superadmin may filter context by school_id; admin_sekolah
+        is scoped to their own school.
       parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
       - description: Filter by education level UUID
         in: query
         name: level_id
@@ -1444,8 +1712,43 @@ paths:
       summary: Update class
       tags:
       - academic
+  /academic/classrooms:
+    get:
+      description: Returns classrooms. Superadmin may filter context by school_id;
+        admin_sekolah is scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.ClassroomResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List classrooms
+      tags:
+      - academic
   /academic/levels:
     get:
+      description: Returns education levels. Superadmin may filter context by school_id;
+        admin_sekolah is scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
       produces:
       - application/json
       responses:
@@ -1544,9 +1847,51 @@ paths:
       summary: Update education level
       tags:
       - academic
+  /academic/schedules:
+    get:
+      description: Returns school period schedules. Superadmin may filter context
+        by school_id; admin_sekolah is scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      - description: Filter by day of week
+        in: query
+        name: day_of_week
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.ScheduleResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List school schedules
+      tags:
+      - academic
   /academic/sub-classes:
     get:
+      description: Returns sub-classes. Superadmin may filter context by school_id;
+        admin_sekolah is scoped to their own school.
       parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
       - description: Filter by class UUID
         in: query
         name: class_id
@@ -1649,10 +1994,70 @@ paths:
       summary: Update sub-class
       tags:
       - academic
+  /academic/subjects:
+    get:
+      description: Returns subjects. Superadmin may filter context by school_id; admin_sekolah
+        is scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.SubjectResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List subjects
+      tags:
+      - academic
+  /academic/years:
+    get:
+      description: Returns academic years. Superadmin may filter context by school_id;
+        admin_sekolah is scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.AcademicYearResponse'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List academic years
+      tags:
+      - academic
   /admins:
     get:
       description: Returns a paginated list of admins. Tenant-scoped.
       parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
       - description: Search by name, email or username
         in: query
         name: search
@@ -1957,6 +2362,62 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /class-schedules:
+    get:
+      description: Returns class schedules filtered by the request school context.
+        Superadmin may provide school_id to target one school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      - description: Filter by classroom UUID
+        in: query
+        name: classroom_id
+        type: string
+      - description: Filter by teacher UUID
+        in: query
+        name: teacher_id
+        type: string
+      - description: Filter by subject UUID
+        in: query
+        name: subject_id
+        type: string
+      - description: Filter by date (YYYY-MM-DD)
+        in: query
+        name: date
+        type: string
+      - description: Filter by schedule status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.ClassScheduleResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List class schedules
+      tags:
+      - class-schedules
   /dashboard/stats:
     get:
       description: Returns a school summary with counts for users, academics, attendance,
@@ -1997,12 +2458,16 @@ paths:
       - dashboard
   /headmasters:
     get:
-      description: Returns a paginated list of headmaster profiles scoped to the requester's
-        school.
+      description: Returns a paginated list of headmaster profiles. Superadmin may
+        filter by school_id; admin_sekolah is scoped to their own school.
       parameters:
       - description: Search by name, email or username
         in: query
         name: search
+        type: string
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
         type: string
       - description: Page number (default 1)
         in: query
@@ -2713,8 +3178,13 @@ paths:
       - schools
   /staff:
     get:
-      description: Returns a paginated list of staff. Tenant-scoped.
+      description: Returns a paginated list of staff. Superadmin may filter by school_id;
+        admin_sekolah is scoped to their own school.
       parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
       - description: Search by name, email or username
         in: query
         name: search
@@ -2967,10 +3437,115 @@ paths:
       summary: Upload a file
       tags:
       - storage
+  /student-promotions:
+    get:
+      description: Returns promotion history. Superadmin may filter context by school_id;
+        admin_sekolah is scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      - description: Filter by student UUID
+        in: query
+        name: student_id
+        type: string
+      - description: Filter by academic year UUID
+        in: query
+        name: academic_year_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.PromotionResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List student promotions
+      tags:
+      - student-promotions
+  /student-studies:
+    get:
+      description: Returns student study rows. Superadmin may filter context by school_id;
+        admin_sekolah is scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      - description: Filter by classroom UUID
+        in: query
+        name: classroom_id
+        type: string
+      - description: Filter by academic year UUID
+        in: query
+        name: academic_year_id
+        type: string
+      - description: Filter by class UUID
+        in: query
+        name: class_id
+        type: string
+      - description: Filter by student UUID
+        in: query
+        name: student_id
+        type: string
+      - description: Filter by study status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.StudyResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List student studies
+      tags:
+      - student-tracking
   /students:
     get:
-      description: Returns a paginated list of students. Tenant-scoped.
+      description: Returns a paginated list of students. Superadmin may filter by
+        school_id; admin_sekolah is scoped to their own school.
       parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
       - description: Search by name, email, NIS or NISN
         in: query
         name: search
@@ -3238,8 +3813,13 @@ paths:
       - students
   /teachers:
     get:
-      description: Returns a paginated list of teachers. Tenant-scoped.
+      description: Returns a paginated list of teachers. Superadmin may filter by
+        school_id; admin_sekolah is scoped to their own school.
       parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
       - description: Search by name, email or username
         in: query
         name: search

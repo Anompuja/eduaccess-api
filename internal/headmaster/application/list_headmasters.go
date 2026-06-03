@@ -5,6 +5,7 @@ import (
 
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
 	"github.com/eduaccess/eduaccess-api/internal/headmaster/domain"
+	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/google/uuid"
 )
 
@@ -12,6 +13,7 @@ import (
 type ListHeadmastersQuery struct {
 	RequesterSchoolID *uuid.UUID
 	RequesterRole     string
+	SchoolID          *uuid.UUID
 	Search            string
 	Page              int
 	PerPage           int
@@ -38,14 +40,25 @@ func (h *ListHeadmastersHandler) Handle(ctx context.Context, q ListHeadmastersQu
 	if q.Page < 1 {
 		q.Page = 1
 	}
-	if q.PerPage < 1 || q.PerPage > 100 {
+	if q.PerPage < 1 {
 		q.PerPage = 20
 	}
+	if q.PerPage > 100 {
+		q.PerPage = 100
+	}
 
-	// Non-superadmin is always scoped to their own school.
-	schoolID := q.RequesterSchoolID
-	if q.RequesterRole == authdomain.RoleSuperadmin {
-		schoolID = nil // superadmin may see all
+	var schoolID *uuid.UUID
+	switch q.RequesterRole {
+	case authdomain.RoleSuperadmin:
+		// Superadmin may list all schools or scope to one school via query.
+		schoolID = q.SchoolID
+	case authdomain.RoleAdminSekolah:
+		if q.RequesterSchoolID == nil {
+			return nil, apperror.New(apperror.ErrForbidden, "user not assigned to a school")
+		}
+		schoolID = q.RequesterSchoolID
+	default:
+		return nil, apperror.New(apperror.ErrForbidden, "insufficient permissions")
 	}
 
 	profiles, total, err := h.repo.ListHeadmasters(ctx, domain.HeadmasterFilter{

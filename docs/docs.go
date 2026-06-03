@@ -29,6 +29,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Returns classes. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -37,6 +38,12 @@ const docTemplate = `{
                 ],
                 "summary": "List classes",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Filter by education level UUID",
@@ -205,6 +212,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/academic/classrooms": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns classrooms. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "academic"
+                ],
+                "summary": "List classrooms",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.ClassroomResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/academic/levels": {
             "get": {
                 "security": [
@@ -212,6 +267,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Returns education levels. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -219,6 +275,14 @@ const docTemplate = `{
                     "academic"
                 ],
                 "summary": "List education levels",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -380,6 +444,66 @@ const docTemplate = `{
                 }
             }
         },
+        "/academic/schedules": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns school period schedules. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "academic"
+                ],
+                "summary": "List school schedules",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by day of week",
+                        "name": "day_of_week",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.ScheduleResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/academic/sub-classes": {
             "get": {
                 "security": [
@@ -387,6 +511,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Returns sub-classes. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -395,6 +520,12 @@ const docTemplate = `{
                 ],
                 "summary": "List sub-classes",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Filter by class UUID",
@@ -563,6 +694,102 @@ const docTemplate = `{
                 }
             }
         },
+        "/academic/subjects": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns subjects. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "academic"
+                ],
+                "summary": "List subjects",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.SubjectResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/academic/years": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns academic years. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "academic"
+                ],
+                "summary": "List academic years",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.AcademicYearResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/admins": {
             "get": {
                 "security": [
@@ -579,6 +806,12 @@ const docTemplate = `{
                 ],
                 "summary": "List admins",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Search by name, email or username",
@@ -1075,6 +1308,96 @@ const docTemplate = `{
                 }
             }
         },
+        "/class-schedules": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns class schedules filtered by the request school context. Superadmin may provide school_id to target one school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "class-schedules"
+                ],
+                "summary": "List class schedules",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by classroom UUID",
+                        "name": "classroom_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by teacher UUID",
+                        "name": "teacher_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by subject UUID",
+                        "name": "subject_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by date (YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by schedule status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.ClassScheduleResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/dashboard/stats": {
             "get": {
                 "security": [
@@ -1145,7 +1468,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a paginated list of headmaster profiles scoped to the requester's school.",
+                "description": "Returns a paginated list of headmaster profiles. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -1158,6 +1481,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Search by name, email or username",
                         "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
                         "in": "query"
                     },
                     {
@@ -2339,7 +2668,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a paginated list of staff. Tenant-scoped.",
+                "description": "Returns a paginated list of staff. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -2348,6 +2677,12 @@ const docTemplate = `{
                 ],
                 "summary": "List staff",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Search by name, email or username",
@@ -2759,6 +3094,168 @@ const docTemplate = `{
                 }
             }
         },
+        "/student-promotions": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns promotion history. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "student-promotions"
+                ],
+                "summary": "List student promotions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by student UUID",
+                        "name": "student_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by academic year UUID",
+                        "name": "academic_year_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.PromotionResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/student-studies": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns student study rows. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "student-tracking"
+                ],
+                "summary": "List student studies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by classroom UUID",
+                        "name": "classroom_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by academic year UUID",
+                        "name": "academic_year_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by class UUID",
+                        "name": "class_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by student UUID",
+                        "name": "student_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by study status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.StudyResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/students": {
             "get": {
                 "security": [
@@ -2766,7 +3263,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a paginated list of students. Tenant-scoped.",
+                "description": "Returns a paginated list of students. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -2775,6 +3272,12 @@ const docTemplate = `{
                 ],
                 "summary": "List students",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Search by name, email, NIS or NISN",
@@ -3204,7 +3707,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a paginated list of teachers. Tenant-scoped.",
+                "description": "Returns a paginated list of teachers. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -3213,6 +3716,12 @@ const docTemplate = `{
                 ],
                 "summary": "List teachers",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Search by name, email or username",
@@ -3837,6 +4346,38 @@ const docTemplate = `{
                 }
             }
         },
+        "http.AcademicYearResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "http.AdminResponse": {
             "type": "object",
             "properties": {
@@ -3925,6 +4466,106 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.ClassScheduleResponse": {
+            "type": "object",
+            "properties": {
+                "classroom_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "end_period_id": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "start_period_id": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "string"
+                },
+                "teacher_attendance_time": {
+                    "type": "string"
+                },
+                "teacher_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.ClassroomResponse": {
+            "type": "object",
+            "properties": {
+                "academic_year_id": {
+                    "type": "string"
+                },
+                "building": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "class_id": {
+                    "type": "string"
+                },
+                "code_room": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "facilities": {
+                    "type": "string"
+                },
+                "floor": {
+                    "type": "string"
+                },
+                "homeroom_teacher_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "room_type": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "sub_class_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -4727,6 +5368,50 @@ const docTemplate = `{
                 }
             }
         },
+        "http.PromotionResponse": {
+            "type": "object",
+            "properties": {
+                "academic_year_id": {
+                    "type": "string"
+                },
+                "academic_year_name": {
+                    "type": "string"
+                },
+                "from_classroom_id": {
+                    "type": "string"
+                },
+                "from_classroom_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nis": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "promotion_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "student_name": {
+                    "type": "string"
+                },
+                "to_classroom_id": {
+                    "type": "string"
+                },
+                "to_classroom_name": {
+                    "type": "string"
+                }
+            }
+        },
         "http.RefreshRequest": {
             "type": "object",
             "required": [
@@ -4794,6 +5479,41 @@ const docTemplate = `{
                 "value": {
                     "type": "string",
                     "maxLength": 191
+                }
+            }
+        },
+        "http.ScheduleResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "day_of_week": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_break": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "period_number": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -5005,6 +5725,50 @@ const docTemplate = `{
                 }
             }
         },
+        "http.StudyResponse": {
+            "type": "object",
+            "properties": {
+                "academic_year_id": {
+                    "type": "string"
+                },
+                "academic_year_name": {
+                    "type": "string"
+                },
+                "class_id": {
+                    "type": "string"
+                },
+                "class_name": {
+                    "type": "string"
+                },
+                "classroom_id": {
+                    "type": "string"
+                },
+                "classroom_name": {
+                    "type": "string"
+                },
+                "enrollment_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nis": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "student_name": {
+                    "type": "string"
+                },
+                "sub_class_name": {
+                    "type": "string"
+                }
+            }
+        },
         "http.SubClassResponse": {
             "type": "object",
             "properties": {
@@ -5012,6 +5776,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.SubjectResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "education_level_id": {
                     "type": "string"
                 },
                 "id": {
@@ -5578,6 +6371,113 @@ const docTemplate = `{
                 },
                 "verified": {
                     "type": "boolean"
+                }
+            }
+        },
+        "internal_parent_delivery_http.CreateParentRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "religion": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "internal_parent_delivery_http.ParentResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_parent_delivery_http.UpdateParentRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "religion": {
+                    "type": "string",
+                    "maxLength": 50
                 }
             }
         },

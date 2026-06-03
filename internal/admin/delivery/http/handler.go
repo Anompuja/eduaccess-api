@@ -88,6 +88,7 @@ func (h *Handler) GetAdmin(c echo.Context) error {
 //	@Tags         admins
 //	@Produce      json
 //	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
 //	@Param        search   query  string  false  "Search by name, email or username"
 //	@Param        page     query  int     false  "Page number (default 1)"
 //	@Param        per_page query  int     false  "Page size (default 20)"
