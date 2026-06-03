@@ -1,4 +1,4 @@
-package http
+﻿package http
 
 import (
 	"errors"
@@ -97,9 +97,19 @@ func (h *Handler) ListStaff(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
 
+	var schoolID *uuid.UUID
+	if rawSchoolID := c.QueryParam("school_id"); rawSchoolID != "" {
+		parsedSchoolID, err := uuid.Parse(rawSchoolID)
+		if err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+		schoolID = &parsedSchoolID
+	}
+
 	q := application.ListStaffQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
+		SchoolID:          schoolID,
 		Search:            c.QueryParam("search"),
 		Page:              page,
 		PerPage:           perPage,

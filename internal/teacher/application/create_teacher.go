@@ -1,7 +1,8 @@
-package application
+﻿package application
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -144,7 +145,7 @@ func (h *CreateTeacherHandler) Handle(ctx context.Context, cmd CreateTeacherComm
 
 	teacher := &domain.TeacherProfile{
 		ID:                                  uuid.New(),
-		UserID:                              userID,
+		UserID:                              user.ID,
 		SchoolID:                            *schoolID,
 		Name:                                cmd.Name,
 		Email:                               cmd.Email,
@@ -177,6 +178,9 @@ func (h *CreateTeacherHandler) Handle(ctx context.Context, cmd CreateTeacherComm
 		UpdatedAt:                           now,
 	}
 	if err := h.teacherRepo.CreateTeacherProfile(ctx, teacher); err != nil {
+		if rollbackErr := h.userCreator.SoftDelete(ctx, user.ID); rollbackErr != nil {
+			return nil, fmt.Errorf("create teacher failed: %w (rollback failed: %v)", err, rollbackErr)
+		}
 		return nil, err
 	}
 

@@ -197,6 +197,11 @@ func (h *Handler) ListStudents(c echo.Context) error {
 		Page:              page,
 		PerPage:           perPage,
 	}
+	if raw := c.QueryParam("school_id"); raw != "" {
+		if id, err := uuid.Parse(raw); err == nil {
+			q.SchoolID = &id
+		}
+	}
 	if raw := c.QueryParam("education_level_id"); raw != "" {
 		if id, err := uuid.Parse(raw); err == nil {
 			q.EducationLevelID = &id

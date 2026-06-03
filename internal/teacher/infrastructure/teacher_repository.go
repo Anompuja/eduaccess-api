@@ -1,4 +1,4 @@
-package infrastructure
+﻿package infrastructure
 
 import (
 	"context"
@@ -12,35 +12,35 @@ import (
 
 // teacherProfileModel represents the ORM model for teacher profiles.
 type teacherProfileModel struct {
-	ID                                  uuid.UUID  `gorm:"type:uuid;primaryKey"`
-	UserID                              uuid.UUID  `gorm:"type:uuid;index"`
-	SchoolID                            uuid.UUID  `gorm:"type:uuid;index"`
-	NIP                                 *string    `gorm:"type:varchar(191)"`
-	NUPTK                               *string    `gorm:"type:varchar(191)"`
-	PhoneNumber                         *string    `gorm:"type:varchar(50)"`
-	Address                             *string    `gorm:"type:text"`
-	Gender                              *string    `gorm:"type:varchar(50)"`
-	Religion                            *string    `gorm:"type:varchar(100)"`
-	BirthPlace                          *string    `gorm:"type:varchar(191)"`
-	BirthDate                           *time.Time `gorm:"type:date"`
-	NIK                                 *string    `gorm:"type:varchar(50)"`
-	KTPImagePath                        *string    `gorm:"type:varchar(191)"`
-	Kewarganegaraan                     *string    `gorm:"type:varchar(100)"`
-	GolonganDarah                       *string    `gorm:"type:varchar(10)"`
-	BeratBadan                          *string    `gorm:"type:varchar(20)"`
-	TinggiBadan                         *string    `gorm:"type:varchar(20)"`
-	PenyakitYangSeringKambuh            *string    `gorm:"type:text"`
-	KelainanJasmani                     *string    `gorm:"type:text"`
-	PenyakitKronisYangPernahDiderita    *string    `gorm:"type:text"`
-	RTRW                                *string    `gorm:"type:varchar(50)"`
-	KodePos                             *string    `gorm:"type:varchar(20)"`
-	PendidikanTerakhir                  *string    `gorm:"type:varchar(100)"`
-	Jurusan                             *string    `gorm:"type:varchar(191)"`
-	TahunLulus                          *string    `gorm:"type:varchar(10)"`
-	TahunMasuk                          *string    `gorm:"type:varchar(10)"`
-	DeletedAt                           *time.Time `gorm:"type:timestamptz;index"`
-	CreatedAt                           time.Time  `gorm:"type:timestamptz;autoCreateTime"`
-	UpdatedAt                           time.Time  `gorm:"type:timestamptz;autoUpdateTime"`
+	ID                                  uuid.UUID  `gorm:"column:id;type:uuid;primaryKey"`
+	UserID                              uuid.UUID  `gorm:"column:user_id;type:uuid;index"`
+	SchoolID                            uuid.UUID  `gorm:"column:school_id;type:uuid;index"`
+	NIP                                 *string    `gorm:"column:nip;type:varchar(191)"`
+	NUPTK                               *string    `gorm:"column:nuptk;type:varchar(191)"`
+	PhoneNumber                         *string    `gorm:"column:phone_number;type:varchar(50)"`
+	Address                             *string    `gorm:"column:address;type:text"`
+	Gender                              *string    `gorm:"column:gender;type:varchar(50)"`
+	Religion                            *string    `gorm:"column:religion;type:varchar(100)"`
+	BirthPlace                          *string    `gorm:"column:birth_place;type:varchar(191)"`
+	BirthDate                           *time.Time `gorm:"column:birth_date;type:date"`
+	NIK                                 *string    `gorm:"column:nik;type:varchar(50)"`
+	KTPImagePath                        *string    `gorm:"column:ktp_image_path;type:varchar(191)"`
+	Kewarganegaraan                     *string    `gorm:"column:kewarganegaraan;type:varchar(100)"`
+	GolonganDarah                       *string    `gorm:"column:golongan_darah;type:varchar(10)"`
+	BeratBadan                          *string    `gorm:"column:berat_badan;type:varchar(20)"`
+	TinggiBadan                         *string    `gorm:"column:tinggi_badan;type:varchar(20)"`
+	PenyakitYangSeringKambuh            *string    `gorm:"column:penyakit_yang_sering_kambuh;type:text"`
+	KelainanJasmani                     *string    `gorm:"column:kelainan_jasmani;type:text"`
+	PenyakitKronisYangPernahDiderita    *string    `gorm:"column:penyakit_kronis_yang_pernah_diderita;type:text"`
+	RTRW                                *string    `gorm:"column:rt_rw;type:varchar(50)"`
+	KodePos                             *string    `gorm:"column:kode_pos;type:varchar(20)"`
+	PendidikanTerakhir                  *string    `gorm:"column:pendidikan_terakhir;type:varchar(100)"`
+	Jurusan                             *string    `gorm:"column:jurusan;type:varchar(191)"`
+	TahunLulus                          *string    `gorm:"column:tahun_lulus;type:varchar(10)"`
+	TahunMasuk                          *string    `gorm:"column:tahun_masuk;type:varchar(10)"`
+	DeletedAt                           *time.Time `gorm:"column:deleted_at;type:timestamptz;index"`
+	CreatedAt                           time.Time  `gorm:"column:created_at;type:timestamptz;autoCreateTime"`
+	UpdatedAt                           time.Time  `gorm:"column:updated_at;type:timestamptz;autoUpdateTime"`
 }
 
 // TableName specifies the table name for the ORM.
@@ -50,11 +50,11 @@ func (t *teacherProfileModel) TableName() string {
 
 // teacherWithUser is used for JOIN queries to include user data.
 type teacherWithUser struct {
-	TeacherProfile teacherProfileModel
-	Name           string
-	Email          string
-	Username       string
-	Avatar         string
+	teacherProfileModel
+	Name     string
+	Email    string
+	Username string
+	Avatar   string
 }
 
 // TeacherRepository implements the domain repository interface for teachers.
@@ -174,7 +174,10 @@ func (r *TeacherRepository) ListTeachers(ctx context.Context, filter domain.Teac
 	var total int64
 
 	query := r.db.WithContext(ctx).
-		Where("school_id = ? AND deleted_at IS NULL", filter.SchoolID)
+		Where("teacher_profiles.deleted_at IS NULL")
+	if filter.SchoolID != nil {
+		query = query.Where("teacher_profiles.school_id = ?", *filter.SchoolID)
+	}
 
 	// Apply search filter
 	if filter.Search != "" {
@@ -203,15 +206,14 @@ func (r *TeacherRepository) ListTeachers(ctx context.Context, filter domain.Teac
 	// Convert models to domain entities
 	teachers := make([]*domain.TeacherProfile, len(models))
 	for i, model := range models {
-		// Fetch user data for this teacher
 		var user struct {
 			Name     string
 			Email    string
 			Username string
 			Avatar   string
 		}
-		r.db.WithContext(ctx).Table("users").Where("id = ?", model.UserID).
-			Select("name, email, username, avatar").First(&user)
+		_ = r.db.WithContext(ctx).Table("users").Where("id = ?", model.UserID).
+			Select("name, email, username, avatar").First(&user).Error
 
 		teachers[i] = r.modelToDomain(&model, user.Name, user.Email, user.Username, user.Avatar)
 	}

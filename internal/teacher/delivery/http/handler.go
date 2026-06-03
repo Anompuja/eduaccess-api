@@ -1,4 +1,4 @@
-package http
+﻿package http
 
 import (
 	"errors"
@@ -97,9 +97,19 @@ func (h *Handler) ListTeachers(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
 
+	var schoolID *uuid.UUID
+	if rawSchoolID := c.QueryParam("school_id"); rawSchoolID != "" {
+		parsedSchoolID, err := uuid.Parse(rawSchoolID)
+		if err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+		schoolID = &parsedSchoolID
+	}
+
 	q := application.ListTeachersQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
+		SchoolID:          schoolID,
 		Search:            c.QueryParam("search"),
 		Page:              page,
 		PerPage:           perPage,
@@ -286,6 +296,11 @@ func (h *Handler) DeactivateTeacher(c echo.Context) error {
 }
 
 func toTeacherResponse(t *domain.TeacherProfile) TeacherResponse {
+	var birthDate *string
+	if formatted := formatDatePtr(t.BirthDate); formatted != nil {
+		birthDate = formatted
+	}
+
 	return TeacherResponse{
 		ID:                              t.ID.String(),
 		UserID:                          t.UserID.String(),
@@ -301,7 +316,7 @@ func toTeacherResponse(t *domain.TeacherProfile) TeacherResponse {
 		Gender:                          t.Gender,
 		Religion:                        t.Religion,
 		BirthPlace:                      t.BirthPlace,
-		BirthDate:                       t.BirthDate,
+		BirthDate:                       birthDate,
 		NIK:                             t.NIK,
 		KTPImagePath:                    t.KTPImagePath,
 		Kewarganegaraan:                 t.Kewarganegaraan,
@@ -320,6 +335,17 @@ func toTeacherResponse(t *domain.TeacherProfile) TeacherResponse {
 		CreatedAt:                       t.CreatedAt,
 		UpdatedAt:                       t.UpdatedAt,
 	}
+}
+
+func formatDatePtr(t *time.Time) *string {
+	if t == nil {
+		return nil
+	}
+	if y := t.Year(); y < 1 || y > 9999 {
+		return nil
+	}
+	formatted := t.Format("2006-01-02")
+	return &formatted
 }
 
 // parseDateField parses an optional *string "YYYY-MM-DD" into *string.

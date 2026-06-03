@@ -1,4 +1,4 @@
-package domain
+﻿package domain
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type TeacherRepository interface {
 
 // TeacherFilter is used for filtering and pagination in list operations.
 type TeacherFilter struct {
-	SchoolID uuid.UUID
+	SchoolID *uuid.UUID
 	Search   string // searches by name, email, or username
 	Offset   int
 	Limit    int
