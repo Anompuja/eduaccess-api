@@ -52,6 +52,20 @@ func NewHandler(
 	return h
 }
 
+// CreateParent godoc
+//
+//	@Summary      Create parent
+//	@Description  Creates a parent profile. Superadmin may provide school_id in the request body; admin_sekolah is scoped to their own school.
+//	@Tags         parents
+//	@Accept       json
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        body  body      CreateParentRequest  true  "Parent data"
+//	@Success      201   {object}  response.Response{data=ParentResponse}
+//	@Failure      400   {object}  response.Response
+//	@Failure      403   {object}  response.Response
+//	@Failure      409   {object}  response.Response
+//	@Router       /parents [post]
 func (h *Handler) CreateParent(c echo.Context) error {
 	var req CreateParentRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
@@ -90,6 +104,21 @@ func (h *Handler) CreateParent(c echo.Context) error {
 	})
 }
 
+// ListParents godoc
+//
+//	@Summary      List parents
+//	@Description  Returns a paginated list of parents. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         parents
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
+//	@Param        search    query  string  false  "Search by name, email or username"
+//	@Param        page      query  int     false  "Page number (default 1)"
+//	@Param        per_page  query  int     false  "Page size (default 20, max 100)"
+//	@Success      200       {object}  response.PaginatedResponse{data=[]ParentResponse}
+//	@Failure      400       {object}  response.Response
+//	@Failure      403       {object}  response.Response
+//	@Router       /parents [get]
 func (h *Handler) ListParents(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
@@ -122,6 +151,18 @@ func (h *Handler) ListParents(c echo.Context) error {
 	return response.Paginated(c, "parents retrieved", dtos, result.Page, result.PerPage, result.Total)
 }
 
+// GetParent godoc
+//
+//	@Summary      Get parent by ID
+//	@Description  Returns a single parent profile.
+//	@Tags         parents
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        id   path      string  true  "Parent profile UUID"
+//	@Success      200  {object}  response.Response{data=ParentResponse}
+//	@Failure      403  {object}  response.Response
+//	@Failure      404  {object}  response.Response
+//	@Router       /parents/{id} [get]
 func (h *Handler) GetParent(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
@@ -140,6 +181,21 @@ func (h *Handler) GetParent(c echo.Context) error {
 	return response.OK(c, "parent retrieved", toParentResponse(parent))
 }
 
+// UpdateParent godoc
+//
+//	@Summary      Update parent
+//	@Description  Updates mutable fields of a parent profile.
+//	@Tags         parents
+//	@Accept       json
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        id    path      string               true  "Parent profile UUID"
+//	@Param        body  body      UpdateParentRequest  true  "Parent fields to update"
+//	@Success      200   {object}  response.Response{data=ParentResponse}
+//	@Failure      400   {object}  response.Response
+//	@Failure      403   {object}  response.Response
+//	@Failure      404   {object}  response.Response
+//	@Router       /parents/{id} [put]
 func (h *Handler) UpdateParent(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
@@ -168,6 +224,18 @@ func (h *Handler) UpdateParent(c echo.Context) error {
 	return response.OK(c, "parent updated", toParentResponse(parent))
 }
 
+// DeactivateParent godoc
+//
+//	@Summary      Deactivate parent
+//	@Description  Soft-deletes a parent profile.
+//	@Tags         parents
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        id   path      string  true  "Parent profile UUID"
+//	@Success      200  {object}  response.Response
+//	@Failure      403  {object}  response.Response
+//	@Failure      404  {object}  response.Response
+//	@Router       /parents/{id} [delete]
 func (h *Handler) DeactivateParent(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {

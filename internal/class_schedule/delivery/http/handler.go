@@ -89,7 +89,7 @@ func (h *Handler) CreateClassSchedule(c echo.Context) error {
 		TeacherID:     teacherID,
 		StartPeriodID: parseOptionalUUID(req.StartPeriodID),
 		EndPeriodID:   parseOptionalUUID(req.EndPeriodID),
-		Date: date, StartTime: req.StartTime, EndTime: req.EndTime,
+		Date:          date, StartTime: req.StartTime, EndTime: req.EndTime,
 	})
 	if err != nil {
 		return handleAppError(c, err)
@@ -97,6 +97,23 @@ func (h *Handler) CreateClassSchedule(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "class schedule created", Data: toScheduleResponse(cs)})
 }
 
+// ListClassSchedules godoc
+//
+//	@Summary      List class schedules
+//	@Description  Returns class schedules filtered by the request school context. Superadmin may provide school_id to target one school.
+//	@Tags         class-schedules
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id    query  string  false  "School UUID (superadmin only)"
+//	@Param        classroom_id query  string  false  "Filter by classroom UUID"
+//	@Param        teacher_id   query  string  false  "Filter by teacher UUID"
+//	@Param        subject_id   query  string  false  "Filter by subject UUID"
+//	@Param        date         query  string  false  "Filter by date (YYYY-MM-DD)"
+//	@Param        status       query  string  false  "Filter by schedule status"
+//	@Success      200          {object}  response.Response{data=[]ClassScheduleResponse}
+//	@Failure      400          {object}  response.Response
+//	@Failure      403          {object}  response.Response
+//	@Router       /class-schedules [get]
 func (h *Handler) ListClassSchedules(c echo.Context) error {
 	q := application.ListClassSchedulesQuery{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
@@ -172,7 +189,7 @@ func (h *Handler) UpdateClassSchedule(c echo.Context) error {
 		TeacherID:     teacherID,
 		StartPeriodID: parseOptionalUUID(req.StartPeriodID),
 		EndPeriodID:   parseOptionalUUID(req.EndPeriodID),
-		Date: date, StartTime: req.StartTime, EndTime: req.EndTime,
+		Date:          date, StartTime: req.StartTime, EndTime: req.EndTime,
 	})
 	if err != nil {
 		return handleAppError(c, err)

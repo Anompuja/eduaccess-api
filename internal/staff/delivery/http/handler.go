@@ -1,4 +1,4 @@
-﻿package http
+package http
 
 import (
 	"errors"
@@ -6,23 +6,23 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/eduaccess/eduaccess-api/internal/staff/application"
-	"github.com/eduaccess/eduaccess-api/internal/staff/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
+	"github.com/eduaccess/eduaccess-api/internal/staff/application"
+	"github.com/eduaccess/eduaccess-api/internal/staff/domain"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 // Handler wires staff use-cases to HTTP endpoints.
 type Handler struct {
-	createStaff      *application.CreateStaffHandler
-	getStaff         *application.GetStaffHandler
-	listStaff        *application.ListStaffHandler
-	updateStaff      *application.UpdateStaffHandler
-	deactivateStaff  *application.DeactivateStaffHandler
+	createStaff     *application.CreateStaffHandler
+	getStaff        *application.GetStaffHandler
+	listStaff       *application.ListStaffHandler
+	updateStaff     *application.UpdateStaffHandler
+	deactivateStaff *application.DeactivateStaffHandler
 }
 
 // NewHandler registers staff routes and returns the handler.
@@ -84,10 +84,11 @@ func (h *Handler) GetStaff(c echo.Context) error {
 // ListStaff godoc
 //
 //	@Summary      List staff
-//	@Description  Returns a paginated list of staff. Tenant-scoped.
+//	@Description  Returns a paginated list of staff. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.
 //	@Tags         staff
 //	@Produce      json
 //	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
 //	@Param        search   query  string  false  "Search by name, email or username"
 //	@Param        page     query  int     false  "Page number (default 1)"
 //	@Param        per_page query  int     false  "Page size (default 20)"

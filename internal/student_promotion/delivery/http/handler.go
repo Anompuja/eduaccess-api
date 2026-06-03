@@ -34,6 +34,20 @@ func NewHandler(
 	return h
 }
 
+// ListPromotions godoc
+//
+//	@Summary      List student promotions
+//	@Description  Returns promotion history. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         student-promotions
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id        query  string  false  "School UUID (superadmin only)"
+//	@Param        student_id       query  string  false  "Filter by student UUID"
+//	@Param        academic_year_id query  string  false  "Filter by academic year UUID"
+//	@Success      200              {object}  response.Response{data=[]PromotionResponse}
+//	@Failure      400              {object}  response.Response
+//	@Failure      403              {object}  response.Response
+//	@Router       /student-promotions [get]
 func (h *Handler) ListPromotions(c echo.Context) error {
 	q := application.ListPromotionsQuery{
 		RequesterSchoolID: getSchoolID(c),

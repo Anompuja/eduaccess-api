@@ -1,4 +1,4 @@
-﻿package http
+package http
 
 import (
 	"errors"
@@ -6,23 +6,23 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/eduaccess/eduaccess-api/internal/teacher/application"
-	"github.com/eduaccess/eduaccess-api/internal/teacher/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
+	"github.com/eduaccess/eduaccess-api/internal/teacher/application"
+	"github.com/eduaccess/eduaccess-api/internal/teacher/domain"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 // Handler wires teacher use-cases to HTTP endpoints.
 type Handler struct {
-	createTeacher      *application.CreateTeacherHandler
-	getTeacher         *application.GetTeacherHandler
-	listTeachers       *application.ListTeachersHandler
-	updateTeacher      *application.UpdateTeacherHandler
-	deactivateTeacher  *application.DeactivateTeacherHandler
+	createTeacher     *application.CreateTeacherHandler
+	getTeacher        *application.GetTeacherHandler
+	listTeachers      *application.ListTeachersHandler
+	updateTeacher     *application.UpdateTeacherHandler
+	deactivateTeacher *application.DeactivateTeacherHandler
 }
 
 // NewHandler registers teacher routes and returns the handler.
@@ -84,10 +84,11 @@ func (h *Handler) GetTeacher(c echo.Context) error {
 // ListTeachers godoc
 //
 //	@Summary      List teachers
-//	@Description  Returns a paginated list of teachers. Tenant-scoped.
+//	@Description  Returns a paginated list of teachers. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.
 //	@Tags         teachers
 //	@Produce      json
 //	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
 //	@Param        search   query  string  false  "Search by name, email or username"
 //	@Param        page     query  int     false  "Page number (default 1)"
 //	@Param        per_page query  int     false  "Page size (default 20)"
@@ -148,34 +149,34 @@ func (h *Handler) CreateTeacher(c echo.Context) error {
 	}
 
 	cmd := application.CreateTeacherCommand{
-		RequesterSchoolID:                   authmw.GetSchoolID(c),
-		RequesterRole:                       authmw.GetRole(c),
-		Name:                                req.Name,
-		Email:                               req.Email,
-		Username:                            req.Username,
-		Password:                            req.Password,
-		NIP:                                 req.NIP,
-		NUPTK:                               req.NUPTK,
-		PhoneNumber:                         req.PhoneNumber,
-		Address:                             req.Address,
-		Gender:                              req.Gender,
-		Religion:                            req.Religion,
-		BirthPlace:                          req.BirthPlace,
-		NIK:                                 req.NIK,
-		KTPImagePath:                        req.KTPImagePath,
-		Kewarganegaraan:                     req.Kewarganegaraan,
-		GolonganDarah:                       req.GolonganDarah,
-		BeratBadan:                          req.BeratBadan,
-		TinggiBadan:                         req.TinggiBadan,
-		PenyakitYangSeringKambuh:            req.PenyakitYangSeringKambuh,
-		KelainanJasmani:                     req.KelainanJasmani,
-		PenyakitKronisYangPernahDiderita:    req.PenyakitKronisYangPernahDiderita,
-		RTRW:                                req.RTRW,
-		KodePos:                             req.KodePos,
-		PendidikanTerakhir:                  req.PendidikanTerakhir,
-		Jurusan:                             req.Jurusan,
-		TahunLulus:                          req.TahunLulus,
-		TahunMasuk:                          req.TahunMasuk,
+		RequesterSchoolID:                authmw.GetSchoolID(c),
+		RequesterRole:                    authmw.GetRole(c),
+		Name:                             req.Name,
+		Email:                            req.Email,
+		Username:                         req.Username,
+		Password:                         req.Password,
+		NIP:                              req.NIP,
+		NUPTK:                            req.NUPTK,
+		PhoneNumber:                      req.PhoneNumber,
+		Address:                          req.Address,
+		Gender:                           req.Gender,
+		Religion:                         req.Religion,
+		BirthPlace:                       req.BirthPlace,
+		NIK:                              req.NIK,
+		KTPImagePath:                     req.KTPImagePath,
+		Kewarganegaraan:                  req.Kewarganegaraan,
+		GolonganDarah:                    req.GolonganDarah,
+		BeratBadan:                       req.BeratBadan,
+		TinggiBadan:                      req.TinggiBadan,
+		PenyakitYangSeringKambuh:         req.PenyakitYangSeringKambuh,
+		KelainanJasmani:                  req.KelainanJasmani,
+		PenyakitKronisYangPernahDiderita: req.PenyakitKronisYangPernahDiderita,
+		RTRW:                             req.RTRW,
+		KodePos:                          req.KodePos,
+		PendidikanTerakhir:               req.PendidikanTerakhir,
+		Jurusan:                          req.Jurusan,
+		TahunLulus:                       req.TahunLulus,
+		TahunMasuk:                       req.TahunMasuk,
 	}
 
 	if err := parseDateField(req.BirthDate, &cmd.BirthDate); err != nil {
@@ -225,34 +226,34 @@ func (h *Handler) UpdateTeacher(c echo.Context) error {
 	}
 
 	cmd := application.UpdateTeacherCommand{
-		RequesterSchoolID:                   authmw.GetSchoolID(c),
-		RequesterRole:                       authmw.GetRole(c),
-		TeacherID:                           teacherID,
-		Name:                                req.Name,
-		Email:                               req.Email,
-		Username:                            req.Username,
-		PhoneNumber:                         req.PhoneNumber,
-		Address:                             req.Address,
-		Gender:                              req.Gender,
-		Religion:                            req.Religion,
-		BirthPlace:                          req.BirthPlace,
-		NIK:                                 req.NIK,
-		KTPImagePath:                        req.KTPImagePath,
-		NIP:                                 req.NIP,
-		NUPTK:                               req.NUPTK,
-		Kewarganegaraan:                     req.Kewarganegaraan,
-		GolonganDarah:                       req.GolonganDarah,
-		BeratBadan:                          req.BeratBadan,
-		TinggiBadan:                         req.TinggiBadan,
-		PenyakitYangSeringKambuh:            req.PenyakitYangSeringKambuh,
-		KelainanJasmani:                     req.KelainanJasmani,
-		PenyakitKronisYangPernahDiderita:    req.PenyakitKronisYangPernahDiderita,
-		RTRW:                                req.RTRW,
-		KodePos:                             req.KodePos,
-		PendidikanTerakhir:                  req.PendidikanTerakhir,
-		Jurusan:                             req.Jurusan,
-		TahunLulus:                          req.TahunLulus,
-		TahunMasuk:                          req.TahunMasuk,
+		RequesterSchoolID:                authmw.GetSchoolID(c),
+		RequesterRole:                    authmw.GetRole(c),
+		TeacherID:                        teacherID,
+		Name:                             req.Name,
+		Email:                            req.Email,
+		Username:                         req.Username,
+		PhoneNumber:                      req.PhoneNumber,
+		Address:                          req.Address,
+		Gender:                           req.Gender,
+		Religion:                         req.Religion,
+		BirthPlace:                       req.BirthPlace,
+		NIK:                              req.NIK,
+		KTPImagePath:                     req.KTPImagePath,
+		NIP:                              req.NIP,
+		NUPTK:                            req.NUPTK,
+		Kewarganegaraan:                  req.Kewarganegaraan,
+		GolonganDarah:                    req.GolonganDarah,
+		BeratBadan:                       req.BeratBadan,
+		TinggiBadan:                      req.TinggiBadan,
+		PenyakitYangSeringKambuh:         req.PenyakitYangSeringKambuh,
+		KelainanJasmani:                  req.KelainanJasmani,
+		PenyakitKronisYangPernahDiderita: req.PenyakitKronisYangPernahDiderita,
+		RTRW:                             req.RTRW,
+		KodePos:                          req.KodePos,
+		PendidikanTerakhir:               req.PendidikanTerakhir,
+		Jurusan:                          req.Jurusan,
+		TahunLulus:                       req.TahunLulus,
+		TahunMasuk:                       req.TahunMasuk,
 	}
 
 	if err := parseDateField(req.BirthDate, &cmd.BirthDate); err != nil {
@@ -302,38 +303,38 @@ func toTeacherResponse(t *domain.TeacherProfile) TeacherResponse {
 	}
 
 	return TeacherResponse{
-		ID:                              t.ID.String(),
-		UserID:                          t.UserID.String(),
-		SchoolID:                        t.SchoolID.String(),
-		Name:                            t.Name,
-		Email:                           t.Email,
-		Username:                        t.Username,
-		Avatar:                          t.Avatar,
-		NIP:                             t.NIP,
-		NUPTK:                           t.NUPTK,
-		PhoneNumber:                     t.PhoneNumber,
-		Address:                         t.Address,
-		Gender:                          t.Gender,
-		Religion:                        t.Religion,
-		BirthPlace:                      t.BirthPlace,
-		BirthDate:                       birthDate,
-		NIK:                             t.NIK,
-		KTPImagePath:                    t.KTPImagePath,
-		Kewarganegaraan:                 t.Kewarganegaraan,
-		GolonganDarah:                   t.GolonganDarah,
-		BeratBadan:                      t.BeratBadan,
-		TinggiBadan:                     t.TinggiBadan,
-		PenyakitYangSeringKambuh:        t.PenyakitYangSeringKambuh,
-		KelainanJasmani:                 t.KelainanJasmani,
+		ID:                               t.ID.String(),
+		UserID:                           t.UserID.String(),
+		SchoolID:                         t.SchoolID.String(),
+		Name:                             t.Name,
+		Email:                            t.Email,
+		Username:                         t.Username,
+		Avatar:                           t.Avatar,
+		NIP:                              t.NIP,
+		NUPTK:                            t.NUPTK,
+		PhoneNumber:                      t.PhoneNumber,
+		Address:                          t.Address,
+		Gender:                           t.Gender,
+		Religion:                         t.Religion,
+		BirthPlace:                       t.BirthPlace,
+		BirthDate:                        birthDate,
+		NIK:                              t.NIK,
+		KTPImagePath:                     t.KTPImagePath,
+		Kewarganegaraan:                  t.Kewarganegaraan,
+		GolonganDarah:                    t.GolonganDarah,
+		BeratBadan:                       t.BeratBadan,
+		TinggiBadan:                      t.TinggiBadan,
+		PenyakitYangSeringKambuh:         t.PenyakitYangSeringKambuh,
+		KelainanJasmani:                  t.KelainanJasmani,
 		PenyakitKronisYangPernahDiderita: t.PenyakitKronisYangPernahDiderita,
-		RTRW:                            t.RTRW,
-		KodePos:                         t.KodePos,
-		PendidikanTerakhir:              t.PendidikanTerakhir,
-		Jurusan:                         t.Jurusan,
-		TahunLulus:                      t.TahunLulus,
-		TahunMasuk:                      t.TahunMasuk,
-		CreatedAt:                       t.CreatedAt,
-		UpdatedAt:                       t.UpdatedAt,
+		RTRW:                             t.RTRW,
+		KodePos:                          t.KodePos,
+		PendidikanTerakhir:               t.PendidikanTerakhir,
+		Jurusan:                          t.Jurusan,
+		TahunLulus:                       t.TahunLulus,
+		TahunMasuk:                       t.TahunMasuk,
+		CreatedAt:                        t.CreatedAt,
+		UpdatedAt:                        t.UpdatedAt,
 	}
 }
 

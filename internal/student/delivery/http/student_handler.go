@@ -174,10 +174,11 @@ func (h *Handler) CreateStudent(c echo.Context) error {
 // ListStudents godoc
 //
 //	@Summary      List students
-//	@Description  Returns a paginated list of students. Tenant-scoped.
+//	@Description  Returns a paginated list of students. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.
 //	@Tags         students
 //	@Produce      json
 //	@Security     BearerAuth
+//	@Param        school_id         query  string  false  "School UUID (superadmin only)"
 //	@Param        search            query  string  false  "Search by name, email, NIS or NISN"
 //	@Param        education_level_id query string  false  "Filter by education level UUID"
 //	@Param        class_id          query  string  false  "Filter by class UUID"

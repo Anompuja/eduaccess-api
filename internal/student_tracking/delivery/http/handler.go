@@ -33,6 +33,23 @@ func NewHandler(
 	return h
 }
 
+// ListStudies godoc
+//
+//	@Summary      List student studies
+//	@Description  Returns student study rows. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         student-tracking
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id        query  string  false  "School UUID (superadmin only)"
+//	@Param        classroom_id     query  string  false  "Filter by classroom UUID"
+//	@Param        academic_year_id query  string  false  "Filter by academic year UUID"
+//	@Param        class_id         query  string  false  "Filter by class UUID"
+//	@Param        student_id       query  string  false  "Filter by student UUID"
+//	@Param        status           query  string  false  "Filter by study status"
+//	@Success      200              {object}  response.Response{data=[]StudyResponse}
+//	@Failure      400              {object}  response.Response
+//	@Failure      403              {object}  response.Response
+//	@Router       /student-studies [get]
 func (h *Handler) ListStudies(c echo.Context) error {
 	q := application.ListStudiesQuery{
 		RequesterSchoolID: getSchoolID(c),

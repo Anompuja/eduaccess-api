@@ -192,9 +192,11 @@ func (h *Handler) CreateLevel(c echo.Context) error {
 // ListLevels godoc
 //
 //	@Summary      List education levels
+//	@Description  Returns education levels. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
 //	@Tags         academic
 //	@Produce      json
 //	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
 //	@Success      200  {object}  response.Response{data=[]EducationLevelResponse}
 //	@Router       /academic/levels [get]
 func (h *Handler) ListLevels(c echo.Context) error {
@@ -302,9 +304,11 @@ func (h *Handler) CreateClass(c echo.Context) error {
 // ListClasses godoc
 //
 //	@Summary      List classes
+//	@Description  Returns classes. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
 //	@Tags         academic
 //	@Produce      json
 //	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
 //	@Param        level_id  query  string  false  "Filter by education level UUID"
 //	@Success      200  {object}  response.Response{data=[]ClassResponse}
 //	@Router       /academic/classes [get]
@@ -419,9 +423,11 @@ func (h *Handler) CreateSubClass(c echo.Context) error {
 // ListSubClasses godoc
 //
 //	@Summary      List sub-classes
+//	@Description  Returns sub-classes. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
 //	@Tags         academic
 //	@Produce      json
 //	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
 //	@Param        class_id  query  string  false  "Filter by class UUID"
 //	@Success      200  {object}  response.Response{data=[]SubClassResponse}
 //	@Router       /academic/sub-classes [get]
@@ -527,6 +533,16 @@ func (h *Handler) CreateAcademicYear(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "academic year created", Data: toAcademicYearResponse(ay)})
 }
 
+// ListAcademicYears godoc
+//
+//	@Summary      List academic years
+//	@Description  Returns academic years. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         academic
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
+//	@Success      200  {object}  response.Response{data=[]AcademicYearResponse}
+//	@Router       /academic/years [get]
 func (h *Handler) ListAcademicYears(c echo.Context) error {
 	list, err := h.listAcademicYears.Handle(c.Request().Context(), application.ListAcademicYearsQuery{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
@@ -617,6 +633,16 @@ func (h *Handler) CreateSubject(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "subject created", Data: toSubjectResponse(s)})
 }
 
+// ListSubjects godoc
+//
+//	@Summary      List subjects
+//	@Description  Returns subjects. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         academic
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
+//	@Success      200  {object}  response.Response{data=[]SubjectResponse}
+//	@Router       /academic/subjects [get]
 func (h *Handler) ListSubjects(c echo.Context) error {
 	list, err := h.listSubjects.Handle(c.Request().Context(), application.ListSubjectsQuery{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
@@ -701,6 +727,16 @@ func (h *Handler) CreateClassroom(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "classroom created", Data: toClassroomResponse(cr)})
 }
 
+// ListClassrooms godoc
+//
+//	@Summary      List classrooms
+//	@Description  Returns classrooms. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         academic
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
+//	@Success      200  {object}  response.Response{data=[]ClassroomResponse}
+//	@Router       /academic/classrooms [get]
 func (h *Handler) ListClassrooms(c echo.Context) error {
 	list, err := h.listClassrooms.Handle(c.Request().Context(), application.ListClassroomsQuery{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
@@ -780,6 +816,18 @@ func (h *Handler) CreateSchedule(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "schedule created", Data: toScheduleResponse(s)})
 }
 
+// ListSchedules godoc
+//
+//	@Summary      List school schedules
+//	@Description  Returns school period schedules. Superadmin may filter context by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         academic
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id   query  string  false  "School UUID (superadmin only)"
+//	@Param        day_of_week query  string  false  "Filter by day of week"
+//	@Success      200  {object}  response.Response{data=[]ScheduleResponse}
+//	@Failure      400  {object}  response.Response
+//	@Router       /academic/schedules [get]
 func (h *Handler) ListSchedules(c echo.Context) error {
 	q := application.ListSchedulesQuery{
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
@@ -854,7 +902,7 @@ func toSubjectResponse(s *domain.Subject) SubjectResponse {
 	return SubjectResponse{
 		ID: s.ID.String(), SchoolID: s.SchoolID.String(),
 		EducationLevelID: levelID,
-		Name: s.Name, Code: s.Code, Category: s.Category,
+		Name:             s.Name, Code: s.Code, Category: s.Category,
 		CreatedAt: s.CreatedAt, UpdatedAt: s.UpdatedAt,
 	}
 }

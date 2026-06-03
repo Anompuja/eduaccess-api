@@ -115,11 +115,12 @@ func (h *Handler) Create(c echo.Context) error {
 // List godoc
 //
 //	@Summary      List headmasters
-//	@Description  Returns a paginated list of headmaster profiles scoped to the requester's school.
+//	@Description  Returns a paginated list of headmaster profiles. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.
 //	@Tags         headmasters
 //	@Produce      json
 //	@Security     BearerAuth
 //	@Param        search   query  string  false  "Search by name, email or username"
+//	@Param        school_id query string  false  "School UUID (superadmin only)"
 //	@Param        page     query  int     false  "Page number (default 1)"
 //	@Param        per_page query  int     false  "Page size (default 20, max 100)"
 //	@Success      200  {object}  response.PaginatedResponse{data=[]HeadmasterResponse}
@@ -130,9 +131,19 @@ func (h *Handler) List(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
 
+	var schoolID *uuid.UUID
+	if rawSchoolID := c.QueryParam("school_id"); rawSchoolID != "" {
+		parsedSchoolID, err := uuid.Parse(rawSchoolID)
+		if err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+		schoolID = &parsedSchoolID
+	}
+
 	result, err := h.list.Handle(c.Request().Context(), application.ListHeadmastersQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
+		SchoolID:          schoolID,
 		Search:            c.QueryParam("search"),
 		Page:              page,
 		PerPage:           perPage,
