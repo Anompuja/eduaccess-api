@@ -40,13 +40,20 @@ func (h *ListStudiesHandler) Handle(ctx context.Context, q ListStudiesQuery) ([]
 	if err := guardView(q.RequesterRole); err != nil {
 		return nil, err
 	}
+	// Default to active-only so promoted students don't bleed into the old class list.
+	// Callers can override with an explicit Status value (e.g. "inactive", "all").
+	status := q.Status
+	if status == nil {
+		active := "active"
+		status = &active
+	}
 	return h.repo.ListStudies(ctx, domain.StudyFilter{
 		SchoolID:       q.RequesterSchoolID,
 		ClassroomID:    q.ClassroomID,
 		AcademicYearID: q.AcademicYearID,
 		ClassID:        q.ClassID,
 		StudentID:      q.StudentID,
-		Status:         q.Status,
+		Status:         status,
 	})
 }
 

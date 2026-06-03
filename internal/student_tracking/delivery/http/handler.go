@@ -26,7 +26,7 @@ func NewHandler(
 	h := &Handler{listStudies: listStudies, getStudentDetail: getStudentDetail}
 
 	// Read-only, school-scoped data — safe to cache with ETag revalidation.
-	g := v1.Group("/student-studies", authmw.RequireAuth, httpcache.Middleware(httpcache.Reference))
+	g := v1.Group("/student-studies", authmw.RequireAuth, httpcache.Middleware(httpcache.AlwaysRevalidate))
 	g.GET("", h.ListStudies)
 	g.GET("/:student_id", h.GetStudentDetail)
 
