@@ -14,7 +14,8 @@ import (
 )
 
 type fakeStudentUserCreator struct {
-	created *authdomain.User
+	created       *authdomain.User
+	softDeletedID *uuid.UUID
 }
 
 func (f *fakeStudentUserCreator) Create(_ context.Context, user *authdomain.User) error {
@@ -30,14 +31,21 @@ func (f *fakeStudentUserCreator) ExistsByUsername(context.Context, string) (bool
 	return false, nil
 }
 
-func (f *fakeStudentUserCreator) SoftDelete(context.Context, uuid.UUID) error { return nil }
+func (f *fakeStudentUserCreator) SoftDelete(_ context.Context, id uuid.UUID) error {
+	f.softDeletedID = &id
+	return nil
+}
 
 type fakeStudentRepo struct {
 	count   int64
 	created *studentdomain.StudentProfile
+	err     error
 }
 
 func (f *fakeStudentRepo) CreateStudentProfile(_ context.Context, profile *studentdomain.StudentProfile) error {
+	if f.err != nil {
+		return f.err
+	}
 	f.created = profile
 	return nil
 }
@@ -267,5 +275,41 @@ func TestCreateStudentHandler_CreatesStudentWhenQuotaAvailable(t *testing.T) {
 	}
 	if repo.created.SchoolID != schoolID {
 		t.Fatalf("expected school ID %s, got %s", schoolID, repo.created.SchoolID)
+	}
+}
+
+func TestCreateStudentHandler_RollsBackUserWhenProfileCreationFails(t *testing.T) {
+	schoolID := uuid.New()
+	repo := &fakeStudentRepo{err: apperror.New(apperror.ErrInternal, "insert failed")}
+	users := &fakeStudentUserCreator{}
+	handler := NewCreateStudentHandler(
+		users,
+		repo,
+		&fakeAcademicRepo{},
+		&fakeSchoolSubscriptionReader{
+			sub: &schooldomain.Subscription{
+				Plan: &schooldomain.Plan{Name: "Basic", MaxStudents: 500},
+			},
+		},
+	)
+
+	_, err := handler.Handle(context.Background(), CreateStudentCommand{
+		RequesterSchoolID: &schoolID,
+		RequesterRole:     authdomain.RoleAdminSekolah,
+		Name:              "Student C",
+		Email:             "studentc@example.com",
+		NIS:               "1003",
+	})
+	if err == nil {
+		t.Fatal("expected profile creation error, got nil")
+	}
+	if users.created == nil {
+		t.Fatal("expected auth user to be created before profile failure")
+	}
+	if users.softDeletedID == nil {
+		t.Fatal("expected auth user rollback on profile failure")
+	}
+	if *users.softDeletedID != users.created.ID {
+		t.Fatalf("expected rollback for user %s, got %s", users.created.ID, *users.softDeletedID)
 	}
 }

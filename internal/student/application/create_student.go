@@ -184,6 +184,7 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 		UpdatedAt:         time.Now(),
 	}
 	if err := h.repo.CreateStudentProfile(ctx, profile); err != nil {
+		_ = h.users.SoftDelete(ctx, userID)
 		return nil, err
 	}
 

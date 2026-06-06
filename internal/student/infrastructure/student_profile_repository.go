@@ -24,7 +24,7 @@ type studentProfileModel struct {
 	BirthPlace        string     `gorm:"column:birth_place"`
 	BirthDate         *time.Time `gorm:"column:birth_date"`
 	TahunMasuk        string     `gorm:"column:tahun_masuk"`
-	JalurMasukSekolah string     `gorm:"column:jalur_masuk_sekolah"`
+	JalurMasukSekolah *string    `gorm:"column:jalur_masuk_sekolah"`
 	EducationLevelID  *uuid.UUID `gorm:"column:school_education_level_id"`
 	ClassID           *uuid.UUID `gorm:"column:school_class_id"`
 	SubClassID        *uuid.UUID `gorm:"column:school_sub_class_id"`
@@ -76,7 +76,7 @@ func (r *GormStudentRepository) CreateStudentProfile(ctx context.Context, p *dom
 		BirthPlace:        p.BirthPlace,
 		BirthDate:         p.BirthDate,
 		TahunMasuk:        p.TahunMasuk,
-		JalurMasukSekolah: p.JalurMasukSekolah,
+		JalurMasukSekolah: nullableStringPtr(p.JalurMasukSekolah),
 		EducationLevelID:  p.EducationLevelID,
 		ClassID:           p.ClassID,
 		SubClassID:        p.SubClassID,
@@ -278,7 +278,7 @@ func (r *GormStudentRepository) UpdateStudentProfile(ctx context.Context, p *dom
 			"birth_place":               p.BirthPlace,
 			"birth_date":                p.BirthDate,
 			"tahun_masuk":               p.TahunMasuk,
-			"jalur_masuk_sekolah":       p.JalurMasukSekolah,
+			"jalur_masuk_sekolah":       nullableStringValue(p.JalurMasukSekolah),
 			"school_education_level_id": p.EducationLevelID,
 			"school_class_id":           p.ClassID,
 			"school_sub_class_id":       p.SubClassID,
@@ -320,4 +320,18 @@ func toStudentDomain(row studentWithUser) *domain.StudentProfile {
 		Username:          row.Username,
 		Avatar:            row.Avatar,
 	}
+}
+
+func nullableStringPtr(v string) *string {
+	if v == "" {
+		return nil
+	}
+	return &v
+}
+
+func nullableStringValue(v string) interface{} {
+	if v == "" {
+		return nil
+	}
+	return v
 }
