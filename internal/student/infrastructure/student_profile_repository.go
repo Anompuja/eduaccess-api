@@ -255,6 +255,15 @@ LIMIT ? OFFSET ?`, base, where)
 	return students, total, nil
 }
 
+func (r *GormStudentRepository) CountActiveStudents(ctx context.Context, schoolID uuid.UUID) (int64, error) {
+	var total int64
+	err := r.db.WithContext(ctx).
+		Table("student_profiles").
+		Where("school_id = ? AND deleted_at IS NULL", schoolID).
+		Count(&total).Error
+	return total, err
+}
+
 func (r *GormStudentRepository) UpdateStudentProfile(ctx context.Context, p *domain.StudentProfile) error {
 	return r.db.WithContext(ctx).
 		Table("student_profiles").

@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"context"
@@ -101,8 +101,8 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: getAllowedOrigins(),
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
+		AllowOrigins:  getAllowedOrigins(),
+		AllowMethods:  []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
 		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderXRequestedWith, "If-None-Match", "If-Modified-Since"},
 		ExposeHeaders: []string{"ETag", "Cache-Control"},
 	}))
@@ -146,9 +146,11 @@ func main() {
 		schoolApp.NewGetSchoolHandler(schoolRepo),
 		schoolApp.NewUpdateSchoolHandler(schoolRepo),
 		schoolApp.NewDeactivateSchoolHandler(schoolRepo),
+		schoolApp.NewListPlansHandler(schoolRepo),
 		schoolApp.NewListRulesHandler(schoolRepo),
 		schoolApp.NewUpsertRulesHandler(schoolRepo),
 		schoolApp.NewGetSubscriptionHandler(schoolRepo),
+		schoolApp.NewUpdateSubscriptionHandler(schoolRepo),
 	)
 
 	// ΓöÇΓöÇ Dashboard module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -174,7 +176,7 @@ func main() {
 	academicRepo := academicInfra.NewGormAcademicRepository(db)
 	studentHTTP.NewHandler(
 		v1,
-		studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo),
+		studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo, schoolRepo),
 		studentApp.NewListStudentsHandler(studentRepo),
 		studentApp.NewGetStudentHandler(studentRepo),
 		studentApp.NewUpdateStudentHandler(studentRepo),

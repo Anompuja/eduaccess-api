@@ -6,18 +6,18 @@ import "time"
 
 // SchoolResponse is the public representation of a school.
 type SchoolResponse struct {
-	ID           string              `json:"id"`
-	HeadmasterID *string             `json:"headmaster_id,omitempty"`
-	Name         string              `json:"name"`
-	Address      string              `json:"address"`
-	Phone        string              `json:"phone"`
-	Email        string              `json:"email"`
-	Description  string              `json:"description"`
-	ImagePath    string              `json:"image_path"`
-	TimeZone     string              `json:"time_zone"`
-	Status       string              `json:"status"`
-	CreatedAt    time.Time           `json:"created_at"`
-	UpdatedAt    time.Time           `json:"updated_at"`
+	ID           string                `json:"id"`
+	HeadmasterID *string               `json:"headmaster_id,omitempty"`
+	Name         string                `json:"name"`
+	Address      string                `json:"address"`
+	Phone        string                `json:"phone"`
+	Email        string                `json:"email"`
+	Description  string                `json:"description"`
+	ImagePath    string                `json:"image_path"`
+	TimeZone     string                `json:"time_zone"`
+	Status       string                `json:"status"`
+	CreatedAt    time.Time             `json:"created_at"`
+	UpdatedAt    time.Time             `json:"updated_at"`
 	Subscription *SubscriptionResponse `json:"subscription,omitempty"`
 }
 
@@ -90,6 +90,13 @@ type PlanResponse struct {
 	Name         string   `json:"name"`
 	Description  string   `json:"description"`
 	Features     []string `json:"features"`
+	MaxStudents  int      `json:"max_students"`
 	MonthlyPrice int64    `json:"monthly_price"`
 	YearlyPrice  int64    `json:"yearly_price"`
+}
+
+// UpdateSubscriptionRequest is the body for PUT /schools/:id/subscription.
+type UpdateSubscriptionRequest struct {
+	PlanID string `json:"plan_id" validate:"required,uuid4"`
+	Cycle  string `json:"cycle" validate:"required,oneof=month year onetime"`
 }

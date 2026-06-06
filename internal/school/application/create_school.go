@@ -62,8 +62,10 @@ func (h *CreateSchoolHandler) Handle(ctx context.Context, cmd CreateSchoolComman
 		UpdatedAt:   time.Now(),
 	}
 
-	if err := h.repo.Create(ctx, school); err != nil {
+	sub, err := h.repo.CreateWithDefaultSubscription(ctx, school)
+	if err != nil {
 		return nil, err
 	}
+	school.Subscription = sub
 	return school, nil
 }

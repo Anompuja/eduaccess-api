@@ -2295,6 +2295,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/schools/plans": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the active pricing plans available for school subscriptions.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schools"
+                ],
+                "summary": "List subscription plans",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.PlanResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/schools/{id}": {
             "get": {
                 "security": [
@@ -2644,6 +2690,80 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Replaces the active subscription for a school. Superadmin only.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schools"
+                ],
+                "summary": "Change school subscription",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Subscription update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateSubscriptionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/http.SubscriptionResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "403": {
@@ -5357,6 +5477,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "max_students": {
+                    "type": "integer"
+                },
                 "monthly_price": {
                     "type": "integer"
                 },
@@ -6192,6 +6315,26 @@ const docTemplate = `{
                 "tahun_masuk": {
                     "type": "string",
                     "maxLength": 10
+                }
+            }
+        },
+        "http.UpdateSubscriptionRequest": {
+            "type": "object",
+            "required": [
+                "cycle",
+                "plan_id"
+            ],
+            "properties": {
+                "cycle": {
+                    "type": "string",
+                    "enum": [
+                        "month",
+                        "year",
+                        "onetime"
+                    ]
+                },
+                "plan_id": {
+                    "type": "string"
                 }
             }
         },

@@ -106,6 +106,7 @@ CREATE TABLE "plans" (
     "name"          VARCHAR(191) NOT NULL,
     "description"   TEXT,
     "features"      JSONB        NOT NULL DEFAULT '[]',
+    "max_students"  INT          NOT NULL DEFAULT 0,
     "monthly_price" BIGINT       NOT NULL DEFAULT 0,
     "yearly_price"  BIGINT       NOT NULL DEFAULT 0,
     "onetime_price" BIGINT,
@@ -802,16 +803,16 @@ INSERT INTO "roles" ("name", "guard_name", "display_name", "description") VALUES
 -- SEED DATA — Default Plans
 -- ============================================================
 
-INSERT INTO "plans" ("name", "description", "features", "monthly_price", "yearly_price", "active", "is_default") VALUES
-    ('Trial',    'Plan percobaan gratis untuk semua sekolah baru.',
-     '["Maks 50 siswa","1 sekolah","Absensi dasar","CBT dasar"]',
-     0, 0, TRUE, TRUE),
-    ('Basic',    'Paket dasar untuk sekolah kecil.',
-     '["Maks 200 siswa","1 sekolah","Absensi lengkap","CBT lengkap","Notifikasi WhatsApp"]',
-     500000, 5000000, TRUE, FALSE),
-    ('Standard', 'Paket standar untuk sekolah menengah.',
-     '["Maks 500 siswa","1 sekolah","Semua fitur Basic","Laporan lanjutan"]',
-     1000000, 10000000, TRUE, FALSE),
-    ('Premium',  'Paket premium tanpa batas untuk sekolah besar.',
-     '["Siswa tidak terbatas","1 sekolah","Semua fitur","Prioritas support"]',
-     1500000, 15000000, TRUE, FALSE);
+INSERT INTO "plans" ("name", "description", "features", "max_students", "monthly_price", "yearly_price", "active", "is_default") VALUES
+    ('Trial',      'Masa percobaan untuk sekolah baru sebelum berlangganan paket berbayar.',
+     '["Maks 100 siswa","Durasi trial 14 hari","1 sekolah","Absensi dan akademik dasar"]',
+     100, 0, 0, TRUE, TRUE),
+    ('Basic',      'Paket awal untuk sekolah kecil yang sudah menjalankan operasional harian.',
+     '["Maks 500 siswa","1 sekolah","Dashboard, akademik, absensi, dan pelacakan siswa"]',
+     500, 499000, 4990000, TRUE, FALSE),
+    ('Pro',        'Paket untuk sekolah berkembang yang butuh kapasitas lebih besar.',
+     '["Maks 1500 siswa","1 sekolah","Semua fitur Basic","Laporan operasional lebih besar"]',
+     1500, 1299000, 12990000, TRUE, FALSE),
+    ('Enterprise', 'Paket untuk sekolah besar dengan kebutuhan kapasitas tinggi.',
+     '["Maks 5000 siswa","1 sekolah","Semua fitur Pro","Prioritas dukungan implementasi"]',
+     5000, 2999000, 29990000, TRUE, FALSE);

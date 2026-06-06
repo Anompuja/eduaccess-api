@@ -23,6 +23,7 @@ type StudentProfileRepository interface {
 	FindStudentByID(ctx context.Context, id uuid.UUID) (*StudentProfile, error)
 	FindStudentByUserID(ctx context.Context, userID uuid.UUID) (*StudentProfile, error)
 	ListStudents(ctx context.Context, f StudentFilter) ([]*StudentProfile, int64, error)
+	CountActiveStudents(ctx context.Context, schoolID uuid.UUID) (int64, error)
 	UpdateStudentProfile(ctx context.Context, profile *StudentProfile) error
 	SoftDeleteStudent(ctx context.Context, id uuid.UUID) error
 

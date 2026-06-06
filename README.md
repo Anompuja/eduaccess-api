@@ -395,7 +395,8 @@ Key tables:
 | `schools`              | School tenants                                  |
 | `school_users`         | User ↔ school membership (provides `school_id`) |
 | `school_rules`         | Key-value config per school                     |
-| `subscriptions`        | School subscription & plan                      |
+| `plans`                | Subscription catalog with student quota limits  |
+| `subscriptions`        | School subscription history & active plan       |
 | `student_profiles`     | Student-specific data                           |
 | `student_parent_links` | Many-to-many student ↔ parent                   |
 | `academic_levels`      | Grade levels (e.g. SD, SMP)                     |
@@ -524,14 +525,22 @@ Query params for `GET /users`: `role`, `search`, `page`, `per_page`
 | ------ | --------------------------- | ---- | ------------------------------- |
 | POST   | `/schools`                  | Yes  | Create school (superadmin only) |
 | GET    | `/schools`                  | Yes  | List schools (paginated)        |
+| GET    | `/schools/plans`            | Yes  | List active subscription plans  |
 | GET    | `/schools/:id`              | Yes  | Get school by ID                |
 | PUT    | `/schools/:id`              | Yes  | Update school                   |
 | DELETE | `/schools/:id`              | Yes  | Soft-deactivate school          |
 | GET    | `/schools/:id/rules`        | Yes  | Get school key-value rules      |
 | PUT    | `/schools/:id/rules`        | Yes  | Create/update school rules      |
 | GET    | `/schools/:id/subscription` | Yes  | Get school subscription & plan  |
+| PUT    | `/schools/:id/subscription` | Yes  | Change school subscription      |
 
 Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `page`, `per_page`
+
+Subscription notes:
+
+- Sekolah baru otomatis mendapat plan `Trial` selama 14 hari.
+- Batas jumlah siswa mengikuti `plans.max_students`.
+- Pembuatan siswa baru ditolak jika kuota plan aktif sekolah sudah penuh.
 
 ---
 

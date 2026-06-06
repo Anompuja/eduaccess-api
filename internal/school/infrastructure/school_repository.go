@@ -66,6 +66,7 @@ type planModel struct {
 	Name         string    `gorm:"column:name"`
 	Description  string    `gorm:"column:description"`
 	Features     []byte    `gorm:"column:features"` // JSONB stored as []byte
+	MaxStudents  int       `gorm:"column:max_students"`
 	MonthlyPrice int64     `gorm:"column:monthly_price"`
 	YearlyPrice  int64     `gorm:"column:yearly_price"`
 	OnetimePrice *int64    `gorm:"column:onetime_price"`
@@ -102,6 +103,29 @@ func (r *GormSchoolRepository) Create(ctx context.Context, school *domain.School
 		UpdatedAt:    school.UpdatedAt,
 	}
 	return r.db.WithContext(ctx).Create(&m).Error
+}
+
+func (r *GormSchoolRepository) CreateWithDefaultSubscription(ctx context.Context, school *domain.School) (*domain.Subscription, error) {
+	var created *domain.Subscription
+
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		repo := &GormSchoolRepository{db: tx}
+		if err := repo.Create(ctx, school); err != nil {
+			return err
+		}
+
+		sub, err := repo.createDefaultSubscription(ctx, school.ID)
+		if err != nil {
+			return err
+		}
+		created = sub
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return created, nil
 }
 
 func (r *GormSchoolRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.School, error) {
@@ -240,6 +264,36 @@ func (r *GormSchoolRepository) DeleteRule(ctx context.Context, schoolID uuid.UUI
 
 // ── Subscription ──────────────────────────────────────────────────────────────
 
+func (r *GormSchoolRepository) ListPlans(ctx context.Context) ([]*domain.Plan, error) {
+	var rows []planModel
+	if err := r.db.WithContext(ctx).
+		Where("active = TRUE AND deleted_at IS NULL").
+		Order("is_default DESC").
+		Order("monthly_price ASC").
+		Find(&rows).Error; err != nil {
+		return nil, err
+	}
+
+	plans := make([]*domain.Plan, 0, len(rows))
+	for _, row := range rows {
+		plans = append(plans, toPlanDomain(row))
+	}
+	return plans, nil
+}
+
+func (r *GormSchoolRepository) FindPlanByID(ctx context.Context, id uuid.UUID) (*domain.Plan, error) {
+	var row planModel
+	if err := r.db.WithContext(ctx).
+		Where("id = ? AND active = TRUE AND deleted_at IS NULL", id).
+		First(&row).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, apperror.New(apperror.ErrNotFound, "plan not found")
+		}
+		return nil, err
+	}
+	return toPlanDomain(row), nil
+}
+
 func (r *GormSchoolRepository) FindActiveSubscription(ctx context.Context, schoolID uuid.UUID) (*domain.Subscription, error) {
 	var sub subscriptionModel
 	err := r.db.WithContext(ctx).
@@ -269,22 +323,39 @@ func (r *GormSchoolRepository) FindActiveSubscription(ctx context.Context, schoo
 	// Load plan
 	var plan planModel
 	if err := r.db.WithContext(ctx).Where("id = ?", sub.PlanID).First(&plan).Error; err == nil {
-		var features []string
-		_ = json.Unmarshal(plan.Features, &features)
-		result.Plan = &domain.Plan{
-			ID:           plan.ID,
-			Name:         plan.Name,
-			Description:  plan.Description,
-			Features:     features,
-			MonthlyPrice: plan.MonthlyPrice,
-			YearlyPrice:  plan.YearlyPrice,
-			OnetimePrice: plan.OnetimePrice,
-			Active:       plan.Active,
-			IsDefault:    plan.IsDefault,
-		}
+		result.Plan = toPlanDomain(plan)
 	}
 
 	return result, nil
+}
+
+func (r *GormSchoolRepository) ReplaceSubscription(ctx context.Context, sub *domain.Subscription) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		now := time.Now()
+		if err := tx.Table("subscriptions").
+			Where("school_id = ? AND status IN ('active','trial')", sub.SchoolID).
+			Updates(map[string]interface{}{
+				"status":     "inactive",
+				"ends_at":    now,
+				"updated_at": now,
+			}).Error; err != nil {
+			return err
+		}
+
+		m := subscriptionModel{
+			ID:        sub.ID,
+			SchoolID:  sub.SchoolID,
+			PlanID:    sub.PlanID,
+			Status:    sub.Status,
+			Cycle:     sub.Cycle,
+			Quantity:  sub.Quantity,
+			Price:     sub.Price,
+			EndsAt:    sub.EndsAt,
+			CreatedAt: sub.CreatedAt,
+			UpdatedAt: sub.UpdatedAt,
+		}
+		return tx.Create(&m).Error
+	})
 }
 
 // SetHeadmasterID updates schools.headmaster_id for the given school.
@@ -331,5 +402,78 @@ func toRuleDomain(m schoolRuleModel) *domain.SchoolRule {
 		DeletedAt: m.DeletedAt,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
+	}
+}
+
+func (r *GormSchoolRepository) createDefaultSubscription(ctx context.Context, schoolID uuid.UUID) (*domain.Subscription, error) {
+	plan, err := r.findDefaultPlan(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+	endsAt := now.Add(14 * 24 * time.Hour)
+	sub := &domain.Subscription{
+		ID:        uuid.New(),
+		SchoolID:  schoolID,
+		PlanID:    plan.ID,
+		Status:    "trial",
+		Cycle:     "month",
+		Quantity:  1,
+		Price:     0,
+		EndsAt:    &endsAt,
+		CreatedAt: now,
+		UpdatedAt: now,
+		Plan:      plan,
+	}
+
+	m := subscriptionModel{
+		ID:        sub.ID,
+		SchoolID:  sub.SchoolID,
+		PlanID:    sub.PlanID,
+		Status:    sub.Status,
+		Cycle:     sub.Cycle,
+		Quantity:  sub.Quantity,
+		Price:     sub.Price,
+		EndsAt:    sub.EndsAt,
+		CreatedAt: sub.CreatedAt,
+		UpdatedAt: sub.UpdatedAt,
+	}
+	if err := r.db.WithContext(ctx).Create(&m).Error; err != nil {
+		return nil, err
+	}
+
+	return sub, nil
+}
+
+func (r *GormSchoolRepository) findDefaultPlan(ctx context.Context) (*domain.Plan, error) {
+	var row planModel
+	if err := r.db.WithContext(ctx).
+		Where("is_default = TRUE AND active = TRUE AND deleted_at IS NULL").
+		Order("created_at ASC").
+		First(&row).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, apperror.New(apperror.ErrNotFound, "default plan not found")
+		}
+		return nil, err
+	}
+	return toPlanDomain(row), nil
+}
+
+func toPlanDomain(m planModel) *domain.Plan {
+	var features []string
+	_ = json.Unmarshal(m.Features, &features)
+
+	return &domain.Plan{
+		ID:           m.ID,
+		Name:         m.Name,
+		Description:  m.Description,
+		Features:     features,
+		MaxStudents:  m.MaxStudents,
+		MonthlyPrice: m.MonthlyPrice,
+		YearlyPrice:  m.YearlyPrice,
+		OnetimePrice: m.OnetimePrice,
+		Active:       m.Active,
+		IsDefault:    m.IsDefault,
 	}
 }
