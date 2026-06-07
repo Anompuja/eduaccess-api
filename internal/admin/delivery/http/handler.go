@@ -264,6 +264,12 @@ func (h *Handler) DeactivateAdmin(c echo.Context) error {
 }
 
 func toAdminResponse(a *domain.AdminProfile) AdminResponse {
+	var birthDate *string
+
+	if a.BirthDate != nil {
+		s := a.BirthDate.Format("2006-01-02")
+		birthDate = &s
+	}
 	return AdminResponse{
 		ID:           a.ID.String(),
 		UserID:       a.UserID.String(),
@@ -277,7 +283,7 @@ func toAdminResponse(a *domain.AdminProfile) AdminResponse {
 		Gender:       a.Gender,
 		Religion:     a.Religion,
 		BirthPlace:   a.BirthPlace,
-		BirthDate:    a.BirthDate,
+		BirthDate:    birthDate,
 		NIK:          a.NIK,
 		KTPImagePath: a.KTPImagePath,
 		CreatedAt:    a.CreatedAt,
