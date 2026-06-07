@@ -7,6 +7,7 @@ import (
 
 	academicdomain "github.com/eduaccess/eduaccess-api/internal/academic/domain"
 	authdomain "github.com/eduaccess/eduaccess-api/internal/auth/domain"
+	schooldomain "github.com/eduaccess/eduaccess-api/internal/school/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/student/domain"
 	"github.com/google/uuid"
@@ -42,10 +43,20 @@ type CreateStudentHandler struct {
 	users    UserCreator
 	repo     domain.StudentRepository
 	academic academicdomain.AcademicRepository
+	schools  SchoolSubscriptionReader
 }
 
-func NewCreateStudentHandler(users UserCreator, repo domain.StudentRepository, academic academicdomain.AcademicRepository) *CreateStudentHandler {
-	return &CreateStudentHandler{users: users, repo: repo, academic: academic}
+type SchoolSubscriptionReader interface {
+	FindActiveSubscription(ctx context.Context, schoolID uuid.UUID) (*schooldomain.Subscription, error)
+}
+
+func NewCreateStudentHandler(
+	users UserCreator,
+	repo domain.StudentRepository,
+	academic academicdomain.AcademicRepository,
+	schools SchoolSubscriptionReader,
+) *CreateStudentHandler {
+	return &CreateStudentHandler{users: users, repo: repo, academic: academic, schools: schools}
 }
 
 func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentCommand) (*domain.StudentProfile, error) {
@@ -78,6 +89,29 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 	}
 	if schoolID == nil {
 		return nil, apperror.New(apperror.ErrBadRequest, "unable to resolve school context; provide class_id, sub_class_id, or education_level_id")
+	}
+
+	sub, err := h.schools.FindActiveSubscription(ctx, *schoolID)
+	if err != nil {
+		if apperror.Is(err, apperror.ErrNotFound) {
+			return nil, apperror.New(apperror.ErrBadRequest, "school does not have an active subscription")
+		}
+		return nil, err
+	}
+	if sub.Plan == nil {
+		return nil, apperror.New(apperror.ErrBadRequest, "school subscription is missing plan details")
+	}
+	if sub.Plan.MaxStudents > 0 {
+		totalStudents, err := h.repo.CountActiveStudents(ctx, *schoolID)
+		if err != nil {
+			return nil, err
+		}
+		if totalStudents >= int64(sub.Plan.MaxStudents) {
+			return nil, apperror.New(
+				apperror.ErrConflict,
+				"student quota reached for plan "+sub.Plan.Name+"; upgrade the subscription to add more students",
+			)
+		}
 	}
 
 	// Check email uniqueness
@@ -150,6 +184,7 @@ func (h *CreateStudentHandler) Handle(ctx context.Context, cmd CreateStudentComm
 		UpdatedAt:         time.Now(),
 	}
 	if err := h.repo.CreateStudentProfile(ctx, profile); err != nil {
+		_ = h.users.SoftDelete(ctx, userID)
 		return nil, err
 	}
 

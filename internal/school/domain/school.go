@@ -62,6 +62,7 @@ type Plan struct {
 	Name         string
 	Description  string
 	Features     []string
+	MaxStudents  int
 	MonthlyPrice int64
 	YearlyPrice  int64
 	OnetimePrice *int64

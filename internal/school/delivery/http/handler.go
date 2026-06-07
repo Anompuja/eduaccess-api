@@ -17,14 +17,16 @@ import (
 
 // Handler wires school use-cases to HTTP endpoints.
 type Handler struct {
-	createSchool      *application.CreateSchoolHandler
-	listSchools       *application.ListSchoolsHandler
-	getSchool         *application.GetSchoolHandler
-	updateSchool      *application.UpdateSchoolHandler
-	deactivateSchool  *application.DeactivateSchoolHandler
-	listRules         *application.ListRulesHandler
-	upsertRules       *application.UpsertRulesHandler
-	getSubscription   *application.GetSubscriptionHandler
+	createSchool       *application.CreateSchoolHandler
+	listSchools        *application.ListSchoolsHandler
+	getSchool          *application.GetSchoolHandler
+	updateSchool       *application.UpdateSchoolHandler
+	deactivateSchool   *application.DeactivateSchoolHandler
+	listPlans          *application.ListPlansHandler
+	listRules          *application.ListRulesHandler
+	upsertRules        *application.UpsertRulesHandler
+	getSubscription    *application.GetSubscriptionHandler
+	updateSubscription *application.UpdateSubscriptionHandler
 }
 
 // NewHandler registers school routes and returns the handler.
@@ -35,22 +37,27 @@ func NewHandler(
 	getSchool *application.GetSchoolHandler,
 	updateSchool *application.UpdateSchoolHandler,
 	deactivateSchool *application.DeactivateSchoolHandler,
+	listPlans *application.ListPlansHandler,
 	listRules *application.ListRulesHandler,
 	upsertRules *application.UpsertRulesHandler,
 	getSubscription *application.GetSubscriptionHandler,
+	updateSubscription *application.UpdateSubscriptionHandler,
 ) *Handler {
 	h := &Handler{
-		createSchool:     createSchool,
-		listSchools:      listSchools,
-		getSchool:        getSchool,
-		updateSchool:     updateSchool,
-		deactivateSchool: deactivateSchool,
-		listRules:        listRules,
-		upsertRules:      upsertRules,
-		getSubscription:  getSubscription,
+		createSchool:       createSchool,
+		listSchools:        listSchools,
+		getSchool:          getSchool,
+		updateSchool:       updateSchool,
+		deactivateSchool:   deactivateSchool,
+		listPlans:          listPlans,
+		listRules:          listRules,
+		upsertRules:        upsertRules,
+		getSubscription:    getSubscription,
+		updateSubscription: updateSubscription,
 	}
 
 	schools := v1.Group("/schools", authmw.RequireAuth)
+	schools.GET("/plans", h.ListPlans)
 	schools.POST("", h.CreateSchool)
 	schools.GET("", h.ListSchools)
 	schools.GET("/:id", h.GetSchool)
@@ -59,6 +66,7 @@ func NewHandler(
 	schools.GET("/:id/rules", h.ListRules)
 	schools.PUT("/:id/rules", h.UpsertRules)
 	schools.GET("/:id/subscription", h.GetSubscription)
+	schools.PUT("/:id/subscription", h.UpdateSubscription)
 
 	return h
 }
@@ -246,6 +254,30 @@ func (h *Handler) DeactivateSchool(c echo.Context) error {
 	return response.OK(c, "school deactivated", nil)
 }
 
+// ListPlans godoc
+//
+//	@Summary      List subscription plans
+//	@Description  Returns the active pricing plans available for school subscriptions.
+//	@Tags         schools
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Success      200  {object}  response.Response{data=[]PlanResponse}
+//	@Failure      401  {object}  response.Response
+//	@Router       /schools/plans [get]
+func (h *Handler) ListPlans(c echo.Context) error {
+	plans, err := h.listPlans.Handle(c.Request().Context())
+	if err != nil {
+		return handleAppError(c, err)
+	}
+
+	dtos := make([]PlanResponse, 0, len(plans))
+	for _, p := range plans {
+		dtos = append(dtos, toPlanResponse(p))
+	}
+
+	return response.OK(c, "plans retrieved", dtos)
+}
+
 // ListRules godoc
 //
 //	@Summary      List school rules
@@ -363,6 +395,50 @@ func (h *Handler) GetSubscription(c echo.Context) error {
 	return response.OK(c, "subscription retrieved", toSubscriptionResponse(sub))
 }
 
+// UpdateSubscription godoc
+//
+//	@Summary      Change school subscription
+//	@Description  Replaces the active subscription for a school. Superadmin only.
+//	@Tags         schools
+//	@Accept       json
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        id    path      string                    true  "School UUID"
+//	@Param        body  body      UpdateSubscriptionRequest true  "Subscription update"
+//	@Success      200   {object}  response.Response{data=SubscriptionResponse}
+//	@Failure      400   {object}  response.Response
+//	@Failure      403   {object}  response.Response
+//	@Failure      404   {object}  response.Response
+//	@Router       /schools/{id}/subscription [put]
+func (h *Handler) UpdateSubscription(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+
+	var req UpdateSubscriptionRequest
+	if err := validator.BindAndValidate(c, &req); err != nil {
+		return err
+	}
+
+	planID, err := uuid.Parse(req.PlanID)
+	if err != nil {
+		return response.BadRequest(c, "invalid plan_id")
+	}
+
+	sub, err := h.updateSubscription.Handle(c.Request().Context(), application.UpdateSubscriptionCommand{
+		RequesterRole: authmw.GetRole(c),
+		SchoolID:      id,
+		PlanID:        planID,
+		Cycle:         req.Cycle,
+	})
+	if err != nil {
+		return handleAppError(c, err)
+	}
+
+	return response.OK(c, "subscription updated", toSubscriptionResponse(sub))
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 func toSchoolResponse(s *domain.School) SchoolResponse {
@@ -423,12 +499,30 @@ func toSubscriptionResponse(s *domain.Subscription) SubscriptionResponse {
 			Name:         s.Plan.Name,
 			Description:  s.Plan.Description,
 			Features:     features,
+			MaxStudents:  s.Plan.MaxStudents,
 			MonthlyPrice: s.Plan.MonthlyPrice,
 			YearlyPrice:  s.Plan.YearlyPrice,
 		}
 		dto.Plan = &plan
 	}
 	return dto
+}
+
+func toPlanResponse(p *domain.Plan) PlanResponse {
+	features := p.Features
+	if features == nil {
+		features = []string{}
+	}
+
+	return PlanResponse{
+		ID:           p.ID.String(),
+		Name:         p.Name,
+		Description:  p.Description,
+		Features:     features,
+		MaxStudents:  p.MaxStudents,
+		MonthlyPrice: p.MonthlyPrice,
+		YearlyPrice:  p.YearlyPrice,
+	}
 }
 
 func parseUUID(c echo.Context, param string) (uuid.UUID, error) {
