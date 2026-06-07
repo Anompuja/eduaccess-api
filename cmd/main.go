@@ -24,6 +24,9 @@ import (
 	authApp "github.com/eduaccess/eduaccess-api/internal/auth/application"
 	authHTTP "github.com/eduaccess/eduaccess-api/internal/auth/delivery/http"
 	authInfra "github.com/eduaccess/eduaccess-api/internal/auth/infrastructure"
+	billingApp "github.com/eduaccess/eduaccess-api/internal/billing/application"
+	billingHTTP "github.com/eduaccess/eduaccess-api/internal/billing/delivery/http"
+	billingInfra "github.com/eduaccess/eduaccess-api/internal/billing/infrastructure"
 	classScheduleApp "github.com/eduaccess/eduaccess-api/internal/class_schedule/application"
 	classScheduleHTTP "github.com/eduaccess/eduaccess-api/internal/class_schedule/delivery/http"
 	classScheduleInfra "github.com/eduaccess/eduaccess-api/internal/class_schedule/infrastructure"
@@ -139,6 +142,7 @@ func main() {
 
 	// ΓöÇΓöÇ School setup module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	schoolRepo := schoolInfra.NewGormSchoolRepository(db)
+	studentRepo := studentInfra.NewGormStudentRepository(db)
 	schoolHTTP.NewHandler(
 		v1,
 		schoolApp.NewCreateSchoolHandler(schoolRepo),
@@ -150,7 +154,16 @@ func main() {
 		schoolApp.NewListRulesHandler(schoolRepo),
 		schoolApp.NewUpsertRulesHandler(schoolRepo),
 		schoolApp.NewGetSubscriptionHandler(schoolRepo),
-		schoolApp.NewUpdateSubscriptionHandler(schoolRepo),
+		schoolApp.NewUpdateSubscriptionHandler(schoolRepo, studentRepo),
+	)
+
+	paymentRepo := billingInfra.NewGormPaymentRepository(db)
+	midtransClient := billingInfra.NewMidtransClientFromEnv()
+	billingHTTP.NewHandler(
+		v1,
+		billingApp.NewCreateCheckoutHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
+		billingApp.NewGetPaymentHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
+		billingApp.NewHandleMidtransNotificationHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
 	)
 
 	// ΓöÇΓöÇ Dashboard module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -172,7 +185,6 @@ func main() {
 	)
 
 	// ΓöÇΓöÇ Student module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-	studentRepo := studentInfra.NewGormStudentRepository(db)
 	academicRepo := academicInfra.NewGormAcademicRepository(db)
 	studentHTTP.NewHandler(
 		v1,

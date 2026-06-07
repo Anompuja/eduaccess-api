@@ -20,11 +20,20 @@ type UpdateSubscriptionCommand struct {
 
 // UpdateSubscriptionHandler replaces the active subscription for a school.
 type UpdateSubscriptionHandler struct {
-	repo schooldomain.SchoolRepository
+	repo          schooldomain.SchoolRepository
+	studentCounts ActiveStudentCounter
 }
 
-func NewUpdateSubscriptionHandler(repo schooldomain.SchoolRepository) *UpdateSubscriptionHandler {
-	return &UpdateSubscriptionHandler{repo: repo}
+type ActiveStudentCounter interface {
+	CountActiveStudents(ctx context.Context, schoolID uuid.UUID) (int64, error)
+}
+
+func NewUpdateSubscriptionHandler(repo schooldomain.SchoolRepository, studentCounts ...ActiveStudentCounter) *UpdateSubscriptionHandler {
+	var counter ActiveStudentCounter
+	if len(studentCounts) > 0 {
+		counter = studentCounts[0]
+	}
+	return &UpdateSubscriptionHandler{repo: repo, studentCounts: counter}
 }
 
 func (h *UpdateSubscriptionHandler) Handle(ctx context.Context, cmd UpdateSubscriptionCommand) (*schooldomain.Subscription, error) {
@@ -39,6 +48,18 @@ func (h *UpdateSubscriptionHandler) Handle(ctx context.Context, cmd UpdateSubscr
 	plan, err := h.repo.FindPlanByID(ctx, cmd.PlanID)
 	if err != nil {
 		return nil, err
+	}
+	if h.studentCounts != nil && plan.MaxStudents > 0 {
+		totalStudents, err := h.studentCounts.CountActiveStudents(ctx, cmd.SchoolID)
+		if err != nil {
+			return nil, err
+		}
+		if totalStudents > int64(plan.MaxStudents) {
+			return nil, apperror.New(
+				apperror.ErrBadRequest,
+				"selected plan does not support the current number of active students in this school",
+			)
+		}
 	}
 
 	price, endsAt, err := buildSubscriptionBilling(plan, cmd.Cycle)

@@ -533,6 +533,8 @@ Query params for `GET /users`: `role`, `search`, `page`, `per_page`
 | PUT    | `/schools/:id/rules`        | Yes  | Create/update school rules      |
 | GET    | `/schools/:id/subscription` | Yes  | Get school subscription & plan  |
 | PUT    | `/schools/:id/subscription` | Yes  | Change school subscription      |
+| POST   | `/schools/:id/subscription/checkout` | Yes | Create a Midtrans checkout for upgrading a subscription |
+| GET    | `/schools/:id/subscription/payments/:payment_id` | Yes | Get a payment transaction and its current status |
 
 Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `page`, `per_page`
 
@@ -541,6 +543,15 @@ Subscription notes:
 - Sekolah baru otomatis mendapat plan `Trial` selama 14 hari.
 - Batas jumlah siswa mengikuti `plans.max_students`.
 - Pembuatan siswa baru ditolak jika kuota plan aktif sekolah sudah penuh.
+- Checkout Midtrans hanya dipakai untuk pembelian atau upgrade plan berbayar.
+- Aktivasi subscription baru terjadi setelah webhook Midtrans tervalidasi dan status transaksi sukses.
+- Endpoint `PUT /schools/:id/subscription` tetap dipertahankan sebagai override internal untuk `superadmin`.
+
+Billing webhook:
+
+| Method | Path                         | Auth | Description                                     |
+| ------ | ---------------------------- | ---- | ----------------------------------------------- |
+| POST   | `/billing/webhooks/midtrans` | No   | Midtrans notification endpoint for payment sync |
 
 ---
 
@@ -734,6 +745,38 @@ The Dockerfile is multi-stage (Go builder → Alpine runtime) and generates Swag
 GET /health
 → 200 { "status": "ok" }
 ```
+
+---
+
+## Midtrans Setup
+
+1. Buat akun Midtrans dan gunakan mode `Sandbox` terlebih dulu.
+2. Ambil `Server Key` dan, bila diperlukan untuk frontend web, `Client Key` dari dashboard Midtrans.
+3. Isi `.env`:
+
+```dotenv
+MIDTRANS_ENVIRONMENT=sandbox
+MIDTRANS_SERVER_KEY=SB-Mid-server-xxxx
+MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxx
+MIDTRANS_PAYMENT_EXPIRY_MINUTES=1440
+```
+
+4. Apply migration `database/migrations/005_midtrans_payment_transactions.sql` ke database yang dipakai backend.
+5. Jalankan backend, lalu expose endpoint webhook agar bisa diakses Midtrans saat testing.
+6. Set Midtrans payment notification URL ke:
+
+```
+https://your-domain/api/v1/billing/webhooks/midtrans
+```
+
+7. Flow frontend yang disarankan:
+- Panggil `GET /schools/plans`
+- Panggil `POST /schools/:id/subscription/checkout`
+- Buka `provider_redirect_url` di browser atau webview
+- Setelah user selesai bayar, poll `GET /schools/:id/subscription/payments/:payment_id`
+- Jika status `paid`, refresh `GET /schools/:id/subscription`
+
+8. Untuk demo lokal, gunakan tunnel seperti ngrok atau Cloudflare Tunnel agar Midtrans bisa mengirim webhook ke laptop pengembang.
 
 ---
 

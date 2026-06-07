@@ -66,6 +66,14 @@ func (f *fakeSchoolRepo) ReplaceSubscription(_ context.Context, sub *domain.Subs
 
 func (f *fakeSchoolRepo) SetHeadmasterID(context.Context, uuid.UUID, uuid.UUID) error { return nil }
 
+type fakeStudentCounter struct {
+	total int64
+}
+
+func (f *fakeStudentCounter) CountActiveStudents(context.Context, uuid.UUID) (int64, error) {
+	return f.total, nil
+}
+
 func TestCreateSchoolHandler_AssignsDefaultSubscription(t *testing.T) {
 	repo := &fakeSchoolRepo{
 		defaultSubscription: &domain.Subscription{
@@ -141,5 +149,31 @@ func TestUpdateSubscriptionHandler_UsesSelectedPlanPricing(t *testing.T) {
 	}
 	if sub.EndsAt == nil {
 		t.Fatal("expected yearly subscription to have an end date")
+	}
+}
+
+func TestUpdateSubscriptionHandler_RejectsPlanBelowCurrentStudentCount(t *testing.T) {
+	planID := uuid.New()
+	schoolID := uuid.New()
+	repo := &fakeSchoolRepo{
+		findByIDResult: &domain.School{ID: schoolID},
+		findPlanByIDResult: &domain.Plan{
+			ID:           planID,
+			Name:         "Basic",
+			MaxStudents:  500,
+			MonthlyPrice: 499000,
+			YearlyPrice:  4990000,
+		},
+	}
+	handler := NewUpdateSubscriptionHandler(repo, &fakeStudentCounter{total: 700})
+
+	_, err := handler.Handle(context.Background(), UpdateSubscriptionCommand{
+		RequesterRole: authdomain.RoleSuperadmin,
+		SchoolID:      schoolID,
+		PlanID:        planID,
+		Cycle:         "month",
+	})
+	if err == nil {
+		t.Fatal("expected quota validation error, got nil")
 	}
 }
