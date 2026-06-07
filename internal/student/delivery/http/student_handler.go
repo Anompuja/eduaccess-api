@@ -18,6 +18,9 @@ func (h *Handler) registerStudentRoutes(v1 *echo.Group, auth echo.MiddlewareFunc
 	students := v1.Group("/students", auth)
 	students.POST("", h.CreateStudent)
 	students.GET("", h.ListStudents)
+	// Bulk routes registered before /:id to prevent "bulk" matching as an ID param.
+	students.GET("/bulk/template", h.DownloadBulkTemplate)
+	students.POST("/bulk", h.BulkCreateStudents)
 	students.GET("/:id", h.GetStudent)
 	students.PUT("/:id", h.UpdateStudent)
 	students.DELETE("/:id", h.DeactivateStudent)

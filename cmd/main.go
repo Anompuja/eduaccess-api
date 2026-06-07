@@ -172,9 +172,11 @@ func main() {
 	// ΓöÇΓöÇ Student module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	studentRepo := studentInfra.NewGormStudentRepository(db)
 	academicRepo := academicInfra.NewGormAcademicRepository(db)
+	createStudentHandler := studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo)
 	studentHTTP.NewHandler(
 		v1,
-		studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo),
+		createStudentHandler,
+		studentApp.NewBulkCreateStudentHandler(createStudentHandler, academicRepo),
 		studentApp.NewListStudentsHandler(studentRepo),
 		studentApp.NewGetStudentHandler(studentRepo),
 		studentApp.NewUpdateStudentHandler(studentRepo),
@@ -281,6 +283,8 @@ func main() {
 		classScheduleApp.NewSyncStudentsHandler(classScheduleRepo),
 		classScheduleApp.NewListAttendancesHandler(classScheduleRepo),
 		classScheduleApp.NewUpdateAttendanceHandler(classScheduleRepo),
+		classScheduleApp.NewGenerateQRHandler(classScheduleRepo),
+		classScheduleApp.NewScanQRHandler(classScheduleRepo),
 	)
 
 	// ΓöÇΓöÇ Student Tracking module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ

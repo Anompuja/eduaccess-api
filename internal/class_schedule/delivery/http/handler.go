@@ -28,6 +28,8 @@ type Handler struct {
 	syncStudents     *application.SyncStudentsHandler
 	listAttendances  *application.ListAttendancesHandler
 	updateAttendance *application.UpdateAttendanceHandler
+	generateQR       *application.GenerateQRHandler
+	scanQR           *application.ScanQRHandler
 }
 
 func NewHandler(
@@ -43,6 +45,8 @@ func NewHandler(
 	syncStudents *application.SyncStudentsHandler,
 	listAttendances *application.ListAttendancesHandler,
 	updateAttendance *application.UpdateAttendanceHandler,
+	generateQR *application.GenerateQRHandler,
+	scanQR *application.ScanQRHandler,
 ) *Handler {
 	h := &Handler{
 		createSchedule: createSchedule, listSchedules: listSchedules,
@@ -51,12 +55,17 @@ func NewHandler(
 		completeSchedule: completeSchedule, cancelSchedule: cancelSchedule,
 		syncStudents: syncStudents, listAttendances: listAttendances,
 		updateAttendance: updateAttendance,
+		generateQR:       generateQR,
+		scanQR:           scanQR,
 	}
 
 	auth := authmw.RequireAuth
 	cs := v1.Group("/class-schedules", auth, httpcache.Middleware(httpcache.AlwaysRevalidate))
 	cs.POST("", h.CreateClassSchedule)
 	cs.GET("", h.ListClassSchedules)
+	// QR routes registered before /:id to prevent "qr" matching as an ID param.
+	cs.GET("/:id/qr", h.GetQRToken)
+	cs.GET("/:id/qr/image", h.GetQRImage)
 	cs.GET("/:id", h.GetClassSchedule)
 	cs.PUT("/:id", h.UpdateClassSchedule)
 	cs.DELETE("/:id", h.DeleteClassSchedule)
@@ -66,6 +75,9 @@ func NewHandler(
 	cs.PATCH("/:id/sync-students", h.SyncStudents)
 	cs.GET("/:id/attendances", h.ListAttendances)
 	cs.PUT("/:id/attendances/:student_id", h.UpdateAttendance)
+
+	// Scan endpoint is at /api/v1/attendance/scan (student-facing, not under /class-schedules).
+	v1.POST("/attendance/scan", h.ScanQR, auth)
 
 	return h
 }
