@@ -34,10 +34,10 @@ func Connect() (*gorm.DB, error) {
 	maxOpen, _ := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONNS"))
 	maxIdle, _ := strconv.Atoi(os.Getenv("DB_MAX_IDLE_CONNS"))
 	if maxOpen == 0 {
-		maxOpen = 25
+		maxOpen = 10
 	}
 	if maxIdle == 0 {
-		maxIdle = 5
+		maxIdle = 3
 	}
 
 	sqlDB.SetMaxOpenConns(maxOpen)

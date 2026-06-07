@@ -127,17 +127,26 @@ func (h *Handler) CreateClassSchedule(c echo.Context) error {
 //	@Failure      403          {object}  response.Response
 //	@Router       /class-schedules [get]
 func (h *Handler) ListClassSchedules(c echo.Context) error {
+	role := authmw.GetRole(c)
 	q := application.ListClassSchedulesQuery{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+		RequesterSchoolID: getSchoolID(c), RequesterRole: role,
+	}
+	// Teachers always see only their own schedules.
+	if role == "guru" {
+		userID := authmw.GetUserID(c)
+		q.TeacherID = &userID
 	}
 	if raw := c.QueryParam("classroom_id"); raw != "" {
 		if id, err := uuid.Parse(raw); err == nil {
 			q.ClassroomID = &id
 		}
 	}
-	if raw := c.QueryParam("teacher_id"); raw != "" {
-		if id, err := uuid.Parse(raw); err == nil {
-			q.TeacherID = &id
+	// Only non-guru roles may override teacher_id via query param.
+	if role != "guru" {
+		if raw := c.QueryParam("teacher_id"); raw != "" {
+			if id, err := uuid.Parse(raw); err == nil {
+				q.TeacherID = &id
+			}
 		}
 	}
 	if raw := c.QueryParam("subject_id"); raw != "" {
@@ -330,10 +339,16 @@ func toScheduleResponse(cs *domain.ClassSchedule) ClassScheduleResponse {
 		ID:                    cs.ID.String(),
 		SchoolID:              cs.SchoolID.String(),
 		ClassroomID:           cs.ClassroomID.String(),
+		ClassroomName:         cs.ClassroomName,
 		SubjectID:             cs.SubjectID.String(),
+		SubjectName:           cs.SubjectName,
 		TeacherID:             cs.TeacherID.String(),
+		TeacherName:           cs.TeacherName,
 		StartPeriodID:         uuidPtrToStr(cs.StartPeriodID),
+		StartPeriodNumber:     cs.StartPeriodNumber,
+		StartPeriodLabel:      cs.StartPeriodLabel,
 		EndPeriodID:           uuidPtrToStr(cs.EndPeriodID),
+		EndPeriodNumber:       cs.EndPeriodNumber,
 		Date:                  cs.Date.Format("2006-01-02"),
 		StartTime:             cs.StartTime,
 		EndTime:               cs.EndTime,
@@ -349,6 +364,7 @@ func toAttendanceResponse(att *domain.ClassScheduleStudent) AttendanceResponse {
 		ID:                    att.ID.String(),
 		ClassScheduleID:       att.ClassScheduleID.String(),
 		StudentID:             att.StudentID.String(),
+		StudentName:           att.StudentName,
 		Status:                att.Status,
 		Type:                  att.Type,
 		Note:                  att.Note,

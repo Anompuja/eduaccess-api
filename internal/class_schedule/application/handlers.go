@@ -309,7 +309,7 @@ func NewCancelClassScheduleHandler(repo domain.ClassScheduleRepository) *CancelC
 }
 
 func (h *CancelClassScheduleHandler) Handle(ctx context.Context, cmd CancelClassScheduleCommand) error {
-	if err := guardWrite(cmd.RequesterRole); err != nil {
+	if err := guardSessionControl(cmd.RequesterRole); err != nil {
 		return err
 	}
 	cs, err := h.repo.FindClassScheduleByID(ctx, cmd.ScheduleID)

@@ -22,6 +22,14 @@ type ClassSchedule struct {
 	DeletedAt             *time.Time
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
+
+	// Enriched via JOIN — not stored in class_schedules
+	ClassroomName     string
+	SubjectName       string
+	TeacherName       string
+	StartPeriodNumber *int
+	StartPeriodLabel  *string
+	EndPeriodNumber   *int
 }
 
 type ClassScheduleStudent struct {
@@ -37,4 +45,7 @@ type ClassScheduleStudent struct {
 	DeletedAt             *time.Time
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
+
+	// Enriched via JOIN — not stored in class_schedule_students
+	StudentName string
 }
