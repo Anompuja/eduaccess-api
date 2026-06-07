@@ -32,6 +32,32 @@ type classScheduleModel struct {
 
 func (classScheduleModel) TableName() string { return "class_schedules" }
 
+// classScheduleRow is a flat struct for JOIN scans — does NOT embed classScheduleModel
+// because GORM's Scan() skips fields of embedded structs that define TableName().
+type classScheduleRow struct {
+	ID                    uuid.UUID  `gorm:"column:id"`
+	SchoolID              uuid.UUID  `gorm:"column:school_id"`
+	ClassroomID           uuid.UUID  `gorm:"column:school_classroom_id"`
+	SubjectID             uuid.UUID  `gorm:"column:school_subject_id"`
+	TeacherID             uuid.UUID  `gorm:"column:teacher_id"`
+	StartPeriodID         *uuid.UUID `gorm:"column:start_period_id"`
+	EndPeriodID           *uuid.UUID `gorm:"column:end_period_id"`
+	Date                  time.Time  `gorm:"column:date"`
+	StartTime             string     `gorm:"column:start_time"`
+	EndTime               string     `gorm:"column:end_time"`
+	TeacherAttendanceTime *time.Time `gorm:"column:teacher_attendance_time"`
+	Status                string     `gorm:"column:status"`
+	DeletedAt             *time.Time `gorm:"column:deleted_at"`
+	CreatedAt             time.Time  `gorm:"column:created_at"`
+	UpdatedAt             time.Time  `gorm:"column:updated_at"`
+	ClassroomName         string     `gorm:"column:classroom_name"`
+	SubjectName           string     `gorm:"column:subject_name"`
+	TeacherName           string     `gorm:"column:teacher_name"`
+	StartPeriodNumber     *int       `gorm:"column:start_period_number"`
+	StartPeriodLabel      *string    `gorm:"column:start_period_label"`
+	EndPeriodNumber       *int       `gorm:"column:end_period_number"`
+}
+
 type classScheduleStudentModel struct {
 	ID                    uuid.UUID  `gorm:"column:id;primaryKey"`
 	SchoolID              uuid.UUID  `gorm:"column:school_id"`
@@ -49,6 +75,23 @@ type classScheduleStudentModel struct {
 
 func (classScheduleStudentModel) TableName() string { return "class_schedule_students" }
 
+// classScheduleStudentRow is a flat struct for JOIN scans — same reason as classScheduleRow.
+type classScheduleStudentRow struct {
+	ID                    uuid.UUID  `gorm:"column:id"`
+	SchoolID              uuid.UUID  `gorm:"column:school_id"`
+	ClassScheduleID       uuid.UUID  `gorm:"column:class_schedule_id"`
+	StudentID             uuid.UUID  `gorm:"column:student_id"`
+	Type                  string     `gorm:"column:type"`
+	PhotoPath             string     `gorm:"column:photo_path"`
+	Note                  string     `gorm:"column:note"`
+	StudentAttendanceTime *time.Time `gorm:"column:student_attendance_time"`
+	Status                string     `gorm:"column:status"`
+	DeletedAt             *time.Time `gorm:"column:deleted_at"`
+	CreatedAt             time.Time  `gorm:"column:created_at"`
+	UpdatedAt             time.Time  `gorm:"column:updated_at"`
+	StudentName           string     `gorm:"column:student_name"`
+}
+
 // ── Repository ────────────────────────────────────────────────────────────────
 
 type GormClassScheduleRepository struct {
@@ -59,27 +102,55 @@ func NewGormClassScheduleRepository(db *gorm.DB) *GormClassScheduleRepository {
 	return &GormClassScheduleRepository{db: db}
 }
 
-func scheduleFromModel(m classScheduleModel) *domain.ClassSchedule {
+func scheduleFromRow(r classScheduleRow) *domain.ClassSchedule {
 	return &domain.ClassSchedule{
-		ID: m.ID, SchoolID: m.SchoolID, ClassroomID: m.ClassroomID,
-		SubjectID: m.SubjectID, TeacherID: m.TeacherID,
-		StartPeriodID: m.StartPeriodID, EndPeriodID: m.EndPeriodID,
-		Date: m.Date, StartTime: m.StartTime, EndTime: m.EndTime,
-		TeacherAttendanceTime: m.TeacherAttendanceTime,
-		Status:                m.Status,
-		DeletedAt:             m.DeletedAt, CreatedAt: m.CreatedAt, UpdatedAt: m.UpdatedAt,
+		ID: r.ID, SchoolID: r.SchoolID, ClassroomID: r.ClassroomID,
+		SubjectID: r.SubjectID, TeacherID: r.TeacherID,
+		StartPeriodID: r.StartPeriodID, EndPeriodID: r.EndPeriodID,
+		Date: r.Date, StartTime: r.StartTime, EndTime: r.EndTime,
+		TeacherAttendanceTime: r.TeacherAttendanceTime,
+		Status:                r.Status,
+		DeletedAt:             r.DeletedAt, CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt,
+		ClassroomName:     r.ClassroomName,
+		SubjectName:       r.SubjectName,
+		TeacherName:       r.TeacherName,
+		StartPeriodNumber: r.StartPeriodNumber,
+		StartPeriodLabel:  r.StartPeriodLabel,
+		EndPeriodNumber:   r.EndPeriodNumber,
 	}
 }
 
-func attendanceFromModel(m classScheduleStudentModel) *domain.ClassScheduleStudent {
+func attendanceFromRow(r classScheduleStudentRow) *domain.ClassScheduleStudent {
 	return &domain.ClassScheduleStudent{
-		ID: m.ID, SchoolID: m.SchoolID, ClassScheduleID: m.ClassScheduleID,
-		StudentID: m.StudentID, Type: m.Type, PhotoPath: m.PhotoPath, Note: m.Note,
-		StudentAttendanceTime: m.StudentAttendanceTime,
-		Status:                m.Status,
-		DeletedAt:             m.DeletedAt, CreatedAt: m.CreatedAt, UpdatedAt: m.UpdatedAt,
+		ID: r.ID, SchoolID: r.SchoolID, ClassScheduleID: r.ClassScheduleID,
+		StudentID: r.StudentID, Type: r.Type, PhotoPath: r.PhotoPath, Note: r.Note,
+		StudentAttendanceTime: r.StudentAttendanceTime,
+		Status:                r.Status,
+		DeletedAt:             r.DeletedAt, CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt,
+		StudentName: r.StudentName,
 	}
 }
+
+const scheduleSelectCols = `
+	class_schedules.id, class_schedules.school_id,
+	class_schedules.school_classroom_id, class_schedules.school_subject_id,
+	class_schedules.teacher_id, class_schedules.start_period_id, class_schedules.end_period_id,
+	class_schedules.date, class_schedules.start_time, class_schedules.end_time,
+	class_schedules.teacher_attendance_time, class_schedules.status,
+	class_schedules.deleted_at, class_schedules.created_at, class_schedules.updated_at,
+	sc.name AS classroom_name,
+	ss.name AS subject_name,
+	u.name  AS teacher_name,
+	sp.period_number AS start_period_number,
+	sp.label         AS start_period_label,
+	ep.period_number AS end_period_number`
+
+const scheduleJoins = `
+	LEFT JOIN school_classrooms sc ON sc.id = class_schedules.school_classroom_id
+	LEFT JOIN school_subjects   ss ON ss.id = class_schedules.school_subject_id
+	LEFT JOIN users              u  ON u.id  = class_schedules.teacher_id
+	LEFT JOIN school_schedules  sp ON sp.id = class_schedules.start_period_id
+	LEFT JOIN school_schedules  ep ON ep.id = class_schedules.end_period_id`
 
 // ── Schedule CRUD ─────────────────────────────────────────────────────────────
 
@@ -95,43 +166,53 @@ func (r *GormClassScheduleRepository) CreateClassSchedule(ctx context.Context, c
 }
 
 func (r *GormClassScheduleRepository) FindClassScheduleByID(ctx context.Context, id uuid.UUID) (*domain.ClassSchedule, error) {
-	var m classScheduleModel
-	if err := r.db.WithContext(ctx).Where("id = ? AND deleted_at IS NULL", id).First(&m).Error; err != nil {
+	var row classScheduleRow
+	err := r.db.WithContext(ctx).
+		Table("class_schedules").
+		Select(scheduleSelectCols).
+		Joins(scheduleJoins).
+		Where("class_schedules.id = ? AND class_schedules.deleted_at IS NULL", id).
+		First(&row).Error
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, apperror.New(apperror.ErrNotFound, "class schedule not found")
 		}
 		return nil, err
 	}
-	return scheduleFromModel(m), nil
+	return scheduleFromRow(row), nil
 }
 
 func (r *GormClassScheduleRepository) ListClassSchedules(ctx context.Context, filter domain.ClassScheduleFilter) ([]*domain.ClassSchedule, error) {
-	q := r.db.WithContext(ctx).Where("deleted_at IS NULL")
+	q := r.db.WithContext(ctx).
+		Table("class_schedules").
+		Select(scheduleSelectCols).
+		Joins(scheduleJoins).
+		Where("class_schedules.deleted_at IS NULL")
 	if filter.SchoolID != nil {
-		q = q.Where("school_id = ?", *filter.SchoolID)
+		q = q.Where("class_schedules.school_id = ?", *filter.SchoolID)
 	}
 	if filter.ClassroomID != nil {
-		q = q.Where("school_classroom_id = ?", *filter.ClassroomID)
+		q = q.Where("class_schedules.school_classroom_id = ?", *filter.ClassroomID)
 	}
 	if filter.TeacherID != nil {
-		q = q.Where("teacher_id = ?", *filter.TeacherID)
+		q = q.Where("class_schedules.teacher_id = ?", *filter.TeacherID)
 	}
 	if filter.SubjectID != nil {
-		q = q.Where("school_subject_id = ?", *filter.SubjectID)
+		q = q.Where("class_schedules.school_subject_id = ?", *filter.SubjectID)
 	}
 	if filter.Date != nil {
-		q = q.Where("date = ?", filter.Date.Format("2006-01-02"))
+		q = q.Where("class_schedules.date = ?", filter.Date.Format("2006-01-02"))
 	}
 	if filter.Status != nil {
-		q = q.Where("status = ?", *filter.Status)
+		q = q.Where("class_schedules.status = ?", *filter.Status)
 	}
-	var rows []classScheduleModel
-	if err := q.Order("date ASC, start_time ASC").Find(&rows).Error; err != nil {
+	var rows []classScheduleRow
+	if err := q.Order("class_schedules.date ASC, class_schedules.start_time ASC").Scan(&rows).Error; err != nil {
 		return nil, err
 	}
 	list := make([]*domain.ClassSchedule, 0, len(rows))
-	for _, m := range rows {
-		list = append(list, scheduleFromModel(m))
+	for _, row := range rows {
+		list = append(list, scheduleFromRow(row))
 	}
 	return list, nil
 }
@@ -204,6 +285,7 @@ func (r *GormClassScheduleRepository) AutoPopulateStudents(ctx context.Context, 
 			SchoolID:        schoolID,
 			ClassScheduleID: scheduleID,
 			StudentID:       s.StudentID,
+			Type:            "check_in",
 			Status:          "scheduled",
 			CreatedAt:       now,
 			UpdatedAt:       now,
@@ -241,6 +323,7 @@ func (r *GormClassScheduleRepository) SyncStudents(ctx context.Context, schedule
 				SchoolID:        schoolID,
 				ClassScheduleID: scheduleID,
 				StudentID:       s.StudentID,
+				Type:            "check_in",
 				Status:          "scheduled",
 				CreatedAt:       now,
 				UpdatedAt:       now,
@@ -254,30 +337,39 @@ func (r *GormClassScheduleRepository) SyncStudents(ctx context.Context, schedule
 }
 
 func (r *GormClassScheduleRepository) ListAttendances(ctx context.Context, scheduleID uuid.UUID) ([]*domain.ClassScheduleStudent, error) {
-	var rows []classScheduleStudentModel
-	if err := r.db.WithContext(ctx).
-		Where("class_schedule_id = ? AND deleted_at IS NULL", scheduleID).
-		Order("created_at ASC").Find(&rows).Error; err != nil {
+	var rows []classScheduleStudentRow
+	err := r.db.WithContext(ctx).
+		Table("class_schedule_students").
+		Select("class_schedule_students.*, u.name AS student_name").
+		Joins("LEFT JOIN users u ON u.id = class_schedule_students.student_id").
+		Where("class_schedule_students.class_schedule_id = ? AND class_schedule_students.deleted_at IS NULL", scheduleID).
+		Order("class_schedule_students.created_at ASC").
+		Scan(&rows).Error
+	if err != nil {
 		return nil, err
 	}
 	list := make([]*domain.ClassScheduleStudent, 0, len(rows))
-	for _, m := range rows {
-		list = append(list, attendanceFromModel(m))
+	for _, row := range rows {
+		list = append(list, attendanceFromRow(row))
 	}
 	return list, nil
 }
 
 func (r *GormClassScheduleRepository) FindAttendance(ctx context.Context, scheduleID uuid.UUID, studentID uuid.UUID) (*domain.ClassScheduleStudent, error) {
-	var m classScheduleStudentModel
-	if err := r.db.WithContext(ctx).
-		Where("class_schedule_id = ? AND student_id = ? AND deleted_at IS NULL", scheduleID, studentID).
-		First(&m).Error; err != nil {
+	var row classScheduleStudentRow
+	err := r.db.WithContext(ctx).
+		Table("class_schedule_students").
+		Select("class_schedule_students.*, u.name AS student_name").
+		Joins("LEFT JOIN users u ON u.id = class_schedule_students.student_id").
+		Where("class_schedule_students.class_schedule_id = ? AND class_schedule_students.student_id = ? AND class_schedule_students.deleted_at IS NULL", scheduleID, studentID).
+		First(&row).Error
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, apperror.New(apperror.ErrNotFound, "attendance record not found")
 		}
 		return nil, err
 	}
-	return attendanceFromModel(m), nil
+	return attendanceFromRow(row), nil
 }
 
 func (r *GormClassScheduleRepository) UpdateAttendance(ctx context.Context, att *domain.ClassScheduleStudent) error {
