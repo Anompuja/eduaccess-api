@@ -17,7 +17,10 @@ type UpdateParentCommand struct {
 	ParentID          uuid.UUID
 	Name              *string
 	Email             *string
-	Religion          *string
+	FatherName        *string
+	MotherName        *string
+	FatherReligion    *string
+	MotherReligion    *string
 	PhoneNumber       *string
 	Address           *string
 }
@@ -68,8 +71,17 @@ func (h *UpdateParentHandler) Handle(ctx context.Context, cmd UpdateParentComman
 		profile.Name = *cmd.Name
 	}
 
-	if cmd.Religion != nil {
-		profile.Religion = *cmd.Religion
+	if cmd.FatherName != nil {
+		profile.FatherName = *cmd.FatherName
+	}
+	if cmd.MotherName != nil {
+		profile.MotherName = *cmd.MotherName
+	}
+	if cmd.FatherReligion != nil {
+		profile.FatherReligion = *cmd.FatherReligion
+	}
+	if cmd.MotherReligion != nil {
+		profile.MotherReligion = *cmd.MotherReligion
 	}
 	if cmd.PhoneNumber != nil {
 		profile.PhoneNumber = *cmd.PhoneNumber

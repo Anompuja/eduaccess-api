@@ -76,28 +76,6 @@ func (f *fakeStudentRepo) AutoEnrollStudent(context.Context, uuid.UUID, uuid.UUI
 	return nil
 }
 
-func (f *fakeStudentRepo) CreateParentProfile(context.Context, *studentdomain.ParentProfile) error {
-	return nil
-}
-
-func (f *fakeStudentRepo) FindParentByID(context.Context, uuid.UUID) (*studentdomain.ParentProfile, error) {
-	return nil, nil
-}
-
-func (f *fakeStudentRepo) FindParentByUserID(context.Context, uuid.UUID) (*studentdomain.ParentProfile, error) {
-	return nil, nil
-}
-
-func (f *fakeStudentRepo) ListParents(context.Context, studentdomain.ParentFilter) ([]*studentdomain.ParentProfile, int64, error) {
-	return nil, 0, nil
-}
-
-func (f *fakeStudentRepo) UpdateParentProfile(context.Context, *studentdomain.ParentProfile) error {
-	return nil
-}
-
-func (f *fakeStudentRepo) SoftDeleteParent(context.Context, uuid.UUID) error { return nil }
-
 func (f *fakeStudentRepo) LinkParent(context.Context, *studentdomain.ParentLink) error { return nil }
 
 func (f *fakeStudentRepo) UnlinkParent(context.Context, uuid.UUID, uuid.UUID) error { return nil }

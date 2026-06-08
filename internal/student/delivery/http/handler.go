@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
@@ -15,9 +16,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Handler wires student and parent use-cases to HTTP endpoints.
+// Handler wires student and parent-link use-cases to HTTP endpoints.
 type Handler struct {
-	// Students
 	createStudent     *application.CreateStudentHandler
 	bulkCreateStudent *application.BulkCreateStudentHandler
 	listStudents      *application.ListStudentsHandler
@@ -26,15 +26,9 @@ type Handler struct {
 	deactivateStudent *application.DeactivateStudentHandler
 	linkParent        *application.LinkParentHandler
 	unlinkParent      *application.UnlinkParentHandler
-	// Parents
-	createParent     *application.CreateParentHandler
-	listParents      *application.ListParentsHandler
-	getParent        *application.GetParentHandler
-	updateParent     *application.UpdateParentHandler
-	deactivateParent *application.DeactivateParentHandler
 }
 
-// NewHandler registers all student routes and returns the handler.
+// NewHandler registers student routes and returns the handler.
 func NewHandler(
 	v1 *echo.Group,
 	createStudent *application.CreateStudentHandler,
@@ -45,11 +39,6 @@ func NewHandler(
 	deactivateStudent *application.DeactivateStudentHandler,
 	linkParent *application.LinkParentHandler,
 	unlinkParent *application.UnlinkParentHandler,
-	createParent *application.CreateParentHandler,
-	listParents *application.ListParentsHandler,
-	getParent *application.GetParentHandler,
-	updateParent *application.UpdateParentHandler,
-	deactivateParent *application.DeactivateParentHandler,
 ) *Handler {
 	h := &Handler{
 		createStudent:     createStudent,
@@ -60,184 +49,333 @@ func NewHandler(
 		deactivateStudent: deactivateStudent,
 		linkParent:        linkParent,
 		unlinkParent:      unlinkParent,
-		createParent:      createParent,
-		listParents:       listParents,
-		getParent:         getParent,
-		updateParent:      updateParent,
-		deactivateParent:  deactivateParent,
 	}
 
-	auth := authmw.RequireAuth
-
-	// Students
-	h.registerStudentRoutes(v1, auth)
-	// Parents
-	h.registerParentRoutes(v1, auth)
+	h.registerStudentRoutes(v1, authmw.RequireAuth)
 
 	return h
 }
 
-// CreateParent godoc
+func (h *Handler) registerStudentRoutes(v1 *echo.Group, auth echo.MiddlewareFunc) {
+	students := v1.Group("/students", auth)
+	students.POST("", h.CreateStudent)
+	students.GET("", h.ListStudents)
+	students.GET("/:id", h.GetStudent)
+	students.PUT("/:id", h.UpdateStudent)
+	students.DELETE("/:id", h.DeactivateStudent)
+	students.POST("/:id/parents", h.LinkParent)
+	students.DELETE("/:id/parents/:parent_id", h.UnlinkParent)
+}
+
+// LinkParent godoc
 //
-//	@Summary      Create parent
-//	@Description  Creates a user account (role=orangtua) and parent profile atomically.
-//	@Tags         parents
+//	@Summary      Link parent to student
+//	@Description  Links an existing parent profile to a student.
+//	@Tags         students
 //	@Accept       json
 //	@Produce      json
 //	@Security     BearerAuth
-//	@Param        body  body      CreateParentRequest  true  "Parent data"
-//	@Success      201   {object}  response.Response{data=ParentResponse}
+//	@Param        id    path      string            true  "Student profile UUID"
+//	@Param        body  body      LinkParentRequest true  "Parent link data"
+//	@Success      200   {object}  response.Response
 //	@Failure      400   {object}  response.Response
 //	@Failure      403   {object}  response.Response
-//	@Failure      409   {object}  response.Response
-//	@Router       /parents [post]
-func (h *Handler) CreateParent(c echo.Context) error {
-	var req CreateParentRequest
+//	@Failure      404   {object}  response.Response
+//	@Router       /students/{id}/parents [post]
+func (h *Handler) LinkParent(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+	var req LinkParentRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
 		return err
 	}
-	parent, err := h.createParent.Handle(c.Request().Context(), application.CreateParentCommand{
+	parentID, err := uuid.Parse(req.ParentID)
+	if err != nil {
+		return response.BadRequest(c, "invalid parent_id")
+	}
+	if err := h.linkParent.Handle(c.Request().Context(), application.LinkParentCommand{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		StudentID:         id,
+		ParentID:          parentID,
+		Relationship:      req.Relationship,
+		IsPrimary:         req.IsPrimary,
+	}); err != nil {
+		return handleAppError(c, err)
+	}
+	return response.OK(c, "parent linked", nil)
+}
+
+// UnlinkParent godoc
+//
+//	@Summary      Unlink parent from student
+//	@Description  Removes a parent-student link.
+//	@Tags         students
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        id         path      string  true  "Student profile UUID"
+//	@Param        parent_id  path      string  true  "Parent profile UUID"
+//	@Success      200        {object}  response.Response
+//	@Failure      403        {object}  response.Response
+//	@Failure      404        {object}  response.Response
+//	@Router       /students/{id}/parents/{parent_id} [delete]
+func (h *Handler) UnlinkParent(c echo.Context) error {
+	id, err := parseUUID(c, "id")
+	if err != nil {
+		return err
+	}
+	parentID, err := parseUUID(c, "parent_id")
+	if err != nil {
+		return err
+	}
+	if err := h.unlinkParent.Handle(c.Request().Context(), application.UnlinkParentCommand{
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		RequesterRole:     authmw.GetRole(c),
+		StudentID:         id,
+		ParentID:          parentID,
+	}); err != nil {
+		return handleAppError(c, err)
+	}
+	return response.OK(c, "parent unlinked", nil)
+}
+
+// CreateStudent godoc
+//
+//	@Summary      Create student
+//	@Description  Creates a user account (role=siswa) and student profile atomically.
+//	@Tags         students
+//	@Accept       json
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        body  body      CreateStudentRequest  true  "Student data"
+//	@Success      201   {object}  response.Response{data=StudentResponse}
+//	@Failure      400   {object}  response.Response
+//	@Failure      403   {object}  response.Response
+//	@Failure      409   {object}  response.Response
+//	@Router       /students [post]
+func (h *Handler) CreateStudent(c echo.Context) error {
+	var req CreateStudentRequest
+	if err := validator.BindAndValidate(c, &req); err != nil {
+		return err
+	}
+
+	cmd := application.CreateStudentCommand{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		Name:              req.Name,
 		Email:             req.Email,
 		Username:          req.Username,
 		Password:          req.Password,
-		FatherName:        req.FatherName,
-		MotherName:        req.MotherName,
-		FatherReligion:    req.FatherReligion,
-		MotherReligion:    req.MotherReligion,
+		NIS:               req.NIS,
+		NISN:              req.NISN,
 		PhoneNumber:       req.PhoneNumber,
 		Address:           req.Address,
-	})
+		Gender:            req.Gender,
+		Religion:          req.Religion,
+		BirthPlace:        req.BirthPlace,
+		TahunMasuk:        req.TahunMasuk,
+		JalurMasukSekolah: req.JalurMasukSekolah,
+	}
+	if err := parseDateField(req.BirthDate, &cmd.BirthDate); err != nil {
+		return response.BadRequest(c, "birth_date must be YYYY-MM-DD")
+	}
+	if err := parseUUIDField(req.EducationLevelID, &cmd.EducationLevelID); err != nil {
+		return response.BadRequest(c, "invalid education_level_id")
+	}
+	if err := parseUUIDField(req.ClassID, &cmd.ClassID); err != nil {
+		return response.BadRequest(c, "invalid class_id")
+	}
+	if err := parseUUIDField(req.SubClassID, &cmd.SubClassID); err != nil {
+		return response.BadRequest(c, "invalid sub_class_id")
+	}
+
+	student, err := h.createStudent.Handle(c.Request().Context(), cmd)
 	if err != nil {
 		return handleAppError(c, err)
 	}
 	return c.JSON(http.StatusCreated, response.Response{
 		Success: true,
-		Message: "parent created",
-		Data:    toParentResponse(parent),
+		Message: "student created",
+		Data:    toStudentResponse(student),
 	})
 }
 
-// ListParents godoc
+// ListStudents godoc
 //
-//	@Summary      List parents
-//	@Description  Returns a paginated list of parents. Tenant-scoped.
-//	@Tags         parents
+//	@Summary      List students
+//	@Description  Returns a paginated list of students. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.
+//	@Tags         students
 //	@Produce      json
 //	@Security     BearerAuth
-//	@Param        search   query  string  false  "Search by name or email"
-//	@Param        page     query  int     false  "Page number (default 1)"
-//	@Param        per_page query  int     false  "Page size (default 20)"
-//	@Success      200  {object}  response.PaginatedResponse{data=[]ParentResponse}
-//	@Router       /parents [get]
-func (h *Handler) ListParents(c echo.Context) error {
+//	@Param        school_id         query  string  false  "School UUID (superadmin only)"
+//	@Param        search            query  string  false  "Search by name, email, NIS or NISN"
+//	@Param        education_level_id query string  false  "Filter by education level UUID"
+//	@Param        class_id          query  string  false  "Filter by class UUID"
+//	@Param        sub_class_id      query  string  false  "Filter by sub-class UUID"
+//	@Param        page              query  int     false  "Page number (default 1)"
+//	@Param        per_page          query  int     false  "Page size (default 20)"
+//	@Success      200  {object}  response.PaginatedResponse{data=[]StudentResponse}
+//	@Router       /students [get]
+func (h *Handler) ListStudents(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
-	result, err := h.listParents.Handle(c.Request().Context(), application.ListParentsQuery{
+
+	q := application.ListStudentsQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
 		Search:            c.QueryParam("search"),
 		Page:              page,
 		PerPage:           perPage,
-	})
+	}
+	if raw := c.QueryParam("school_id"); raw != "" {
+		if id, err := uuid.Parse(raw); err == nil {
+			q.SchoolID = &id
+		}
+	}
+	if raw := c.QueryParam("education_level_id"); raw != "" {
+		if id, err := uuid.Parse(raw); err == nil {
+			q.EducationLevelID = &id
+		}
+	}
+	if raw := c.QueryParam("class_id"); raw != "" {
+		if id, err := uuid.Parse(raw); err == nil {
+			q.ClassID = &id
+		}
+	}
+	if raw := c.QueryParam("sub_class_id"); raw != "" {
+		if id, err := uuid.Parse(raw); err == nil {
+			q.SubClassID = &id
+		}
+	}
+
+	result, err := h.listStudents.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
 	}
-	dtos := make([]ParentResponse, 0, len(result.Parents))
-	for _, p := range result.Parents {
-		dtos = append(dtos, toParentResponse(p))
+	dtos := make([]StudentResponse, 0, len(result.Students))
+	for _, s := range result.Students {
+		dtos = append(dtos, toStudentResponse(s))
 	}
-	return response.Paginated(c, "parents retrieved", dtos, result.Page, result.PerPage, result.Total)
+	return response.Paginated(c, "students retrieved", dtos, result.Page, result.PerPage, result.Total)
 }
 
-// GetParent godoc
+// GetStudent godoc
 //
-//	@Summary      Get parent by ID
-//	@Tags         parents
+//	@Summary      Get student by ID
+//	@Description  Returns a student with parent links. Tenant-scoped.
+//	@Tags         students
 //	@Produce      json
 //	@Security     BearerAuth
-//	@Param        id   path      string  true  "Parent profile UUID"
-//	@Success      200  {object}  response.Response{data=ParentResponse}
+//	@Param        id   path      string  true  "Student profile UUID"
+//	@Success      200  {object}  response.Response{data=StudentResponse}
 //	@Failure      403  {object}  response.Response
 //	@Failure      404  {object}  response.Response
-//	@Router       /parents/{id} [get]
-func (h *Handler) GetParent(c echo.Context) error {
+//	@Router       /students/{id} [get]
+func (h *Handler) GetStudent(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
 		return err
 	}
-	parent, err := h.getParent.Handle(c.Request().Context(), application.GetParentQuery{
+	student, err := h.getStudent.Handle(c.Request().Context(), application.GetStudentQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
-		ParentID:          id,
+		RequesterUserID:   authmw.GetUserID(c),
+		StudentID:         id,
 	})
 	if err != nil {
 		return handleAppError(c, err)
 	}
-	return response.OK(c, "parent retrieved", toParentResponse(parent))
+	return response.OK(c, "student retrieved", toStudentResponse(student))
 }
 
-// UpdateParent godoc
+// UpdateStudent godoc
 //
-//	@Summary      Update parent
-//	@Tags         parents
+//	@Summary      Update student
+//	@Description  Updates student profile fields.
+//	@Tags         students
 //	@Accept       json
 //	@Produce      json
 //	@Security     BearerAuth
-//	@Param        id    path      string             true  "Parent profile UUID"
-//	@Param        body  body      UpdateParentRequest true  "Fields to update"
-//	@Success      200   {object}  response.Response{data=ParentResponse}
-//	@Router       /parents/{id} [put]
-func (h *Handler) UpdateParent(c echo.Context) error {
+//	@Param        id    path      string              true  "Student profile UUID"
+//	@Param        body  body      UpdateStudentRequest true  "Fields to update"
+//	@Success      200   {object}  response.Response{data=StudentResponse}
+//	@Failure      400   {object}  response.Response
+//	@Failure      403   {object}  response.Response
+//	@Failure      404   {object}  response.Response
+//	@Router       /students/{id} [put]
+func (h *Handler) UpdateStudent(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
 		return err
 	}
-	var req UpdateParentRequest
+	var req UpdateStudentRequest
 	if err := validator.BindAndValidate(c, &req); err != nil {
 		return err
 	}
-	parent, err := h.updateParent.Handle(c.Request().Context(), application.UpdateParentCommand{
+
+	cmd := application.UpdateStudentCommand{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
-		ParentID:          id,
-		FatherName:        req.FatherName,
-		MotherName:        req.MotherName,
-		FatherReligion:    req.FatherReligion,
-		MotherReligion:    req.MotherReligion,
+		StudentID:         id,
+		NIS:               req.NIS,
+		NISN:              req.NISN,
 		PhoneNumber:       req.PhoneNumber,
 		Address:           req.Address,
-	})
+		Gender:            req.Gender,
+		Religion:          req.Religion,
+		BirthPlace:        req.BirthPlace,
+		TahunMasuk:        req.TahunMasuk,
+		JalurMasukSekolah: req.JalurMasukSekolah,
+	}
+	if req.BirthDate != nil {
+		if err := parseDateField(req.BirthDate, &cmd.BirthDate); err != nil {
+			return response.BadRequest(c, "birth_date must be YYYY-MM-DD")
+		}
+	}
+	if err := parseUUIDField(req.EducationLevelID, &cmd.EducationLevelID); err != nil {
+		return response.BadRequest(c, "invalid education_level_id")
+	}
+	if err := parseUUIDField(req.ClassID, &cmd.ClassID); err != nil {
+		return response.BadRequest(c, "invalid class_id")
+	}
+	if err := parseUUIDField(req.SubClassID, &cmd.SubClassID); err != nil {
+		return response.BadRequest(c, "invalid sub_class_id")
+	}
+
+	student, err := h.updateStudent.Handle(c.Request().Context(), cmd)
 	if err != nil {
 		return handleAppError(c, err)
 	}
-	return response.OK(c, "parent updated", toParentResponse(parent))
+	return response.OK(c, "student updated", toStudentResponse(student))
 }
 
-// DeactivateParent godoc
+// DeactivateStudent godoc
 //
-//	@Summary      Deactivate parent
-//	@Tags         parents
+//	@Summary      Deactivate student
+//	@Description  Soft-deletes a student profile.
+//	@Tags         students
 //	@Produce      json
 //	@Security     BearerAuth
-//	@Param        id   path      string  true  "Parent profile UUID"
+//	@Param        id   path      string  true  "Student profile UUID"
 //	@Success      200  {object}  response.Response
-//	@Router       /parents/{id} [delete]
-func (h *Handler) DeactivateParent(c echo.Context) error {
+//	@Failure      403  {object}  response.Response
+//	@Failure      404  {object}  response.Response
+//	@Router       /students/{id} [delete]
+func (h *Handler) DeactivateStudent(c echo.Context) error {
 	id, err := parseUUID(c, "id")
 	if err != nil {
 		return err
 	}
-	if err := h.deactivateParent.Handle(c.Request().Context(), application.DeactivateParentCommand{
+	if err := h.deactivateStudent.Handle(c.Request().Context(), application.DeactivateStudentCommand{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
-		ParentID:          id,
+		StudentID:         id,
 	}); err != nil {
 		return handleAppError(c, err)
 	}
-	return response.OK(c, "parent deactivated", nil)
+	return response.OK(c, "student deactivated", nil)
 }
 
 func toParentResponse(p *domain.ParentProfile) ParentResponse {
@@ -258,6 +396,60 @@ func toParentResponse(p *domain.ParentProfile) ParentResponse {
 		CreatedAt:      p.CreatedAt,
 		UpdatedAt:      p.UpdatedAt,
 	}
+}
+
+func toStudentResponse(s *domain.StudentProfile) StudentResponse {
+	dto := StudentResponse{
+		ID:                s.ID.String(),
+		UserID:            s.UserID.String(),
+		SchoolID:          s.SchoolID.String(),
+		Name:              s.Name,
+		Email:             s.Email,
+		Username:          s.Username,
+		Avatar:            s.Avatar,
+		NIS:               s.NIS,
+		NISN:              s.NISN,
+		PhoneNumber:       s.PhoneNumber,
+		Address:           s.Address,
+		Gender:            s.Gender,
+		Religion:          s.Religion,
+		BirthPlace:        s.BirthPlace,
+		BirthDate:         s.BirthDate,
+		TahunMasuk:        s.TahunMasuk,
+		JalurMasukSekolah: s.JalurMasukSekolah,
+		CreatedAt:         s.CreatedAt,
+		UpdatedAt:         s.UpdatedAt,
+	}
+	if s.EducationLevelID != nil {
+		str := s.EducationLevelID.String()
+		dto.EducationLevelID = &str
+	}
+	if s.ClassID != nil {
+		str := s.ClassID.String()
+		dto.ClassID = &str
+	}
+	if s.SubClassID != nil {
+		str := s.SubClassID.String()
+		dto.SubClassID = &str
+	}
+	if len(s.Parents) > 0 {
+		links := make([]ParentLinkResponse, 0, len(s.Parents))
+		for _, pl := range s.Parents {
+			lr := ParentLinkResponse{
+				ID:           pl.ID.String(),
+				ParentID:     pl.ParentID.String(),
+				Relationship: pl.Relationship,
+				IsPrimary:    pl.IsPrimary,
+			}
+			if pl.Parent != nil {
+				pr := toParentResponse(pl.Parent)
+				lr.Parent = &pr
+			}
+			links = append(links, lr)
+		}
+		dto.Parents = links
+	}
+	return dto
 }
 
 func parseUUID(c echo.Context, param string) (uuid.UUID, error) {
@@ -293,4 +485,30 @@ func handleAppError(c echo.Context, err error) error {
 		Success: false,
 		Message: "internal server error",
 	})
+}
+
+// parseDateField parses an optional *string "YYYY-MM-DD" into *time.Time.
+func parseDateField(src *string, dst **time.Time) error {
+	if src == nil || *src == "" {
+		return nil
+	}
+	t, err := time.Parse("2006-01-02", *src)
+	if err != nil {
+		return err
+	}
+	*dst = &t
+	return nil
+}
+
+// parseUUIDField parses an optional *string UUID into *uuid.UUID.
+func parseUUIDField(src *string, dst **uuid.UUID) error {
+	if src == nil || *src == "" {
+		return nil
+	}
+	id, err := uuid.Parse(*src)
+	if err != nil {
+		return err
+	}
+	*dst = &id
+	return nil
 }

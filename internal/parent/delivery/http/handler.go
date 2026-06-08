@@ -89,7 +89,10 @@ func (h *Handler) CreateParent(c echo.Context) error {
 		Email:             req.Email,
 		Username:          req.Username,
 		Password:          req.Password,
-		Religion:          req.Religion,
+		FatherName:        req.FatherName,
+		MotherName:        req.MotherName,
+		FatherReligion:    req.FatherReligion,
+		MotherReligion:    req.MotherReligion,
 		PhoneNumber:       req.PhoneNumber,
 		Address:           req.Address,
 	})
@@ -213,7 +216,10 @@ func (h *Handler) UpdateParent(c echo.Context) error {
 		ParentID:          id,
 		Name:              req.Name,
 		Email:             req.Email,
-		Religion:          req.Religion,
+		FatherName:        req.FatherName,
+		MotherName:        req.MotherName,
+		FatherReligion:    req.FatherReligion,
+		MotherReligion:    req.MotherReligion,
 		PhoneNumber:       req.PhoneNumber,
 		Address:           req.Address,
 	})
@@ -255,18 +261,21 @@ func (h *Handler) DeactivateParent(c echo.Context) error {
 
 func toParentResponse(p *domain.ParentProfile) ParentResponse {
 	return ParentResponse{
-		ID:          p.ID.String(),
-		UserID:      p.UserID.String(),
-		SchoolID:    p.SchoolID.String(),
-		Name:        p.Name,
-		Email:       p.Email,
-		Username:    p.Username,
-		Avatar:      p.Avatar,
-		Religion:    p.Religion,
-		PhoneNumber: p.PhoneNumber,
-		Address:     p.Address,
-		CreatedAt:   p.CreatedAt,
-		UpdatedAt:   p.UpdatedAt,
+		ID:             p.ID.String(),
+		UserID:         p.UserID.String(),
+		SchoolID:       p.SchoolID.String(),
+		Name:           p.Name,
+		Email:          p.Email,
+		Username:       p.Username,
+		Avatar:         p.Avatar,
+		FatherName:     p.FatherName,
+		MotherName:     p.MotherName,
+		FatherReligion: p.FatherReligion,
+		MotherReligion: p.MotherReligion,
+		PhoneNumber:    p.PhoneNumber,
+		Address:        p.Address,
+		CreatedAt:      p.CreatedAt,
+		UpdatedAt:      p.UpdatedAt,
 	}
 }
 

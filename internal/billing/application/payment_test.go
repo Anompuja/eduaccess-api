@@ -14,17 +14,25 @@ import (
 type fakePaymentRepo struct {
 	created        *billingdomain.PaymentTransaction
 	updated        *billingdomain.PaymentTransaction
+	listResult     []*billingdomain.PaymentTransaction
+	listTotal      int64
 	findByID       *billingdomain.PaymentTransaction
 	findByOrderID  *billingdomain.PaymentTransaction
 	findPending    *billingdomain.PaymentTransaction
 	findPendingErr error
 	findByIDErr    error
 	findByOrderErr error
+	listFilter     *billingdomain.PaymentFilter
 }
 
 func (f *fakePaymentRepo) Create(_ context.Context, payment *billingdomain.PaymentTransaction) error {
 	f.created = payment
 	return nil
+}
+
+func (f *fakePaymentRepo) List(_ context.Context, filter billingdomain.PaymentFilter) ([]*billingdomain.PaymentTransaction, int64, error) {
+	f.listFilter = &filter
+	return f.listResult, f.listTotal, nil
 }
 
 func (f *fakePaymentRepo) FindByID(context.Context, uuid.UUID) (*billingdomain.PaymentTransaction, error) {
@@ -192,6 +200,52 @@ func TestCreateCheckoutHandler_RejectsExistingPendingPayment(t *testing.T) {
 	}
 }
 
+func TestCreateCheckoutHandler_AllowsDowngradeWhenStudentCountFits(t *testing.T) {
+	schoolID := uuid.New()
+	basicPlanID := uuid.New()
+	userID := uuid.New()
+	repo := &fakePaymentRepo{findPendingErr: apperror.New(apperror.ErrNotFound, "not found")}
+	schools := &fakeBillingSchoolRepo{
+		school: &schooldomain.School{ID: schoolID, Name: "SMK Nusantara", Email: "smk@example.com"},
+		plan: &schooldomain.Plan{
+			ID:           basicPlanID,
+			Name:         "Basic",
+			MaxStudents:  500,
+			MonthlyPrice: 499000,
+			YearlyPrice:  4990000,
+		},
+		activeSubscription: &schooldomain.Subscription{
+			Plan: &schooldomain.Plan{ID: uuid.New(), Name: "Pro", MaxStudents: 1500},
+		},
+	}
+	gateway := &fakeGateway{
+		session: &GatewayCheckoutSession{
+			Token:       "snap-token",
+			RedirectURL: "https://midtrans.example/redirect",
+			ExpiresAt:   timePtr(time.Now().Add(24 * time.Hour)),
+		},
+	}
+
+	handler := NewCreateCheckoutHandler(repo, schools, &fakeStudentCounter{total: 300}, gateway)
+	payment, err := handler.Handle(context.Background(), CreateCheckoutCommand{
+		RequesterRole:     "admin_sekolah",
+		RequesterSchoolID: &schoolID,
+		RequesterUserID:   userID,
+		SchoolID:          schoolID,
+		PlanID:            basicPlanID,
+		Cycle:             "month",
+	})
+	if err != nil {
+		t.Fatalf("Handle() error = %v", err)
+	}
+	if payment == nil || repo.created == nil {
+		t.Fatal("expected pending payment to be created")
+	}
+	if payment.PlanName != "Basic" {
+		t.Fatalf("expected payment plan name Basic, got %s", payment.PlanName)
+	}
+}
+
 func TestHandleMidtransNotificationHandler_ActivatesSubscriptionOnPaidStatus(t *testing.T) {
 	schoolID := uuid.New()
 	planID := uuid.New()
@@ -351,6 +405,60 @@ func TestGetPaymentHandler_RefreshesPendingMidtransPayment(t *testing.T) {
 	}
 	if repo.updated == nil {
 		t.Fatal("expected refreshed payment to be persisted")
+	}
+}
+
+func TestListPaymentsHandler_ScopesAdminSekolahToOwnSchool(t *testing.T) {
+	requesterSchoolID := uuid.New()
+	repo := &fakePaymentRepo{
+		listResult: []*billingdomain.PaymentTransaction{
+			{ID: uuid.New(), SchoolID: requesterSchoolID, SchoolName: "SMK Nusantara"},
+		},
+		listTotal: 1,
+	}
+
+	handler := NewListPaymentsHandler(repo)
+	result, err := handler.Handle(context.Background(), ListPaymentsQuery{
+		RequesterRole:     "admin_sekolah",
+		RequesterSchoolID: &requesterSchoolID,
+		SchoolID:          &uuid.UUID{},
+		Status:            billingdomain.PaymentStatusPending,
+		Page:              0,
+		PerPage:           0,
+	})
+	if err != nil {
+		t.Fatalf("Handle() error = %v", err)
+	}
+	if result.Total != 1 {
+		t.Fatalf("expected total 1, got %d", result.Total)
+	}
+	if repo.listFilter == nil || repo.listFilter.SchoolID == nil || *repo.listFilter.SchoolID != requesterSchoolID {
+		t.Fatalf("expected admin scope to own school, got %#v", repo.listFilter)
+	}
+	if repo.listFilter.Limit != 20 || repo.listFilter.Offset != 0 {
+		t.Fatalf("expected default pagination, got %#v", repo.listFilter)
+	}
+}
+
+func TestListPaymentsHandler_AllowsSuperadminCrossSchool(t *testing.T) {
+	filterSchoolID := uuid.New()
+	repo := &fakePaymentRepo{}
+	handler := NewListPaymentsHandler(repo)
+
+	_, err := handler.Handle(context.Background(), ListPaymentsQuery{
+		RequesterRole: "superadmin",
+		SchoolID:      &filterSchoolID,
+		Page:          2,
+		PerPage:       10,
+	})
+	if err != nil {
+		t.Fatalf("Handle() error = %v", err)
+	}
+	if repo.listFilter == nil || repo.listFilter.SchoolID == nil || *repo.listFilter.SchoolID != filterSchoolID {
+		t.Fatalf("expected superadmin filter school id to be forwarded, got %#v", repo.listFilter)
+	}
+	if repo.listFilter.Limit != 10 || repo.listFilter.Offset != 10 {
+		t.Fatalf("expected page 2 offset 10, got %#v", repo.listFilter)
 	}
 }
 

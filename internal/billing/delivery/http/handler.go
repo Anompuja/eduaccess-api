@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/eduaccess/eduaccess-api/internal/billing/application"
@@ -18,6 +19,7 @@ import (
 
 type Handler struct {
 	createCheckout             *application.CreateCheckoutHandler
+	listPayments               *application.ListPaymentsHandler
 	getPayment                 *application.GetPaymentHandler
 	handleMidtransNotification *application.HandleMidtransNotificationHandler
 }
@@ -25,14 +27,19 @@ type Handler struct {
 func NewHandler(
 	v1 *echo.Group,
 	createCheckout *application.CreateCheckoutHandler,
+	listPayments *application.ListPaymentsHandler,
 	getPayment *application.GetPaymentHandler,
 	handleMidtransNotification *application.HandleMidtransNotificationHandler,
 ) *Handler {
 	h := &Handler{
 		createCheckout:             createCheckout,
+		listPayments:               listPayments,
 		getPayment:                 getPayment,
 		handleMidtransNotification: handleMidtransNotification,
 	}
+
+	billing := v1.Group("/billing", authmw.RequireAuth)
+	billing.GET("/payments", h.ListPayments)
 
 	schools := v1.Group("/schools", authmw.RequireAuth)
 	schools.POST("/:id/subscription/checkout", h.CreateCheckout)
@@ -88,6 +95,60 @@ func (h *Handler) CreateCheckout(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 	return response.Created(c, "checkout created", toPaymentResponse(payment))
+}
+
+// ListPayments godoc
+//
+//	@Summary      List subscription payments
+//	@Description  Returns a paginated list of school subscription payment transactions. Superadmin can see all schools and filter by school_id; admin_sekolah is automatically scoped to their own school.
+//	@Tags         billing
+//	@Produce      json
+//	@Security     BearerAuth
+//	@Param        school_id query  string  false  "School UUID (superadmin only)"
+//	@Param        status   query  string  false  "Filter by status (pending|paid|failed|expired|cancelled)"
+//	@Param        search   query  string  false  "Search by school name, plan name, or provider order ID"
+//	@Param        page     query  int     false  "Page number (default 1)"
+//	@Param        per_page query  int     false  "Page size (default 20)"
+//	@Success      200  {object}  response.PaginatedResponse{data=[]PaymentResponse}
+//	@Failure      400  {object}  response.Response
+//	@Failure      401  {object}  response.Response
+//	@Failure      403  {object}  response.Response
+//	@Router       /billing/payments [get]
+func (h *Handler) ListPayments(c echo.Context) error {
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	perPage, _ := strconv.Atoi(c.QueryParam("per_page"))
+
+	var schoolID *uuid.UUID
+	if authmw.GetRole(c) == "superadmin" {
+		if err := parseUUIDField(queryUUIDParam(c, "school_id"), &schoolID); err != nil {
+			return response.BadRequest(c, "invalid school_id")
+		}
+	}
+
+	status := c.QueryParam("status")
+	if status != "" && !isValidPaymentStatus(status) {
+		return response.BadRequest(c, "status must be one of: pending, paid, failed, expired, cancelled")
+	}
+
+	result, err := h.listPayments.Handle(c.Request().Context(), application.ListPaymentsQuery{
+		RequesterRole:     authmw.GetRole(c),
+		RequesterSchoolID: authmw.GetSchoolID(c),
+		SchoolID:          schoolID,
+		Status:            status,
+		Search:            c.QueryParam("search"),
+		Page:              page,
+		PerPage:           perPage,
+	})
+	if err != nil {
+		return handleAppError(c, err)
+	}
+
+	dtos := make([]PaymentResponse, 0, len(result.Payments))
+	for _, payment := range result.Payments {
+		dtos = append(dtos, toPaymentResponse(payment))
+	}
+
+	return response.Paginated(c, "payments retrieved", dtos, result.Page, result.PerPage, result.Total)
 }
 
 // GetPayment godoc
@@ -177,7 +238,9 @@ func toPaymentResponse(payment *billingdomain.PaymentTransaction) PaymentRespons
 	dto := PaymentResponse{
 		ID:                    payment.ID.String(),
 		SchoolID:              payment.SchoolID.String(),
+		SchoolName:            payment.SchoolName,
 		PlanID:                payment.PlanID.String(),
+		PlanName:              payment.PlanName,
 		CreatedByUserID:       payment.CreatedByUserID.String(),
 		Status:                payment.Status,
 		Cycle:                 payment.Cycle,
@@ -214,6 +277,40 @@ func parseUUID(c echo.Context, param string) (uuid.UUID, error) {
 		return uuid.UUID{}, echo.ErrBadRequest
 	}
 	return id, nil
+}
+
+func parseUUIDField(src *string, dst **uuid.UUID) error {
+	if src == nil || *src == "" {
+		return nil
+	}
+
+	id, err := uuid.Parse(*src)
+	if err != nil {
+		return err
+	}
+	*dst = &id
+	return nil
+}
+
+func queryUUIDParam(c echo.Context, key string) *string {
+	value := c.QueryParam(key)
+	if value == "" {
+		return nil
+	}
+	return &value
+}
+
+func isValidPaymentStatus(status string) bool {
+	switch status {
+	case billingdomain.PaymentStatusPending,
+		billingdomain.PaymentStatusPaid,
+		billingdomain.PaymentStatusFailed,
+		billingdomain.PaymentStatusExpired,
+		billingdomain.PaymentStatusCancelled:
+		return true
+	default:
+		return false
+	}
 }
 
 func handleAppError(c echo.Context, err error) error {

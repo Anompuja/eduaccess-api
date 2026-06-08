@@ -61,7 +61,7 @@ func (h *CreateCheckoutHandler) Handle(ctx context.Context, cmd CreateCheckoutCo
 	if err != nil && !apperror.Is(err, apperror.ErrNotFound) {
 		return nil, err
 	}
-	if err := validateUpgradePath(currentSub, plan); err != nil {
+	if err := validateCheckoutPath(currentSub, plan); err != nil {
 		return nil, err
 	}
 
@@ -114,7 +114,9 @@ func (h *CreateCheckoutHandler) Handle(ctx context.Context, cmd CreateCheckoutCo
 	payment := &billingdomain.PaymentTransaction{
 		ID:                  paymentID,
 		SchoolID:            cmd.SchoolID,
+		SchoolName:          school.Name,
 		PlanID:              plan.ID,
+		PlanName:            plan.Name,
 		CreatedByUserID:     cmd.RequesterUserID,
 		Status:              billingdomain.PaymentStatusPending,
 		Cycle:               cmd.Cycle,

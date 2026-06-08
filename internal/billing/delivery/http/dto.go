@@ -10,7 +10,9 @@ type CreateCheckoutRequest struct {
 type PaymentResponse struct {
 	ID                      string     `json:"id"`
 	SchoolID                string     `json:"school_id"`
+	SchoolName              string     `json:"school_name,omitempty"`
 	PlanID                  string     `json:"plan_id"`
+	PlanName                string     `json:"plan_name,omitempty"`
 	CreatedByUserID         string     `json:"created_by_user_id"`
 	ActivatedSubscriptionID *string    `json:"activated_subscription_id,omitempty"`
 	Status                  string     `json:"status"`

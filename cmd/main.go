@@ -149,6 +149,7 @@ func main() {
 	// ΓöÇΓöÇ School setup module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	schoolRepo := schoolInfra.NewGormSchoolRepository(db)
 	studentRepo := studentInfra.NewGormStudentRepository(db)
+	parentRepo := parentInfra.NewGormParentRepository(db)
 	schoolHTTP.NewHandler(
 		v1,
 		schoolApp.NewCreateSchoolHandler(schoolRepo),
@@ -168,6 +169,7 @@ func main() {
 	billingHTTP.NewHandler(
 		v1,
 		billingApp.NewCreateCheckoutHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
+		billingApp.NewListPaymentsHandler(paymentRepo),
 		billingApp.NewGetPaymentHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
 		billingApp.NewHandleMidtransNotificationHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
 	)
@@ -201,13 +203,8 @@ func main() {
 		studentApp.NewGetStudentHandler(studentRepo),
 		studentApp.NewUpdateStudentHandler(studentRepo),
 		studentApp.NewDeactivateStudentHandler(studentRepo),
-		studentApp.NewLinkParentHandler(studentRepo),
+		studentApp.NewLinkParentHandler(studentRepo, parentRepo),
 		studentApp.NewUnlinkParentHandler(studentRepo),
-		studentApp.NewCreateParentHandler(userRepo, studentRepo),
-		studentApp.NewListParentsHandler(studentRepo),
-		studentApp.NewGetParentHandler(studentRepo),
-		studentApp.NewUpdateParentHandler(studentRepo),
-		studentApp.NewDeactivateParentHandler(studentRepo),
 	)
 
 	// ΓöÇΓöÇ Academic module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -245,7 +242,6 @@ func main() {
 	)
 
 	// ΓöÇΓöÇ Parent module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-	parentRepo := parentInfra.NewGormParentRepository(db)
 	parentHTTP.NewHandler(
 		v1,
 		parentApp.NewCreateParentHandler(userRepo, parentRepo),

@@ -20,7 +20,9 @@ const (
 type PaymentTransaction struct {
 	ID                      uuid.UUID
 	SchoolID                uuid.UUID
+	SchoolName              string
 	PlanID                  uuid.UUID
+	PlanName                string
 	CreatedByUserID         uuid.UUID
 	ActivatedSubscriptionID *uuid.UUID
 	Status                  string
