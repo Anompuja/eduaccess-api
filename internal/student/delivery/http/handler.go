@@ -61,6 +61,8 @@ func (h *Handler) registerStudentRoutes(v1 *echo.Group, auth echo.MiddlewareFunc
 	students.POST("", h.CreateStudent)
 	students.GET("", h.ListStudents)
 	students.GET("/:id", h.GetStudent)
+	students.GET("/bulk/template", h.DownloadBulkTemplate)
+	students.POST("/bulk", h.BulkCreateStudents)
 	students.PUT("/:id", h.UpdateStudent)
 	students.DELETE("/:id", h.DeactivateStudent)
 	students.POST("/:id/parents", h.LinkParent)
