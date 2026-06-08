@@ -1,12 +1,16 @@
 package http
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/eduaccess/eduaccess-api/internal/dashboard/application"
+	"github.com/eduaccess/eduaccess-api/internal/dashboard/infrastructure"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
-	"github.com/eduaccess/eduaccess-api/internal/shared/httpcache"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
 	"github.com/google/uuid"
@@ -16,14 +20,15 @@ import (
 // Handler wires dashboard stats to HTTP endpoints.
 type Handler struct {
 	getStats *application.GetStatsHandler
+	cache    *infrastructure.DashboardCache
 }
 
 // NewHandler registers dashboard routes and returns the handler.
-func NewHandler(v1 *echo.Group, getStats *application.GetStatsHandler) *Handler {
-	h := &Handler{getStats: getStats}
+func NewHandler(v1 *echo.Group, getStats *application.GetStatsHandler, cache *infrastructure.DashboardCache) *Handler {
+	h := &Handler{getStats: getStats, cache: cache}
 
 	dashboard := v1.Group("/dashboard", authmw.RequireAuth)
-	dashboard.GET("/stats", h.GetStats, httpcache.Middleware(httpcache.Stats))
+	dashboard.GET("/stats", h.GetStats)
 
 	return h
 }
@@ -51,6 +56,37 @@ func (h *Handler) GetStats(c echo.Context) error {
 		schoolID = &parsed
 	}
 
+	effectiveSchoolID := schoolID
+	if authmw.GetRole(c) != "superadmin" {
+		effectiveSchoolID = authmw.GetSchoolID(c)
+	}
+
+	schoolIDStr := "all"
+	if effectiveSchoolID != nil {
+		schoolIDStr = effectiveSchoolID.String()
+	}
+
+	cacheKey := fmt.Sprintf("dashboard:stats:%s:%s", authmw.GetRole(c), schoolIDStr)
+
+	if h.cache != nil {
+		if cachedResp, found := h.cache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	stats, err := h.getStats.Handle(c.Request().Context(), application.GetStatsQuery{
 		RequesterRole:     authmw.GetRole(c),
 		RequesterSchoolID: authmw.GetSchoolID(c),
@@ -60,7 +96,28 @@ func (h *Handler) GetStats(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 
-	return response.OK(c, "dashboard stats retrieved", toDashboardStatsResponse(stats))
+	resp := response.Response{
+		Success: true,
+		Message: "dashboard stats retrieved",
+		Data:    toDashboardStatsResponse(stats),
+	}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.cache != nil {
+		h.cache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func handleAppError(c echo.Context, err error) error {
