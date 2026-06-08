@@ -1,13 +1,18 @@
 package http
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/admin/application"
 	"github.com/eduaccess/eduaccess-api/internal/admin/domain"
+	"github.com/eduaccess/eduaccess-api/internal/admin/infrastructure"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
@@ -23,6 +28,7 @@ type Handler struct {
 	listAdmins      *application.ListAdminsHandler
 	updateAdmin     *application.UpdateAdminHandler
 	deactivateAdmin *application.DeactivateAdminHandler
+	adminCache      *infrastructure.AdminCache
 }
 
 // NewHandler registers admin routes and returns the handler.
@@ -33,6 +39,7 @@ func NewHandler(
 	listAdmins *application.ListAdminsHandler,
 	updateAdmin *application.UpdateAdminHandler,
 	deactivateAdmin *application.DeactivateAdminHandler,
+	adminCache *infrastructure.AdminCache,
 ) *Handler {
 	h := &Handler{
 		createAdmin:     createAdmin,
@@ -40,6 +47,7 @@ func NewHandler(
 		listAdmins:      listAdmins,
 		updateAdmin:     updateAdmin,
 		deactivateAdmin: deactivateAdmin,
+		adminCache:      adminCache,
 	}
 
 	admins := v1.Group("/admins", authmw.RequireAuth)
@@ -116,6 +124,29 @@ func (h *Handler) ListAdmins(c echo.Context) error {
 		PerPage:           perPage,
 	}
 
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
+	}
+	cacheKey := fmt.Sprintf("admin:list:%s:%s:%d:%d:%s", q.RequesterRole, schoolIDStr, page, perPage, q.Search)
+
+	if cachedResp, found := h.adminCache.Get(cacheKey); found {
+		cacheData := cachedResp.(map[string]interface{})
+		etag := cacheData["etag"].(string)
+
+		c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+		c.Response().Header().Set("ETag", `"`+etag+`"`)
+		c.Response().Header().Set("Vary", "Authorization")
+
+		if match := c.Request().Header.Get("If-None-Match"); match != "" {
+			if match == `"`+etag+`"` {
+				return c.NoContent(http.StatusNotModified)
+			}
+		}
+
+		return c.JSON(http.StatusOK, cacheData["response"])
+	}
+
 	result, err := h.listAdmins.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
@@ -124,7 +155,38 @@ func (h *Handler) ListAdmins(c echo.Context) error {
 	for _, a := range result.Admins {
 		dtos = append(dtos, toAdminResponse(a))
 	}
-	return response.Paginated(c, "admins retrieved", dtos, result.Page, result.PerPage, result.Total)
+
+	totalPages := int(result.Total) / result.PerPage
+	if int(result.Total)%result.PerPage != 0 {
+		totalPages++
+	}
+
+	resp := response.PaginatedResponse{
+		Success: true,
+		Message: "admins retrieved",
+		Data:    dtos,
+		Pagination: response.Pagination{
+			Page:       result.Page,
+			PerPage:    result.PerPage,
+			Total:      result.Total,
+			TotalPages: totalPages,
+		},
+	}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	h.adminCache.Set(cacheKey, map[string]interface{}{
+		"response": resp,
+		"etag":     etag,
+	})
+
+	c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // CreateAdmin godoc
@@ -173,6 +235,8 @@ func (h *Handler) CreateAdmin(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+
+	h.adminCache.InvalidatePrefix("admin:list:")
 
 	return c.JSON(http.StatusCreated, response.Response{
 		Success: true,
@@ -232,6 +296,8 @@ func (h *Handler) UpdateAdmin(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 
+	h.adminCache.InvalidatePrefix("admin:list:")
+
 	return response.OK(c, "admin updated", toAdminResponse(admin))
 }
 
@@ -259,6 +325,8 @@ func (h *Handler) DeactivateAdmin(c echo.Context) error {
 	}); err != nil {
 		return handleAppError(c, err)
 	}
+
+	h.adminCache.InvalidatePrefix("admin:list:")
 
 	return response.OK(c, "admin deactivated", nil)
 }
