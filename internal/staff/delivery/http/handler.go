@@ -1,7 +1,11 @@
 package http
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +16,7 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
 	"github.com/eduaccess/eduaccess-api/internal/staff/application"
 	"github.com/eduaccess/eduaccess-api/internal/staff/domain"
+	"github.com/eduaccess/eduaccess-api/internal/staff/infrastructure"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -23,6 +28,7 @@ type Handler struct {
 	listStaff       *application.ListStaffHandler
 	updateStaff     *application.UpdateStaffHandler
 	deactivateStaff *application.DeactivateStaffHandler
+	staffCache      *infrastructure.StaffCache
 }
 
 // NewHandler registers staff routes and returns the handler.
@@ -33,6 +39,7 @@ func NewHandler(
 	listStaff *application.ListStaffHandler,
 	updateStaff *application.UpdateStaffHandler,
 	deactivateStaff *application.DeactivateStaffHandler,
+	staffCache *infrastructure.StaffCache,
 ) *Handler {
 	h := &Handler{
 		createStaff:     createStaff,
@@ -40,6 +47,7 @@ func NewHandler(
 		listStaff:       listStaff,
 		updateStaff:     updateStaff,
 		deactivateStaff: deactivateStaff,
+		staffCache:      staffCache,
 	}
 
 	staff := v1.Group("/staff", authmw.RequireAuth)
@@ -116,6 +124,29 @@ func (h *Handler) ListStaff(c echo.Context) error {
 		PerPage:           perPage,
 	}
 
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
+	}
+	cacheKey := fmt.Sprintf("staff:list:%s:%s:%d:%d:%s", q.RequesterRole, schoolIDStr, page, perPage, q.Search)
+
+	if cachedResp, found := h.staffCache.Get(cacheKey); found {
+		cacheData := cachedResp.(map[string]interface{})
+		etag := cacheData["etag"].(string)
+
+		c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+		c.Response().Header().Set("ETag", `"`+etag+`"`)
+		c.Response().Header().Set("Vary", "Authorization")
+
+		if match := c.Request().Header.Get("If-None-Match"); match != "" {
+			if match == `"`+etag+`"` {
+				return c.NoContent(http.StatusNotModified)
+			}
+		}
+
+		return c.JSON(http.StatusOK, cacheData["response"])
+	}
+
 	result, err := h.listStaff.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
@@ -125,7 +156,38 @@ func (h *Handler) ListStaff(c echo.Context) error {
 	for _, s := range result.Staff {
 		dtos = append(dtos, toStaffResponse(s))
 	}
-	return response.Paginated(c, "staff retrieved", dtos, result.Page, result.PerPage, result.Total)
+
+	totalPages := int(result.Total) / result.PerPage
+	if int(result.Total)%result.PerPage != 0 {
+		totalPages++
+	}
+
+	resp := response.PaginatedResponse{
+		Success: true,
+		Message: "staff retrieved",
+		Data:    dtos,
+		Pagination: response.Pagination{
+			Page:       result.Page,
+			PerPage:    result.PerPage,
+			Total:      result.Total,
+			TotalPages: totalPages,
+		},
+	}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	h.staffCache.Set(cacheKey, map[string]interface{}{
+		"response": resp,
+		"etag":     etag,
+	})
+
+	c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // CreateStaff godoc
@@ -175,6 +237,8 @@ func (h *Handler) CreateStaff(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+
+	h.staffCache.InvalidatePrefix("staff:list:")
 
 	return c.JSON(http.StatusCreated, response.Response{
 		Success: true,
@@ -235,6 +299,8 @@ func (h *Handler) UpdateStaff(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 
+	h.staffCache.InvalidatePrefix("staff:list:")
+
 	return response.OK(c, "staff updated", toStaffResponse(staff))
 }
 
@@ -262,6 +328,8 @@ func (h *Handler) DeactivateStaff(c echo.Context) error {
 	}); err != nil {
 		return handleAppError(c, err)
 	}
+
+	h.staffCache.InvalidatePrefix("staff:list:")
 
 	return response.OK(c, "staff deactivated", nil)
 }

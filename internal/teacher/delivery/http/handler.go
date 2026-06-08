@@ -1,7 +1,11 @@
 package http
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +16,7 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
 	"github.com/eduaccess/eduaccess-api/internal/teacher/application"
 	"github.com/eduaccess/eduaccess-api/internal/teacher/domain"
+	"github.com/eduaccess/eduaccess-api/internal/teacher/infrastructure"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -23,6 +28,7 @@ type Handler struct {
 	listTeachers      *application.ListTeachersHandler
 	updateTeacher     *application.UpdateTeacherHandler
 	deactivateTeacher *application.DeactivateTeacherHandler
+	teacherCache      *infrastructure.TeacherCache
 }
 
 // NewHandler registers teacher routes and returns the handler.
@@ -33,6 +39,7 @@ func NewHandler(
 	listTeachers *application.ListTeachersHandler,
 	updateTeacher *application.UpdateTeacherHandler,
 	deactivateTeacher *application.DeactivateTeacherHandler,
+	teacherCache *infrastructure.TeacherCache,
 ) *Handler {
 	h := &Handler{
 		createTeacher:     createTeacher,
@@ -40,6 +47,7 @@ func NewHandler(
 		listTeachers:      listTeachers,
 		updateTeacher:     updateTeacher,
 		deactivateTeacher: deactivateTeacher,
+		teacherCache:      teacherCache,
 	}
 
 	teachers := v1.Group("/teachers", authmw.RequireAuth)
@@ -116,6 +124,29 @@ func (h *Handler) ListTeachers(c echo.Context) error {
 		PerPage:           perPage,
 	}
 
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
+	}
+	cacheKey := fmt.Sprintf("teacher:list:%s:%s:%d:%d:%s", q.RequesterRole, schoolIDStr, page, perPage, q.Search)
+
+	if cachedResp, found := h.teacherCache.Get(cacheKey); found {
+		cacheData := cachedResp.(map[string]interface{})
+		etag := cacheData["etag"].(string)
+
+		c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+		c.Response().Header().Set("ETag", `"`+etag+`"`)
+		c.Response().Header().Set("Vary", "Authorization")
+
+		if match := c.Request().Header.Get("If-None-Match"); match != "" {
+			if match == `"`+etag+`"` {
+				return c.NoContent(http.StatusNotModified)
+			}
+		}
+
+		return c.JSON(http.StatusOK, cacheData["response"])
+	}
+
 	result, err := h.listTeachers.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
@@ -125,7 +156,38 @@ func (h *Handler) ListTeachers(c echo.Context) error {
 	for _, t := range result.Teachers {
 		dtos = append(dtos, toTeacherResponse(t))
 	}
-	return response.Paginated(c, "teachers retrieved", dtos, result.Page, result.PerPage, result.Total)
+
+	totalPages := int(result.Total) / result.PerPage
+	if int(result.Total)%result.PerPage != 0 {
+		totalPages++
+	}
+
+	resp := response.PaginatedResponse{
+		Success: true,
+		Message: "teachers retrieved",
+		Data:    dtos,
+		Pagination: response.Pagination{
+			Page:       result.Page,
+			PerPage:    result.PerPage,
+			Total:      result.Total,
+			TotalPages: totalPages,
+		},
+	}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	h.teacherCache.Set(cacheKey, map[string]interface{}{
+		"response": resp,
+		"etag":     etag,
+	})
+
+	c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // CreateTeacher godoc
@@ -190,6 +252,8 @@ func (h *Handler) CreateTeacher(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+
+	h.teacherCache.InvalidatePrefix("teacher:list:")
 
 	return c.JSON(http.StatusCreated, response.Response{
 		Success: true,
@@ -265,6 +329,8 @@ func (h *Handler) UpdateTeacher(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 
+	h.teacherCache.InvalidatePrefix("teacher:list:")
+
 	return response.OK(c, "teacher updated", toTeacherResponse(teacher))
 }
 
@@ -292,6 +358,8 @@ func (h *Handler) DeactivateTeacher(c echo.Context) error {
 	}); err != nil {
 		return handleAppError(c, err)
 	}
+
+	h.teacherCache.InvalidatePrefix("teacher:list:")
 
 	return response.OK(c, "teacher deactivated", nil)
 }

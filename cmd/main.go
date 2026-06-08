@@ -176,13 +176,16 @@ func main() {
 
 	// ΓöÇΓöÇ Dashboard module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	dashboardRepo := dashboardInfra.NewGormDashboardRepository(db)
+	dashboardCache := dashboardInfra.NewDashboardCache(5*time.Minute, 10*time.Minute)
 	dashboardHTTP.NewHandler(
 		v1,
 		dashboardApp.NewGetStatsHandler(dashboardRepo),
+		dashboardCache,
 	)
 
 	// ΓöÇΓöÇ Headmaster module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	headmasterRepo := headmasterInfra.NewGormHeadmasterRepository(db)
+	headmasterCache := headmasterInfra.NewHeadmasterCache(5*time.Minute, 10*time.Minute)
 	headmasterHTTP.NewHandler(
 		v1,
 		headmasterApp.NewCreateHeadmasterHandler(userRepo, headmasterRepo, schoolRepo),
@@ -190,9 +193,12 @@ func main() {
 		headmasterApp.NewGetHeadmasterHandler(headmasterRepo),
 		headmasterApp.NewUpdateHeadmasterHandler(headmasterRepo),
 		headmasterApp.NewDeactivateHeadmasterHandler(headmasterRepo),
+		headmasterCache,
 	)
 
 	// ΓöÇΓöÇ Student module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+	studentRepo := studentInfra.NewGormStudentRepository(db)
+	// studentCache := studentInfra.NewStudentCache(5*time.Minute, 10*time.Minute)
 	academicRepo := academicInfra.NewGormAcademicRepository(db)
 	createStudentHandler := studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo, schoolRepo)
 	studentHTTP.NewHandler(
@@ -205,9 +211,12 @@ func main() {
 		studentApp.NewDeactivateStudentHandler(studentRepo),
 		studentApp.NewLinkParentHandler(studentRepo, parentRepo),
 		studentApp.NewUnlinkParentHandler(studentRepo),
+		studentApp.NewCreateParentHandler(userRepo, studentRepo),
+		studentApp.NewUpdateParentHandler(studentRepo),
+		studentApp.NewDeactivateParentHandler(studentRepo),
+		// studentCache,
 	)
 
-	// ΓöÇΓöÇ Academic module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	academicHTTP.NewHandler(
 		v1,
 		academicApp.NewCreateLevelHandler(academicRepo),
@@ -253,6 +262,7 @@ func main() {
 
 	// ΓöÇΓöÇ Admin module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	adminRepo := adminInfra.NewGormAdminRepository(db)
+	adminCache := adminInfra.NewAdminCache(5*time.Minute, 10*time.Minute)
 	adminHTTP.NewHandler(
 		v1,
 		adminApp.NewCreateAdminHandler(userRepo, adminRepo),
@@ -260,10 +270,12 @@ func main() {
 		adminApp.NewListAdminsHandler(adminRepo),
 		adminApp.NewUpdateAdminHandler(userMgmtRepo, adminRepo),
 		adminApp.NewDeactivateAdminHandler(adminRepo),
+		adminCache,
 	)
 
 	// ΓöÇΓöÇ Teacher module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 	teacherRepo := teacherInfra.NewTeacherRepository(db)
+	teacherCache := teacherInfra.NewTeacherCache(5*time.Minute, 10*time.Minute)
 	teacherHTTP.NewHandler(
 		v1,
 		teacherApp.NewCreateTeacherHandler(teacherRepo, userRepo),
@@ -271,10 +283,12 @@ func main() {
 		teacherApp.NewListTeachersHandler(teacherRepo),
 		teacherApp.NewUpdateTeacherHandler(teacherRepo, userMgmtRepo),
 		teacherApp.NewDeactivateTeacherHandler(teacherRepo),
+		teacherCache,
 	)
 
-	// ΓöÇΓöÇ Staff module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+	// ── Staff module ─────────────────────────────────────────────────────────
 	staffRepo := staffInfra.NewStaffRepository(db)
+	staffCache := staffInfra.NewStaffCache(5*time.Minute, 10*time.Minute)
 	staffHTTP.NewHandler(
 		v1,
 		staffApp.NewCreateStaffHandler(staffRepo, userRepo),
@@ -282,9 +296,10 @@ func main() {
 		staffApp.NewListStaffHandler(staffRepo),
 		staffApp.NewUpdateStaffHandler(staffRepo, userMgmtRepo),
 		staffApp.NewDeactivateStaffHandler(staffRepo),
+		staffCache,
 	)
 
-	// ΓöÇΓöÇ Class Schedule module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+	// ── Class Schedule module ────────────────────────────────────────────────
 	classScheduleRepo := classScheduleInfra.NewGormClassScheduleRepository(db)
 	classScheduleHTTP.NewHandler(
 		v1,
