@@ -35,6 +35,7 @@ type studentProfileModel struct {
 
 func (studentProfileModel) TableName() string { return "student_profiles" }
 
+
 // studentWithUser is the scan target for student JOIN queries.
 type studentWithUser struct {
 	ID                uuid.UUID  `gorm:"column:id"`
