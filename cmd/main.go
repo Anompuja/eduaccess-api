@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	_ "github.com/eduaccess/eduaccess-api/docs"
+	"github.com/eduaccess/eduaccess-api/docs"
 	academicApp "github.com/eduaccess/eduaccess-api/internal/academic/application"
 	academicHTTP "github.com/eduaccess/eduaccess-api/internal/academic/delivery/http"
 	academicInfra "github.com/eduaccess/eduaccess-api/internal/academic/infrastructure"
@@ -87,6 +87,11 @@ import (
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, reading from environment")
+	}
+
+	// Set Swagger host dynamically from environment
+	if host := os.Getenv("SWAGGER_HOST"); host != "" {
+		docs.SwaggerInfo.Host = host
 	}
 
 	db, err := database.Connect()
