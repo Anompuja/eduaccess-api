@@ -117,3 +117,16 @@ type LinkParentRequest struct {
 	Relationship string `json:"relationship" validate:"required,oneof=father mother guardian other"`
 	IsPrimary    bool   `json:"is_primary"`
 }
+
+type BulkCreateResultResponse struct {
+	Total   int                    `json:"total"`
+	Created int                    `json:"created"`
+	Failed  int                    `json:"failed"`
+	Errors  []BulkRowErrorResponse `json:"errors"`
+}
+
+type BulkRowErrorResponse struct {
+	Row     int    `json:"row"`
+	Email   string `json:"email"`
+	Message string `json:"message"`
+}

@@ -28,6 +28,8 @@ type Handler struct {
 	syncStudents     *application.SyncStudentsHandler
 	listAttendances  *application.ListAttendancesHandler
 	updateAttendance *application.UpdateAttendanceHandler
+	generateQR       *application.GenerateQRHandler
+	scanQR           *application.ScanQRHandler
 }
 
 func NewHandler(
@@ -43,6 +45,8 @@ func NewHandler(
 	syncStudents *application.SyncStudentsHandler,
 	listAttendances *application.ListAttendancesHandler,
 	updateAttendance *application.UpdateAttendanceHandler,
+	generateQR *application.GenerateQRHandler,
+	scanQR *application.ScanQRHandler,
 ) *Handler {
 	h := &Handler{
 		createSchedule: createSchedule, listSchedules: listSchedules,
@@ -51,12 +55,17 @@ func NewHandler(
 		completeSchedule: completeSchedule, cancelSchedule: cancelSchedule,
 		syncStudents: syncStudents, listAttendances: listAttendances,
 		updateAttendance: updateAttendance,
+		generateQR:       generateQR,
+		scanQR:           scanQR,
 	}
 
 	auth := authmw.RequireAuth
 	cs := v1.Group("/class-schedules", auth, httpcache.Middleware(httpcache.AlwaysRevalidate))
 	cs.POST("", h.CreateClassSchedule)
 	cs.GET("", h.ListClassSchedules)
+	// QR routes registered before /:id to prevent "qr" matching as an ID param.
+	cs.GET("/:id/qr", h.GetQRToken)
+	cs.GET("/:id/qr/image", h.GetQRImage)
 	cs.GET("/:id", h.GetClassSchedule)
 	cs.PUT("/:id", h.UpdateClassSchedule)
 	cs.DELETE("/:id", h.DeleteClassSchedule)
@@ -66,6 +75,9 @@ func NewHandler(
 	cs.PATCH("/:id/sync-students", h.SyncStudents)
 	cs.GET("/:id/attendances", h.ListAttendances)
 	cs.PUT("/:id/attendances/:student_id", h.UpdateAttendance)
+
+	// Scan endpoint is at /api/v1/attendance/scan (student-facing, not under /class-schedules).
+	v1.POST("/attendance/scan", h.ScanQR, auth)
 
 	return h
 }
@@ -115,17 +127,26 @@ func (h *Handler) CreateClassSchedule(c echo.Context) error {
 //	@Failure      403          {object}  response.Response
 //	@Router       /class-schedules [get]
 func (h *Handler) ListClassSchedules(c echo.Context) error {
+	role := authmw.GetRole(c)
 	q := application.ListClassSchedulesQuery{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+		RequesterSchoolID: getSchoolID(c), RequesterRole: role,
+	}
+	// Teachers always see only their own schedules.
+	if role == "guru" {
+		userID := authmw.GetUserID(c)
+		q.TeacherID = &userID
 	}
 	if raw := c.QueryParam("classroom_id"); raw != "" {
 		if id, err := uuid.Parse(raw); err == nil {
 			q.ClassroomID = &id
 		}
 	}
-	if raw := c.QueryParam("teacher_id"); raw != "" {
-		if id, err := uuid.Parse(raw); err == nil {
-			q.TeacherID = &id
+	// Only non-guru roles may override teacher_id via query param.
+	if role != "guru" {
+		if raw := c.QueryParam("teacher_id"); raw != "" {
+			if id, err := uuid.Parse(raw); err == nil {
+				q.TeacherID = &id
+			}
 		}
 	}
 	if raw := c.QueryParam("subject_id"); raw != "" {
@@ -318,10 +339,16 @@ func toScheduleResponse(cs *domain.ClassSchedule) ClassScheduleResponse {
 		ID:                    cs.ID.String(),
 		SchoolID:              cs.SchoolID.String(),
 		ClassroomID:           cs.ClassroomID.String(),
+		ClassroomName:         cs.ClassroomName,
 		SubjectID:             cs.SubjectID.String(),
+		SubjectName:           cs.SubjectName,
 		TeacherID:             cs.TeacherID.String(),
+		TeacherName:           cs.TeacherName,
 		StartPeriodID:         uuidPtrToStr(cs.StartPeriodID),
+		StartPeriodNumber:     cs.StartPeriodNumber,
+		StartPeriodLabel:      cs.StartPeriodLabel,
 		EndPeriodID:           uuidPtrToStr(cs.EndPeriodID),
+		EndPeriodNumber:       cs.EndPeriodNumber,
 		Date:                  cs.Date.Format("2006-01-02"),
 		StartTime:             cs.StartTime,
 		EndTime:               cs.EndTime,
@@ -337,6 +364,7 @@ func toAttendanceResponse(att *domain.ClassScheduleStudent) AttendanceResponse {
 		ID:                    att.ID.String(),
 		ClassScheduleID:       att.ClassScheduleID.String(),
 		StudentID:             att.StudentID.String(),
+		StudentName:           att.StudentName,
 		Status:                att.Status,
 		Type:                  att.Type,
 		Note:                  att.Note,

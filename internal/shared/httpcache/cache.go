@@ -67,7 +67,9 @@ func Middleware(cacheControl string) echo.MiddlewareFunc {
 			body := cw.buf.Bytes()
 			etag := makeETag(body)
 			header := orig.Header()
-			header.Set("Cache-Control", cacheControl)
+			if header.Get("Cache-Control") == "" {
+				header.Set("Cache-Control", cacheControl)
+			}
 			header.Set("ETag", etag)
 			addVary(header, "Authorization")
 

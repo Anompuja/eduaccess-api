@@ -885,8 +885,8 @@ func (h *DeleteScheduleHandler) Handle(ctx context.Context, cmd DeleteScheduleCo
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 func guardWrite(role string) error {
-	if role != "superadmin" && role != "admin_sekolah" {
-		return apperror.New(apperror.ErrForbidden, "only admin_sekolah or superadmin can manage academic structure")
+	if role != "superadmin" && role != "admin_sekolah" && role != "kepala_sekolah" {
+		return apperror.New(apperror.ErrForbidden, "only admin_sekolah, kepala_sekolah, or superadmin can manage academic structure")
 	}
 	return nil
 }

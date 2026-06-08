@@ -19,6 +19,7 @@ import (
 type Handler struct {
 	// Students
 	createStudent     *application.CreateStudentHandler
+	bulkCreateStudent *application.BulkCreateStudentHandler
 	listStudents      *application.ListStudentsHandler
 	getStudent        *application.GetStudentHandler
 	updateStudent     *application.UpdateStudentHandler
@@ -37,6 +38,7 @@ type Handler struct {
 func NewHandler(
 	v1 *echo.Group,
 	createStudent *application.CreateStudentHandler,
+	bulkCreateStudent *application.BulkCreateStudentHandler,
 	listStudents *application.ListStudentsHandler,
 	getStudent *application.GetStudentHandler,
 	updateStudent *application.UpdateStudentHandler,
@@ -51,6 +53,7 @@ func NewHandler(
 ) *Handler {
 	h := &Handler{
 		createStudent:     createStudent,
+		bulkCreateStudent: bulkCreateStudent,
 		listStudents:      listStudents,
 		getStudent:        getStudent,
 		updateStudent:     updateStudent,
