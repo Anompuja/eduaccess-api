@@ -524,7 +524,7 @@ Query params for `GET /users`: `role`, `search`, `page`, `per_page`
 | Method | Path                        | Auth | Description                     |
 | ------ | --------------------------- | ---- | ------------------------------- |
 | POST   | `/schools`                  | Yes  | Create school (superadmin only) |
-| GET    | `/schools`                  | Yes  | List schools (paginated)        |
+| GET    | `/schools`                  | Yes  | List schools with active subscription info (paginated) |
 | GET    | `/schools/plans`            | Yes  | List active subscription plans  |
 | GET    | `/schools/:id`              | Yes  | Get school by ID                |
 | PUT    | `/schools/:id`              | Yes  | Update school                   |
@@ -533,7 +533,7 @@ Query params for `GET /users`: `role`, `search`, `page`, `per_page`
 | PUT    | `/schools/:id/rules`        | Yes  | Create/update school rules      |
 | GET    | `/schools/:id/subscription` | Yes  | Get school subscription & plan  |
 | PUT    | `/schools/:id/subscription` | Yes  | Change school subscription      |
-| POST   | `/schools/:id/subscription/checkout` | Yes | Create a Midtrans checkout for upgrading a subscription |
+| POST   | `/schools/:id/subscription/checkout` | Yes | Create a Midtrans checkout for changing to another paid subscription |
 | GET    | `/schools/:id/subscription/payments/:payment_id` | Yes | Get a payment transaction and its current status |
 
 Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `page`, `per_page`
@@ -543,15 +543,18 @@ Subscription notes:
 - Sekolah baru otomatis mendapat plan `Trial` selama 14 hari.
 - Batas jumlah siswa mengikuti `plans.max_students`.
 - Pembuatan siswa baru ditolak jika kuota plan aktif sekolah sudah penuh.
-- Checkout Midtrans hanya dipakai untuk pembelian atau upgrade plan berbayar.
+- Checkout Midtrans dipakai untuk perpindahan antar plan berbayar, termasuk downgrade, selama kuota siswa sekolah masih muat pada plan tujuan.
 - Aktivasi subscription baru terjadi setelah webhook Midtrans tervalidasi dan status transaksi sukses.
 - Endpoint `PUT /schools/:id/subscription` tetap dipertahankan sebagai override internal untuk `superadmin`.
 
-Billing webhook:
+Billing:
 
-| Method | Path                         | Auth | Description                                     |
-| ------ | ---------------------------- | ---- | ----------------------------------------------- |
+| Method | Path                 | Auth | Description                                                                 |
+| ------ | -------------------- | ---- | --------------------------------------------------------------------------- |
+| GET    | `/billing/payments`  | Yes  | List payment transactions. Superadmin can see all schools; admin sekolah sees only their own history |
 | POST   | `/billing/webhooks/midtrans` | No   | Midtrans notification endpoint for payment sync |
+
+Query params for `GET /billing/payments`: `school_id` (superadmin only), `status` (`pending`|`paid`|`failed`|`expired`|`cancelled`), `search`, `page`, `per_page`
 
 ---
 
@@ -772,6 +775,7 @@ https://your-domain/api/v1/billing/webhooks/midtrans
 7. Flow frontend yang disarankan:
 - Panggil `GET /schools/plans`
 - Panggil `POST /schools/:id/subscription/checkout`
+- Untuk daftar/history payment, panggil `GET /billing/payments`
 - Buka `provider_redirect_url` di browser atau webview
 - Setelah user selesai bayar, poll `GET /schools/:id/subscription/payments/:payment_id`
 - Jika status `paid`, refresh `GET /schools/:id/subscription`

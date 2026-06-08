@@ -752,6 +752,8 @@ definitions:
         type: string
       plan_id:
         type: string
+      plan_name:
+        type: string
       provider:
         type: string
       provider_order_id:
@@ -763,6 +765,8 @@ definitions:
       provider_transaction_id:
         type: string
       school_id:
+        type: string
+      school_name:
         type: string
       status:
         type: string
@@ -2455,6 +2459,63 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /billing/payments:
+    get:
+      description: Returns a paginated list of school subscription payment transactions.
+        Superadmin can see all schools and filter by school_id; admin_sekolah is automatically
+        scoped to their own school.
+      parameters:
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      - description: Filter by status (pending|paid|failed|expired|cancelled)
+        in: query
+        name: status
+        type: string
+      - description: Search by school name, plan name, or provider order ID
+        in: query
+        name: search
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20)
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/http.PaymentResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List subscription payments
+      tags:
+      - billing
   /billing/webhooks/midtrans:
     post:
       consumes:

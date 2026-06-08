@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	billingdomain "github.com/eduaccess/eduaccess-api/internal/billing/domain"
@@ -65,18 +64,12 @@ func validateCheckoutPlan(plan *schooldomain.Plan) error {
 	return nil
 }
 
-func validateUpgradePath(current *schooldomain.Subscription, target *schooldomain.Plan) error {
+func validateCheckoutPath(current *schooldomain.Subscription, target *schooldomain.Plan) error {
 	if current == nil || current.Plan == nil {
 		return nil
 	}
 	if current.Plan.ID == target.ID {
 		return apperror.New(apperror.ErrConflict, "selected plan is already active for this school")
-	}
-	if current.Plan.MaxStudents >= target.MaxStudents {
-		return apperror.New(
-			apperror.ErrBadRequest,
-			fmt.Sprintf("checkout only supports upgrades to a higher plan than %s", current.Plan.Name),
-		)
 	}
 	return nil
 }

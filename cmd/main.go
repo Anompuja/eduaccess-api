@@ -162,6 +162,7 @@ func main() {
 	billingHTTP.NewHandler(
 		v1,
 		billingApp.NewCreateCheckoutHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
+		billingApp.NewListPaymentsHandler(paymentRepo),
 		billingApp.NewGetPaymentHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
 		billingApp.NewHandleMidtransNotificationHandler(paymentRepo, schoolRepo, studentRepo, midtransClient),
 	)

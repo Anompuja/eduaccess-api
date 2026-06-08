@@ -1308,6 +1308,96 @@ const docTemplate = `{
                 }
             }
         },
+        "/billing/payments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a paginated list of school subscription payment transactions. Superadmin can see all schools and filter by school_id; admin_sekolah is automatically scoped to their own school.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "billing"
+                ],
+                "summary": "List subscription payments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status (pending|paid|failed|expired|cancelled)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by school name, plan name, or provider order ID",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size (default 20)",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/http.PaymentResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/billing/webhooks/midtrans": {
             "post": {
                 "description": "Receives Midtrans HTTP notifications. Real notifications with complete fields are verified and processed. Probe/test requests without a complete notification payload return HTTP 200 without changing payment state.",
@@ -5771,6 +5861,9 @@ const docTemplate = `{
                 "plan_id": {
                     "type": "string"
                 },
+                "plan_name": {
+                    "type": "string"
+                },
                 "provider": {
                     "type": "string"
                 },
@@ -5787,6 +5880,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "school_id": {
+                    "type": "string"
+                },
+                "school_name": {
                     "type": "string"
                 },
                 "status": {

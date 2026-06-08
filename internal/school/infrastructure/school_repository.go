@@ -76,6 +76,29 @@ type planModel struct {
 
 func (planModel) TableName() string { return "plans" }
 
+type subscriptionPlanRow struct {
+	SubscriptionID        *uuid.UUID `gorm:"column:subscription_id"`
+	SchoolID              uuid.UUID  `gorm:"column:school_id"`
+	SubscriptionPlanID    *uuid.UUID `gorm:"column:subscription_plan_id"`
+	SubscriptionStatus    *string    `gorm:"column:subscription_status"`
+	SubscriptionCycle     *string    `gorm:"column:subscription_cycle"`
+	SubscriptionQuantity  *int       `gorm:"column:subscription_quantity"`
+	SubscriptionPrice     *int64     `gorm:"column:subscription_price"`
+	SubscriptionEndsAt    *time.Time `gorm:"column:subscription_ends_at"`
+	SubscriptionCreatedAt *time.Time `gorm:"column:subscription_created_at"`
+	SubscriptionUpdatedAt *time.Time `gorm:"column:subscription_updated_at"`
+	PlanID                *uuid.UUID `gorm:"column:plan_id"`
+	PlanName              *string    `gorm:"column:plan_name"`
+	PlanDescription       *string    `gorm:"column:plan_description"`
+	PlanFeatures          []byte     `gorm:"column:plan_features"`
+	PlanMaxStudents       *int       `gorm:"column:plan_max_students"`
+	PlanMonthlyPrice      *int64     `gorm:"column:plan_monthly_price"`
+	PlanYearlyPrice       *int64     `gorm:"column:plan_yearly_price"`
+	PlanOnetimePrice      *int64     `gorm:"column:plan_onetime_price"`
+	PlanActive            *bool      `gorm:"column:plan_active"`
+	PlanIsDefault         *bool      `gorm:"column:plan_is_default"`
+}
+
 // ── Repository ────────────────────────────────────────────────────────────────
 
 // GormSchoolRepository implements domain.SchoolRepository.
@@ -138,7 +161,11 @@ func (r *GormSchoolRepository) FindByID(ctx context.Context, id uuid.UUID) (*dom
 		}
 		return nil, err
 	}
-	return toSchoolDomain(m), nil
+	school := toSchoolDomain(m)
+	if err := r.attachActiveSubscriptions(ctx, []*domain.School{school}); err != nil {
+		return nil, err
+	}
+	return school, nil
 }
 
 func (r *GormSchoolRepository) List(ctx context.Context, f domain.SchoolFilter) ([]*domain.School, int64, error) {
@@ -177,6 +204,9 @@ func (r *GormSchoolRepository) List(ctx context.Context, f domain.SchoolFilter) 
 	schools := make([]*domain.School, 0, len(rows))
 	for _, row := range rows {
 		schools = append(schools, toSchoolDomain(row))
+	}
+	if err := r.attachActiveSubscriptions(ctx, schools); err != nil {
+		return nil, 0, err
 	}
 	return schools, total, nil
 }
@@ -476,4 +506,100 @@ func toPlanDomain(m planModel) *domain.Plan {
 		Active:       m.Active,
 		IsDefault:    m.IsDefault,
 	}
+}
+
+func (r *GormSchoolRepository) attachActiveSubscriptions(ctx context.Context, schools []*domain.School) error {
+	if len(schools) == 0 {
+		return nil
+	}
+
+	ids := make([]uuid.UUID, 0, len(schools))
+	for _, school := range schools {
+		ids = append(ids, school.ID)
+	}
+
+	const sql = `
+SELECT DISTINCT ON (s.school_id)
+	s.id AS subscription_id,
+	s.school_id,
+	s.plan_id AS subscription_plan_id,
+	s.status AS subscription_status,
+	s.cycle AS subscription_cycle,
+	s.quantity AS subscription_quantity,
+	s.price AS subscription_price,
+	s.ends_at AS subscription_ends_at,
+	s.created_at AS subscription_created_at,
+	s.updated_at AS subscription_updated_at,
+	p.id AS plan_id,
+	p.name AS plan_name,
+	p.description AS plan_description,
+	p.features AS plan_features,
+	p.max_students AS plan_max_students,
+	p.monthly_price AS plan_monthly_price,
+	p.yearly_price AS plan_yearly_price,
+	p.onetime_price AS plan_onetime_price,
+	p.active AS plan_active,
+	p.is_default AS plan_is_default
+FROM subscriptions s
+JOIN plans p ON p.id = s.plan_id
+WHERE s.school_id IN ?
+  AND s.status IN ('active', 'trial')
+ORDER BY s.school_id, s.created_at DESC`
+
+	var rows []subscriptionPlanRow
+	if err := r.db.WithContext(ctx).Raw(sql, ids).Scan(&rows).Error; err != nil {
+		return err
+	}
+
+	bySchoolID := make(map[uuid.UUID]*domain.Subscription, len(rows))
+	for _, row := range rows {
+		sub := toSubscriptionDomain(row)
+		if sub != nil {
+			bySchoolID[row.SchoolID] = sub
+		}
+	}
+
+	for _, school := range schools {
+		school.Subscription = bySchoolID[school.ID]
+	}
+
+	return nil
+}
+
+func toSubscriptionDomain(row subscriptionPlanRow) *domain.Subscription {
+	if row.SubscriptionID == nil || row.SubscriptionPlanID == nil || row.SubscriptionStatus == nil || row.SubscriptionCycle == nil ||
+		row.SubscriptionQuantity == nil || row.SubscriptionPrice == nil || row.SubscriptionCreatedAt == nil || row.SubscriptionUpdatedAt == nil {
+		return nil
+	}
+
+	sub := &domain.Subscription{
+		ID:        *row.SubscriptionID,
+		SchoolID:  row.SchoolID,
+		PlanID:    *row.SubscriptionPlanID,
+		Status:    *row.SubscriptionStatus,
+		Cycle:     *row.SubscriptionCycle,
+		Quantity:  *row.SubscriptionQuantity,
+		Price:     *row.SubscriptionPrice,
+		EndsAt:    row.SubscriptionEndsAt,
+		CreatedAt: *row.SubscriptionCreatedAt,
+		UpdatedAt: *row.SubscriptionUpdatedAt,
+	}
+
+	if row.PlanID != nil && row.PlanName != nil && row.PlanDescription != nil && row.PlanMaxStudents != nil &&
+		row.PlanMonthlyPrice != nil && row.PlanYearlyPrice != nil && row.PlanActive != nil && row.PlanIsDefault != nil {
+		sub.Plan = toPlanDomain(planModel{
+			ID:           *row.PlanID,
+			Name:         *row.PlanName,
+			Description:  *row.PlanDescription,
+			Features:     row.PlanFeatures,
+			MaxStudents:  *row.PlanMaxStudents,
+			MonthlyPrice: *row.PlanMonthlyPrice,
+			YearlyPrice:  *row.PlanYearlyPrice,
+			OnetimePrice: row.PlanOnetimePrice,
+			Active:       *row.PlanActive,
+			IsDefault:    *row.PlanIsDefault,
+		})
+	}
+
+	return sub
 }
