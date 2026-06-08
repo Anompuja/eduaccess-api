@@ -1,13 +1,18 @@
 package http
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/headmaster/application"
 	"github.com/eduaccess/eduaccess-api/internal/headmaster/domain"
+	"github.com/eduaccess/eduaccess-api/internal/headmaster/infrastructure"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
@@ -23,6 +28,7 @@ type Handler struct {
 	get        *application.GetHeadmasterHandler
 	update     *application.UpdateHeadmasterHandler
 	deactivate *application.DeactivateHeadmasterHandler
+	cache      *infrastructure.HeadmasterCache
 }
 
 // NewHandler registers headmaster routes under /api/v1 and returns the handler.
@@ -33,6 +39,7 @@ func NewHandler(
 	get *application.GetHeadmasterHandler,
 	update *application.UpdateHeadmasterHandler,
 	deactivate *application.DeactivateHeadmasterHandler,
+	cache *infrastructure.HeadmasterCache,
 ) *Handler {
 	h := &Handler{
 		create:     create,
@@ -40,6 +47,7 @@ func NewHandler(
 		get:        get,
 		update:     update,
 		deactivate: deactivate,
+		cache:      cache,
 	}
 
 	hm := v1.Group("/headmasters", authmw.RequireAuth)
@@ -105,6 +113,10 @@ func (h *Handler) Create(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 
+	if h.cache != nil {
+		h.cache.InvalidatePrefix("headmaster:list:")
+	}
+
 	return c.JSON(http.StatusCreated, response.Response{
 		Success: true,
 		Message: "headmaster created",
@@ -140,6 +152,37 @@ func (h *Handler) List(c echo.Context) error {
 		schoolID = &parsedSchoolID
 	}
 
+	cacheSchoolID := schoolID
+	if authmw.GetRole(c) != "superadmin" {
+		cacheSchoolID = authmw.GetSchoolID(c)
+	}
+
+	schoolIDStr := "all"
+	if cacheSchoolID != nil {
+		schoolIDStr = cacheSchoolID.String()
+	}
+
+	cacheKey := fmt.Sprintf("headmaster:list:%s:%s:%d:%d:%s", authmw.GetRole(c), schoolIDStr, page, perPage, c.QueryParam("search"))
+
+	if h.cache != nil {
+		if cachedResp, found := h.cache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	result, err := h.list.Handle(c.Request().Context(), application.ListHeadmastersQuery{
 		RequesterSchoolID: authmw.GetSchoolID(c),
 		RequesterRole:     authmw.GetRole(c),
@@ -157,7 +200,39 @@ func (h *Handler) List(c echo.Context) error {
 		dtos = append(dtos, toHeadmasterResponse(p))
 	}
 
-	return response.Paginated(c, "headmasters retrieved", dtos, result.Page, result.PerPage, result.Total)
+	totalPages := int(result.Total) / result.PerPage
+	if int(result.Total)%result.PerPage != 0 {
+		totalPages++
+	}
+
+	resp := response.PaginatedResponse{
+		Success: true,
+		Message: "headmasters retrieved",
+		Data:    dtos,
+		Pagination: response.Pagination{
+			Page:       result.Page,
+			PerPage:    result.PerPage,
+			Total:      result.Total,
+			TotalPages: totalPages,
+		},
+	}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.cache != nil {
+		h.cache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // Get godoc
@@ -236,6 +311,10 @@ func (h *Handler) Update(c echo.Context) error {
 		return handleAppError(c, err)
 	}
 
+	if h.cache != nil {
+		h.cache.InvalidatePrefix("headmaster:list:")
+	}
+
 	return response.OK(c, "headmaster updated", toHeadmasterResponse(profile))
 }
 
@@ -263,6 +342,10 @@ func (h *Handler) Deactivate(c echo.Context) error {
 		HeadmasterID:      id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+
+	if h.cache != nil {
+		h.cache.InvalidatePrefix("headmaster:list:")
 	}
 
 	return response.OK(c, "headmaster deactivated", nil)
