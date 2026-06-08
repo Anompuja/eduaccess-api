@@ -1,6 +1,36 @@
 basePath: /api/v1
 definitions:
-  http.AcademicNameRequest:
+  github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Pagination'
+      success:
+        type: boolean
+    type: object
+  github_com_eduaccess_eduaccess-api_internal_shared_response.Pagination:
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_eduaccess_eduaccess-api_internal_shared_response.Response:
+    properties:
+      data: {}
+      errors: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  internal_academic_delivery_http.AcademicNameRequest:
     properties:
       name:
         maxLength: 191
@@ -9,7 +39,7 @@ definitions:
     required:
     - name
     type: object
-  http.AcademicYearResponse:
+  internal_academic_delivery_http.AcademicYearResponse:
     properties:
       created_at:
         type: string
@@ -30,55 +60,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  http.AdminResponse:
-    properties:
-      address:
-        type: string
-      avatar:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      gender:
-        type: string
-      id:
-        type: string
-      ktp_image_path:
-        type: string
-      name:
-        type: string
-      nik:
-        type: string
-      phone_number:
-        type: string
-      religion:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: string
-      username:
-        type: string
-    type: object
-  http.ChangePasswordRequest:
-    properties:
-      new_password:
-        minLength: 8
-        type: string
-      old_password:
-        minLength: 8
-        type: string
-    required:
-    - new_password
-    type: object
-  http.ClassResponse:
+  internal_academic_delivery_http.ClassResponse:
     properties:
       created_at:
         type: string
@@ -93,38 +75,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  http.ClassScheduleResponse:
-    properties:
-      classroom_id:
-        type: string
-      created_at:
-        type: string
-      date:
-        type: string
-      end_period_id:
-        type: string
-      end_time:
-        type: string
-      id:
-        type: string
-      school_id:
-        type: string
-      start_period_id:
-        type: string
-      start_time:
-        type: string
-      status:
-        type: string
-      subject_id:
-        type: string
-      teacher_attendance_time:
-        type: string
-      teacher_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  http.ClassroomResponse:
+  internal_academic_delivery_http.ClassroomResponse:
     properties:
       academic_year_id:
         type: string
@@ -159,7 +110,138 @@ definitions:
       updated_at:
         type: string
     type: object
-  http.CreateAdminRequest:
+  internal_academic_delivery_http.CreateClassRequest:
+    properties:
+      level_id:
+        type: string
+      name:
+        maxLength: 191
+        minLength: 1
+        type: string
+    required:
+    - level_id
+    - name
+    type: object
+  internal_academic_delivery_http.CreateSubClassRequest:
+    properties:
+      class_id:
+        type: string
+      name:
+        maxLength: 191
+        minLength: 1
+        type: string
+    required:
+    - class_id
+    - name
+    type: object
+  internal_academic_delivery_http.EducationLevelResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_academic_delivery_http.ScheduleResponse:
+    properties:
+      created_at:
+        type: string
+      day_of_week:
+        type: string
+      end_time:
+        type: string
+      id:
+        type: string
+      is_break:
+        type: boolean
+      label:
+        type: string
+      period_number:
+        type: integer
+      school_id:
+        type: string
+      start_time:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_academic_delivery_http.SubClassResponse:
+    properties:
+      class_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_academic_delivery_http.SubjectResponse:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      education_level_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_admin_delivery_http.AdminResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      ktp_image_path:
+        type: string
+      name:
+        type: string
+      nik:
+        type: string
+      phone_number:
+        type: string
+      religion:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_admin_delivery_http.CreateAdminRequest:
     properties:
       address:
         type: string
@@ -205,7 +287,125 @@ definitions:
     - email
     - name
     type: object
-  http.CreateCheckoutRequest:
+  internal_admin_delivery_http.UpdateAdminRequest:
+    properties:
+      address:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        maxLength: 191
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      gender:
+        enum:
+        - L
+        - P
+        type: string
+      ktp_image_path:
+        maxLength: 191
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      nik:
+        maxLength: 50
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      religion:
+        maxLength: 100
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    type: object
+  internal_auth_delivery_http.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  internal_auth_delivery_http.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+      user:
+        $ref: '#/definitions/internal_auth_delivery_http.LoginUserInfo'
+    type: object
+  internal_auth_delivery_http.LoginUserInfo:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      school_id:
+        type: string
+    type: object
+  internal_auth_delivery_http.MeResponse:
+    properties:
+      role:
+        type: string
+      school_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_auth_delivery_http.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  internal_auth_delivery_http.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        type: string
+      school_id:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - role
+    type: object
+  internal_auth_delivery_http.RegisterResponse:
+    properties:
+      user_id:
+        type: string
+    type: object
+  internal_billing_delivery_http.CreateCheckoutRequest:
     properties:
       cycle:
         enum:
@@ -218,483 +418,7 @@ definitions:
     - cycle
     - plan_id
     type: object
-  http.CreateClassRequest:
-    properties:
-      level_id:
-        type: string
-      name:
-        maxLength: 191
-        minLength: 1
-        type: string
-    required:
-    - level_id
-    - name
-    type: object
-  http.CreateHeadmasterRequest:
-    properties:
-      address:
-        maxLength: 500
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        maxLength: 191
-        type: string
-      email:
-        type: string
-      gender:
-        enum:
-        - L
-        - P
-        type: string
-      ktp_image_path:
-        maxLength: 191
-        type: string
-      name:
-        maxLength: 100
-        minLength: 2
-        type: string
-      nik:
-        maxLength: 50
-        type: string
-      password:
-        minLength: 8
-        type: string
-      phone_number:
-        maxLength: 50
-        type: string
-      religion:
-        maxLength: 100
-        type: string
-      school_id:
-        description: |-
-          SchoolID is required when called by superadmin (who has no school in their JWT).
-          admin_sekolah may omit it — their JWT school is used automatically.
-        type: string
-      username:
-        maxLength: 50
-        minLength: 3
-        type: string
-    required:
-    - email
-    - name
-    type: object
-  http.CreateSchoolRequest:
-    properties:
-      address:
-        maxLength: 191
-        type: string
-      description:
-        type: string
-      email:
-        maxLength: 191
-        type: string
-      image_path:
-        maxLength: 191
-        type: string
-      name:
-        maxLength: 191
-        minLength: 2
-        type: string
-      phone:
-        maxLength: 50
-        type: string
-      time_zone:
-        maxLength: 100
-        type: string
-    required:
-    - name
-    type: object
-  http.CreateStaffRequest:
-    properties:
-      address:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        type: string
-      email:
-        type: string
-      gender:
-        enum:
-        - male
-        - female
-        - other
-        type: string
-      ktp_image_path:
-        type: string
-      name:
-        maxLength: 191
-        minLength: 1
-        type: string
-      nik:
-        type: string
-      password:
-        minLength: 8
-        type: string
-      phone_number:
-        type: string
-      religion:
-        type: string
-      school_id:
-        type: string
-      username:
-        maxLength: 191
-        minLength: 3
-        type: string
-    required:
-    - email
-    - name
-    - password
-    - username
-    type: object
-  http.CreateStudentRequest:
-    properties:
-      address:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        maxLength: 191
-        type: string
-      class_id:
-        type: string
-      education_level_id:
-        type: string
-      email:
-        maxLength: 191
-        type: string
-      gender:
-        enum:
-        - L
-        - P
-        type: string
-      jalur_masuk_sekolah:
-        enum:
-        - reguler
-        - beasiswa
-        - mutasi
-        - lainnya
-        type: string
-      name:
-        maxLength: 191
-        minLength: 2
-        type: string
-      nis:
-        maxLength: 191
-        type: string
-      nisn:
-        maxLength: 191
-        type: string
-      password:
-        minLength: 8
-        type: string
-      phone_number:
-        maxLength: 50
-        type: string
-      religion:
-        maxLength: 100
-        type: string
-      sub_class_id:
-        type: string
-      tahun_masuk:
-        maxLength: 10
-        type: string
-      username:
-        maxLength: 50
-        minLength: 3
-        type: string
-    required:
-    - email
-    - name
-    type: object
-  http.CreateSubClassRequest:
-    properties:
-      class_id:
-        type: string
-      name:
-        maxLength: 191
-        minLength: 1
-        type: string
-    required:
-    - class_id
-    - name
-    type: object
-  http.CreateTeacherRequest:
-    properties:
-      address:
-        type: string
-      berat_badan:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        type: string
-      email:
-        type: string
-      gender:
-        enum:
-        - male
-        - female
-        - other
-        type: string
-      golongan_darah:
-        type: string
-      jurusan:
-        type: string
-      kelainan_jasmani:
-        type: string
-      kewarganegaraan:
-        type: string
-      kode_pos:
-        type: string
-      ktp_image_path:
-        type: string
-      name:
-        maxLength: 191
-        minLength: 1
-        type: string
-      nik:
-        type: string
-      nip:
-        type: string
-      nuptk:
-        type: string
-      password:
-        minLength: 8
-        type: string
-      pendidikan_terakhir:
-        type: string
-      penyakit_kronis_yang_pernah_diderita:
-        type: string
-      penyakit_yang_sering_kambuh:
-        type: string
-      phone_number:
-        type: string
-      religion:
-        type: string
-      rt_rw:
-        type: string
-      school_id:
-        type: string
-      tahun_lulus:
-        type: string
-      tahun_masuk:
-        type: string
-      tinggi_badan:
-        type: string
-      username:
-        maxLength: 191
-        minLength: 3
-        type: string
-    required:
-    - email
-    - name
-    - password
-    - username
-    type: object
-  http.DashboardAttendanceResponse:
-    properties:
-      absent:
-        type: integer
-      excused:
-        type: integer
-      late:
-        type: integer
-      present:
-        type: integer
-      rate:
-        type: number
-      total:
-        type: integer
-    type: object
-  http.DashboardCountsResponse:
-    properties:
-      academic_years:
-        type: integer
-      active_enrollments:
-        type: integer
-      active_students:
-        type: integer
-      admins:
-        type: integer
-      classes:
-        type: integer
-      classrooms:
-        type: integer
-      education_levels:
-        type: integer
-      enrollments:
-        type: integer
-      headmasters:
-        type: integer
-      parents:
-        type: integer
-      schedules:
-        type: integer
-      school_users:
-        type: integer
-      staff:
-        type: integer
-      students:
-        type: integer
-      sub_classes:
-        type: integer
-      subjects:
-        type: integer
-      teachers:
-        type: integer
-    type: object
-  http.DashboardSchoolResponse:
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      status:
-        type: string
-      time_zone:
-        type: string
-    type: object
-  http.DashboardStatsResponse:
-    properties:
-      attendance:
-        $ref: '#/definitions/http.DashboardAttendanceResponse'
-      counts:
-        $ref: '#/definitions/http.DashboardCountsResponse'
-      school:
-        $ref: '#/definitions/http.DashboardSchoolResponse'
-      subscription:
-        $ref: '#/definitions/http.DashboardSubscriptionResponse'
-    type: object
-  http.DashboardSubscriptionResponse:
-    properties:
-      cycle:
-        type: string
-      ends_at:
-        type: string
-      plan_name:
-        type: string
-      price:
-        type: integer
-      status:
-        type: string
-    type: object
-  http.EducationLevelResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  http.HeadmasterResponse:
-    properties:
-      address:
-        type: string
-      avatar:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      gender:
-        type: string
-      id:
-        type: string
-      ktp_image_path:
-        type: string
-      name:
-        type: string
-      nik:
-        type: string
-      phone_number:
-        type: string
-      religion:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: string
-      username:
-        type: string
-    type: object
-  http.LinkParentRequest:
-    properties:
-      is_primary:
-        type: boolean
-      parent_id:
-        type: string
-      relationship:
-        enum:
-        - father
-        - mother
-        - guardian
-        - other
-        type: string
-    required:
-    - parent_id
-    - relationship
-    type: object
-  http.LoginRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  http.LoginResponse:
-    properties:
-      access_token:
-        type: string
-      expires_in:
-        type: integer
-      refresh_token:
-        type: string
-      token_type:
-        type: string
-      user:
-        $ref: '#/definitions/http.LoginUserInfo'
-    type: object
-  http.LoginUserInfo:
-    properties:
-      avatar:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      role:
-        type: string
-      school_id:
-        type: string
-    type: object
-  http.MeResponse:
-    properties:
-      role:
-        type: string
-      school_id:
-        type: string
-      user_id:
-        type: string
-    type: object
-  http.MidtransNotificationRequest:
+  internal_billing_delivery_http.MidtransNotificationRequest:
     properties:
       fraud_status:
         type: string
@@ -713,20 +437,7 @@ definitions:
       transaction_status:
         type: string
     type: object
-  http.ParentLinkResponse:
-    properties:
-      id:
-        type: string
-      is_primary:
-        type: boolean
-      parent:
-        $ref: '#/definitions/internal_student_delivery_http.ParentResponse'
-      parent_id:
-        type: string
-      relationship:
-        type: string
-    type: object
-  http.PaymentResponse:
+  internal_billing_delivery_http.PaymentResponse:
     properties:
       activated_subscription_id:
         type: string
@@ -775,418 +486,128 @@ definitions:
       updated_at:
         type: string
     type: object
-  http.PlanResponse:
+  internal_class_schedule_delivery_http.ClassScheduleResponse:
     properties:
-      description:
+      classroom_id:
         type: string
-      features:
-        items:
-          type: string
-        type: array
-      id:
-        type: string
-      max_students:
-        type: integer
-      monthly_price:
-        type: integer
-      name:
-        type: string
-      yearly_price:
-        type: integer
-    type: object
-  http.PromotionResponse:
-    properties:
-      academic_year_id:
-        type: string
-      academic_year_name:
-        type: string
-      from_classroom_id:
-        type: string
-      from_classroom_name:
-        type: string
-      id:
-        type: string
-      nis:
-        type: string
-      notes:
-        type: string
-      promotion_date:
-        type: string
-      status:
-        type: string
-      student_id:
-        type: string
-      student_name:
-        type: string
-      to_classroom_id:
-        type: string
-      to_classroom_name:
-        type: string
-    type: object
-  http.RefreshRequest:
-    properties:
-      refresh_token:
-        type: string
-    required:
-    - refresh_token
-    type: object
-  http.RegisterRequest:
-    properties:
-      email:
-        type: string
-      name:
-        type: string
-      password:
-        minLength: 8
-        type: string
-      role:
-        type: string
-      school_id:
-        type: string
-      username:
-        type: string
-    required:
-    - email
-    - name
-    - password
-    - role
-    type: object
-  http.RegisterResponse:
-    properties:
-      user_id:
-        type: string
-    type: object
-  http.RuleInput:
-    properties:
-      key:
-        maxLength: 191
-        minLength: 1
-        type: string
-      note:
-        type: string
-      value:
-        maxLength: 191
-        type: string
-    required:
-    - key
-    - value
-    type: object
-  http.ScheduleResponse:
-    properties:
       created_at:
         type: string
-      day_of_week:
+      date:
+        type: string
+      end_period_id:
         type: string
       end_time:
         type: string
       id:
         type: string
-      is_break:
-        type: boolean
-      label:
-        type: string
-      period_number:
-        type: integer
       school_id:
+        type: string
+      start_period_id:
         type: string
       start_time:
         type: string
+      status:
+        type: string
+      subject_id:
+        type: string
+      teacher_attendance_time:
+        type: string
+      teacher_id:
+        type: string
       updated_at:
         type: string
     type: object
-  http.SchoolResponse:
+  internal_dashboard_delivery_http.DashboardAttendanceResponse:
     properties:
-      address:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      email:
-        type: string
-      headmaster_id:
-        type: string
+      absent:
+        type: integer
+      excused:
+        type: integer
+      late:
+        type: integer
+      present:
+        type: integer
+      rate:
+        type: number
+      total:
+        type: integer
+    type: object
+  internal_dashboard_delivery_http.DashboardCountsResponse:
+    properties:
+      academic_years:
+        type: integer
+      active_enrollments:
+        type: integer
+      active_students:
+        type: integer
+      admins:
+        type: integer
+      classes:
+        type: integer
+      classrooms:
+        type: integer
+      education_levels:
+        type: integer
+      enrollments:
+        type: integer
+      headmasters:
+        type: integer
+      parents:
+        type: integer
+      schedules:
+        type: integer
+      school_users:
+        type: integer
+      staff:
+        type: integer
+      students:
+        type: integer
+      sub_classes:
+        type: integer
+      subjects:
+        type: integer
+      teachers:
+        type: integer
+    type: object
+  internal_dashboard_delivery_http.DashboardSchoolResponse:
+    properties:
       id:
-        type: string
-      image_path:
         type: string
       name:
         type: string
-      phone:
-        type: string
       status:
         type: string
-      subscription:
-        $ref: '#/definitions/http.SubscriptionResponse'
       time_zone:
         type: string
-      updated_at:
-        type: string
     type: object
-  http.SchoolRuleResponse:
+  internal_dashboard_delivery_http.DashboardStatsResponse:
     properties:
-      id:
-        type: string
-      key:
-        type: string
-      note:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-      value:
-        type: string
+      attendance:
+        $ref: '#/definitions/internal_dashboard_delivery_http.DashboardAttendanceResponse'
+      counts:
+        $ref: '#/definitions/internal_dashboard_delivery_http.DashboardCountsResponse'
+      school:
+        $ref: '#/definitions/internal_dashboard_delivery_http.DashboardSchoolResponse'
+      subscription:
+        $ref: '#/definitions/internal_dashboard_delivery_http.DashboardSubscriptionResponse'
     type: object
-  http.SignedURLResponse:
+  internal_dashboard_delivery_http.DashboardSubscriptionResponse:
     properties:
-      url:
-        type: string
-    type: object
-  http.StaffResponse:
-    properties:
-      address:
-        type: string
-      avatar:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      gender:
-        type: string
-      id:
-        type: string
-      ktp_image_path:
-        type: string
-      name:
-        type: string
-      nik:
-        type: string
-      phone_number:
-        type: string
-      religion:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: string
-      username:
-        type: string
-    type: object
-  http.StudentResponse:
-    properties:
-      address:
-        type: string
-      avatar:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        type: string
-      class_id:
-        type: string
-      created_at:
-        type: string
-      education_level_id:
-        type: string
-      email:
-        type: string
-      gender:
-        type: string
-      id:
-        type: string
-      jalur_masuk_sekolah:
-        type: string
-      name:
-        type: string
-      nis:
-        type: string
-      nisn:
-        type: string
-      parents:
-        items:
-          $ref: '#/definitions/http.ParentLinkResponse'
-        type: array
-      phone_number:
-        type: string
-      religion:
-        type: string
-      school_id:
-        type: string
-      sub_class_id:
-        type: string
-      tahun_masuk:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: string
-      username:
-        type: string
-    type: object
-  http.StudyResponse:
-    properties:
-      academic_year_id:
-        type: string
-      academic_year_name:
-        type: string
-      class_id:
-        type: string
-      class_name:
-        type: string
-      classroom_id:
-        type: string
-      classroom_name:
-        type: string
-      enrollment_date:
-        type: string
-      id:
-        type: string
-      nis:
-        type: string
-      status:
-        type: string
-      student_id:
-        type: string
-      student_name:
-        type: string
-      sub_class_name:
-        type: string
-    type: object
-  http.SubClassResponse:
-    properties:
-      class_id:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  http.SubjectResponse:
-    properties:
-      category:
-        type: string
-      code:
-        type: string
-      created_at:
-        type: string
-      education_level_id:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  http.SubscriptionResponse:
-    properties:
-      created_at:
-        type: string
       cycle:
         type: string
       ends_at:
         type: string
-      id:
+      plan_name:
         type: string
-      plan:
-        $ref: '#/definitions/http.PlanResponse'
       price:
         type: integer
-      quantity:
-        type: integer
-      school_id:
-        type: string
       status:
         type: string
-      updated_at:
-        type: string
     type: object
-  http.TeacherResponse:
+  internal_headmaster_delivery_http.CreateHeadmasterRequest:
     properties:
       address:
-        type: string
-      avatar:
-        type: string
-      berat_badan:
-        type: string
-      birth_date:
-        type: string
-      birth_place:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      gender:
-        type: string
-      golongan_darah:
-        type: string
-      id:
-        type: string
-      jurusan:
-        type: string
-      kelainan_jasmani:
-        type: string
-      kewarganegaraan:
-        type: string
-      kode_pos:
-        type: string
-      ktp_image_path:
-        type: string
-      name:
-        type: string
-      nik:
-        type: string
-      nip:
-        type: string
-      nuptk:
-        type: string
-      pendidikan_terakhir:
-        type: string
-      penyakit_kronis_yang_pernah_diderita:
-        type: string
-      penyakit_yang_sering_kambuh:
-        type: string
-      phone_number:
-        type: string
-      religion:
-        type: string
-      rt_rw:
-        type: string
-      school_id:
-        type: string
-      tahun_lulus:
-        type: string
-      tahun_masuk:
-        type: string
-      tinggi_badan:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: string
-      username:
-        type: string
-    type: object
-  http.UpdateAdminRequest:
-    properties:
-      address:
+        maxLength: 500
         type: string
       birth_date:
         type: string
@@ -1194,7 +615,6 @@ definitions:
         maxLength: 191
         type: string
       email:
-        maxLength: 191
         type: string
       gender:
         enum:
@@ -1205,11 +625,14 @@ definitions:
         maxLength: 191
         type: string
       name:
-        maxLength: 191
+        maxLength: 100
         minLength: 2
         type: string
       nik:
         maxLength: 50
+        type: string
+      password:
+        minLength: 8
         type: string
       phone_number:
         maxLength: 50
@@ -1217,12 +640,57 @@ definitions:
       religion:
         maxLength: 100
         type: string
+      school_id:
+        description: |-
+          SchoolID is required when called by superadmin (who has no school in their JWT).
+          admin_sekolah may omit it — their JWT school is used automatically.
+        type: string
       username:
         maxLength: 50
         minLength: 3
         type: string
+    required:
+    - email
+    - name
     type: object
-  http.UpdateHeadmasterRequest:
+  internal_headmaster_delivery_http.HeadmasterResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      ktp_image_path:
+        type: string
+      name:
+        type: string
+      nik:
+        type: string
+      phone_number:
+        type: string
+      religion:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_headmaster_delivery_http.UpdateHeadmasterRequest:
     properties:
       address:
         maxLength: 500
@@ -1250,7 +718,233 @@ definitions:
         maxLength: 100
         type: string
     type: object
-  http.UpdateSchoolRequest:
+  internal_parent_delivery_http.CreateParentRequest:
+    properties:
+      address:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      father_name:
+        maxLength: 191
+        type: string
+      father_religion:
+        maxLength: 100
+        type: string
+      mother_name:
+        maxLength: 191
+        type: string
+      mother_religion:
+        maxLength: 100
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      school_id:
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  internal_parent_delivery_http.ParentResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      father_name:
+        type: string
+      father_religion:
+        type: string
+      id:
+        type: string
+      mother_name:
+        type: string
+      mother_religion:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_parent_delivery_http.UpdateParentRequest:
+    properties:
+      address:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      father_name:
+        maxLength: 191
+        type: string
+      father_religion:
+        maxLength: 100
+        type: string
+      mother_name:
+        maxLength: 191
+        type: string
+      mother_religion:
+        maxLength: 100
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+    type: object
+  internal_school_delivery_http.CreateSchoolRequest:
+    properties:
+      address:
+        maxLength: 191
+        type: string
+      description:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      image_path:
+        maxLength: 191
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 50
+        type: string
+      time_zone:
+        maxLength: 100
+        type: string
+    required:
+    - name
+    type: object
+  internal_school_delivery_http.PlanResponse:
+    properties:
+      description:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      max_students:
+        type: integer
+      monthly_price:
+        type: integer
+      name:
+        type: string
+      yearly_price:
+        type: integer
+    type: object
+  internal_school_delivery_http.RuleInput:
+    properties:
+      key:
+        maxLength: 191
+        minLength: 1
+        type: string
+      note:
+        type: string
+      value:
+        maxLength: 191
+        type: string
+    required:
+    - key
+    - value
+    type: object
+  internal_school_delivery_http.SchoolResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      headmaster_id:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      status:
+        type: string
+      subscription:
+        $ref: '#/definitions/internal_school_delivery_http.SubscriptionResponse'
+      time_zone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_school_delivery_http.SchoolRuleResponse:
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+      note:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      value:
+        type: string
+    type: object
+  internal_school_delivery_http.SubscriptionResponse:
+    properties:
+      created_at:
+        type: string
+      cycle:
+        type: string
+      ends_at:
+        type: string
+      id:
+        type: string
+      plan:
+        $ref: '#/definitions/internal_school_delivery_http.PlanResponse'
+      price:
+        type: integer
+      quantity:
+        type: integer
+      school_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_school_delivery_http.UpdateSchoolRequest:
     properties:
       address:
         maxLength: 191
@@ -1279,7 +973,111 @@ definitions:
         maxLength: 100
         type: string
     type: object
-  http.UpdateStaffRequest:
+  internal_school_delivery_http.UpdateSubscriptionRequest:
+    properties:
+      cycle:
+        enum:
+        - month
+        - year
+        - onetime
+        type: string
+      plan_id:
+        type: string
+    required:
+    - cycle
+    - plan_id
+    type: object
+  internal_school_delivery_http.UpsertRulesRequest:
+    properties:
+      rules:
+        items:
+          $ref: '#/definitions/internal_school_delivery_http.RuleInput'
+        minItems: 1
+        type: array
+    required:
+    - rules
+    type: object
+  internal_staff_delivery_http.CreateStaffRequest:
+    properties:
+      address:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      email:
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      ktp_image_path:
+        type: string
+      name:
+        maxLength: 191
+        minLength: 1
+        type: string
+      nik:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone_number:
+        type: string
+      religion:
+        type: string
+      school_id:
+        type: string
+      username:
+        maxLength: 191
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
+  internal_staff_delivery_http.StaffResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      ktp_image_path:
+        type: string
+      name:
+        type: string
+      nik:
+        type: string
+      phone_number:
+        type: string
+      religion:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_staff_delivery_http.UpdateStaffRequest:
     properties:
       address:
         type: string
@@ -1312,7 +1110,195 @@ definitions:
         minLength: 3
         type: string
     type: object
-  http.UpdateStudentRequest:
+  internal_storage_delivery_http.SignedURLResponse:
+    properties:
+      url:
+        type: string
+    type: object
+  internal_storage_delivery_http.UploadResponse:
+    properties:
+      bucket:
+        type: string
+      path:
+        type: string
+      url:
+        type: string
+    type: object
+  internal_student_delivery_http.CreateStudentRequest:
+    properties:
+      address:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        maxLength: 191
+        type: string
+      class_id:
+        type: string
+      education_level_id:
+        type: string
+      email:
+        maxLength: 191
+        type: string
+      gender:
+        enum:
+        - L
+        - P
+        type: string
+      jalur_masuk_sekolah:
+        enum:
+        - reguler
+        - beasiswa
+        - mutasi
+        - lainnya
+        type: string
+      name:
+        maxLength: 191
+        minLength: 2
+        type: string
+      nis:
+        maxLength: 191
+        type: string
+      nisn:
+        maxLength: 191
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone_number:
+        maxLength: 50
+        type: string
+      religion:
+        maxLength: 100
+        type: string
+      sub_class_id:
+        type: string
+      tahun_masuk:
+        maxLength: 10
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  internal_student_delivery_http.LinkParentRequest:
+    properties:
+      is_primary:
+        type: boolean
+      parent_id:
+        type: string
+      relationship:
+        enum:
+        - father
+        - mother
+        - guardian
+        - other
+        type: string
+    required:
+    - parent_id
+    - relationship
+    type: object
+  internal_student_delivery_http.ParentLinkResponse:
+    properties:
+      id:
+        type: string
+      is_primary:
+        type: boolean
+      parent:
+        $ref: '#/definitions/internal_student_delivery_http.ParentResponse'
+      parent_id:
+        type: string
+      relationship:
+        type: string
+    type: object
+  internal_student_delivery_http.ParentResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      father_name:
+        type: string
+      father_religion:
+        type: string
+      id:
+        type: string
+      mother_name:
+        type: string
+      mother_religion:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      school_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_student_delivery_http.StudentResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      class_id:
+        type: string
+      created_at:
+        type: string
+      education_level_id:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      jalur_masuk_sekolah:
+        type: string
+      name:
+        type: string
+      nis:
+        type: string
+      nisn:
+        type: string
+      parents:
+        items:
+          $ref: '#/definitions/internal_student_delivery_http.ParentLinkResponse'
+        type: array
+      phone_number:
+        type: string
+      religion:
+        type: string
+      school_id:
+        type: string
+      sub_class_id:
+        type: string
+      tahun_masuk:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_student_delivery_http.UpdateStudentRequest:
     properties:
       address:
         type: string
@@ -1355,21 +1341,205 @@ definitions:
         maxLength: 10
         type: string
     type: object
-  http.UpdateSubscriptionRequest:
+  internal_student_promotion_delivery_http.PromotionResponse:
     properties:
-      cycle:
-        enum:
-        - month
-        - year
-        - onetime
+      academic_year_id:
         type: string
-      plan_id:
+      academic_year_name:
+        type: string
+      from_classroom_id:
+        type: string
+      from_classroom_name:
+        type: string
+      id:
+        type: string
+      nis:
+        type: string
+      notes:
+        type: string
+      promotion_date:
+        type: string
+      status:
+        type: string
+      student_id:
+        type: string
+      student_name:
+        type: string
+      to_classroom_id:
+        type: string
+      to_classroom_name:
+        type: string
+    type: object
+  internal_student_tracking_delivery_http.StudyResponse:
+    properties:
+      academic_year_id:
+        type: string
+      academic_year_name:
+        type: string
+      class_id:
+        type: string
+      class_name:
+        type: string
+      classroom_id:
+        type: string
+      classroom_name:
+        type: string
+      enrollment_date:
+        type: string
+      id:
+        type: string
+      nis:
+        type: string
+      status:
+        type: string
+      student_id:
+        type: string
+      student_name:
+        type: string
+      sub_class_name:
+        type: string
+    type: object
+  internal_teacher_delivery_http.CreateTeacherRequest:
+    properties:
+      address:
+        type: string
+      berat_badan:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      email:
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      golongan_darah:
+        type: string
+      jurusan:
+        type: string
+      kelainan_jasmani:
+        type: string
+      kewarganegaraan:
+        type: string
+      kode_pos:
+        type: string
+      ktp_image_path:
+        type: string
+      name:
+        maxLength: 191
+        minLength: 1
+        type: string
+      nik:
+        type: string
+      nip:
+        type: string
+      nuptk:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      pendidikan_terakhir:
+        type: string
+      penyakit_kronis_yang_pernah_diderita:
+        type: string
+      penyakit_yang_sering_kambuh:
+        type: string
+      phone_number:
+        type: string
+      religion:
+        type: string
+      rt_rw:
+        type: string
+      school_id:
+        type: string
+      tahun_lulus:
+        type: string
+      tahun_masuk:
+        type: string
+      tinggi_badan:
+        type: string
+      username:
+        maxLength: 191
+        minLength: 3
         type: string
     required:
-    - cycle
-    - plan_id
+    - email
+    - name
+    - password
+    - username
     type: object
-  http.UpdateTeacherRequest:
+  internal_teacher_delivery_http.TeacherResponse:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      berat_badan:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      golongan_darah:
+        type: string
+      id:
+        type: string
+      jurusan:
+        type: string
+      kelainan_jasmani:
+        type: string
+      kewarganegaraan:
+        type: string
+      kode_pos:
+        type: string
+      ktp_image_path:
+        type: string
+      name:
+        type: string
+      nik:
+        type: string
+      nip:
+        type: string
+      nuptk:
+        type: string
+      pendidikan_terakhir:
+        type: string
+      penyakit_kronis_yang_pernah_diderita:
+        type: string
+      penyakit_yang_sering_kambuh:
+        type: string
+      phone_number:
+        type: string
+      religion:
+        type: string
+      rt_rw:
+        type: string
+      school_id:
+        type: string
+      tahun_lulus:
+        type: string
+      tahun_masuk:
+        type: string
+      tinggi_badan:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_teacher_delivery_http.UpdateTeacherRequest:
     properties:
       address:
         type: string
@@ -1432,7 +1602,18 @@ definitions:
         minLength: 3
         type: string
     type: object
-  http.UpdateUserRequest:
+  internal_user_delivery_http.ChangePasswordRequest:
+    properties:
+      new_password:
+        minLength: 8
+        type: string
+      old_password:
+        minLength: 8
+        type: string
+    required:
+    - new_password
+    type: object
+  internal_user_delivery_http.UpdateUserRequest:
     properties:
       avatar:
         maxLength: 255
@@ -1449,26 +1630,7 @@ definitions:
         minLength: 3
         type: string
     type: object
-  http.UploadResponse:
-    properties:
-      bucket:
-        type: string
-      path:
-        type: string
-      url:
-        type: string
-    type: object
-  http.UpsertRulesRequest:
-    properties:
-      rules:
-        items:
-          $ref: '#/definitions/http.RuleInput'
-        minItems: 1
-        type: array
-    required:
-    - rules
-    type: object
-  http.UserResponse:
+  internal_user_delivery_http.UserResponse:
     properties:
       avatar:
         type: string
@@ -1489,201 +1651,6 @@ definitions:
       username:
         type: string
       verified:
-        type: boolean
-    type: object
-  internal_parent_delivery_http.CreateParentRequest:
-    properties:
-      address:
-        type: string
-      email:
-        maxLength: 191
-        type: string
-      name:
-        maxLength: 191
-        minLength: 2
-        type: string
-      password:
-        minLength: 8
-        type: string
-      phone_number:
-        maxLength: 50
-        type: string
-      religion:
-        maxLength: 50
-        type: string
-      school_id:
-        type: string
-      username:
-        maxLength: 50
-        minLength: 3
-        type: string
-    required:
-    - email
-    - name
-    type: object
-  internal_parent_delivery_http.ParentResponse:
-    properties:
-      address:
-        type: string
-      avatar:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      phone_number:
-        type: string
-      religion:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: string
-      username:
-        type: string
-    type: object
-  internal_parent_delivery_http.UpdateParentRequest:
-    properties:
-      address:
-        type: string
-      email:
-        maxLength: 191
-        type: string
-      name:
-        maxLength: 191
-        minLength: 2
-        type: string
-      phone_number:
-        maxLength: 50
-        type: string
-      religion:
-        maxLength: 50
-        type: string
-    type: object
-  internal_student_delivery_http.CreateParentRequest:
-    properties:
-      address:
-        type: string
-      email:
-        maxLength: 191
-        type: string
-      father_name:
-        maxLength: 191
-        type: string
-      father_religion:
-        maxLength: 100
-        type: string
-      mother_name:
-        maxLength: 191
-        type: string
-      mother_religion:
-        maxLength: 100
-        type: string
-      name:
-        maxLength: 191
-        minLength: 2
-        type: string
-      password:
-        minLength: 8
-        type: string
-      phone_number:
-        maxLength: 50
-        type: string
-      username:
-        maxLength: 50
-        minLength: 3
-        type: string
-    required:
-    - email
-    - name
-    type: object
-  internal_student_delivery_http.ParentResponse:
-    properties:
-      address:
-        type: string
-      avatar:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      father_name:
-        type: string
-      father_religion:
-        type: string
-      id:
-        type: string
-      mother_name:
-        type: string
-      mother_religion:
-        type: string
-      name:
-        type: string
-      phone_number:
-        type: string
-      school_id:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: string
-      username:
-        type: string
-    type: object
-  internal_student_delivery_http.UpdateParentRequest:
-    properties:
-      address:
-        type: string
-      father_name:
-        maxLength: 191
-        type: string
-      father_religion:
-        maxLength: 100
-        type: string
-      mother_name:
-        maxLength: 191
-        type: string
-      mother_religion:
-        maxLength: 100
-        type: string
-      phone_number:
-        maxLength: 50
-        type: string
-    type: object
-  response.PaginatedResponse:
-    properties:
-      data: {}
-      message:
-        type: string
-      pagination:
-        $ref: '#/definitions/response.Pagination'
-      success:
-        type: boolean
-    type: object
-  response.Pagination:
-    properties:
-      page:
-        type: integer
-      per_page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  response.Response:
-    properties:
-      data: {}
-      errors: {}
-      message:
-        type: string
-      success:
         type: boolean
     type: object
 host: localhost:8080
@@ -1718,11 +1685,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.ClassResponse'
+                    $ref: '#/definitions/internal_academic_delivery_http.ClassResponse'
                   type: array
               type: object
       security:
@@ -1739,7 +1706,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateClassRequest'
+          $ref: '#/definitions/internal_academic_delivery_http.CreateClassRequest'
       produces:
       - application/json
       responses:
@@ -1747,10 +1714,10 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.ClassResponse'
+                  $ref: '#/definitions/internal_academic_delivery_http.ClassResponse'
               type: object
       security:
       - BearerAuth: []
@@ -1771,7 +1738,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Delete class
@@ -1791,7 +1758,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.AcademicNameRequest'
+          $ref: '#/definitions/internal_academic_delivery_http.AcademicNameRequest'
       produces:
       - application/json
       responses:
@@ -1799,10 +1766,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.ClassResponse'
+                  $ref: '#/definitions/internal_academic_delivery_http.ClassResponse'
               type: object
       security:
       - BearerAuth: []
@@ -1825,11 +1792,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.ClassroomResponse'
+                    $ref: '#/definitions/internal_academic_delivery_http.ClassroomResponse'
                   type: array
               type: object
       security:
@@ -1853,11 +1820,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.EducationLevelResponse'
+                    $ref: '#/definitions/internal_academic_delivery_http.EducationLevelResponse'
                   type: array
               type: object
       security:
@@ -1874,7 +1841,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.AcademicNameRequest'
+          $ref: '#/definitions/internal_academic_delivery_http.AcademicNameRequest'
       produces:
       - application/json
       responses:
@@ -1882,10 +1849,10 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.EducationLevelResponse'
+                  $ref: '#/definitions/internal_academic_delivery_http.EducationLevelResponse'
               type: object
       security:
       - BearerAuth: []
@@ -1906,7 +1873,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Delete education level
@@ -1926,7 +1893,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.AcademicNameRequest'
+          $ref: '#/definitions/internal_academic_delivery_http.AcademicNameRequest'
       produces:
       - application/json
       responses:
@@ -1934,10 +1901,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.EducationLevelResponse'
+                  $ref: '#/definitions/internal_academic_delivery_http.EducationLevelResponse'
               type: object
       security:
       - BearerAuth: []
@@ -1964,17 +1931,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.ScheduleResponse'
+                    $ref: '#/definitions/internal_academic_delivery_http.ScheduleResponse'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List school schedules
@@ -2000,11 +1967,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.SubClassResponse'
+                    $ref: '#/definitions/internal_academic_delivery_http.SubClassResponse'
                   type: array
               type: object
       security:
@@ -2021,7 +1988,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateSubClassRequest'
+          $ref: '#/definitions/internal_academic_delivery_http.CreateSubClassRequest'
       produces:
       - application/json
       responses:
@@ -2029,10 +1996,10 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SubClassResponse'
+                  $ref: '#/definitions/internal_academic_delivery_http.SubClassResponse'
               type: object
       security:
       - BearerAuth: []
@@ -2053,7 +2020,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Delete sub-class
@@ -2073,7 +2040,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.AcademicNameRequest'
+          $ref: '#/definitions/internal_academic_delivery_http.AcademicNameRequest'
       produces:
       - application/json
       responses:
@@ -2081,10 +2048,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SubClassResponse'
+                  $ref: '#/definitions/internal_academic_delivery_http.SubClassResponse'
               type: object
       security:
       - BearerAuth: []
@@ -2107,11 +2074,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.SubjectResponse'
+                    $ref: '#/definitions/internal_academic_delivery_http.SubjectResponse'
                   type: array
               type: object
       security:
@@ -2135,11 +2102,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.AcademicYearResponse'
+                    $ref: '#/definitions/internal_academic_delivery_http.AcademicYearResponse'
                   type: array
               type: object
       security:
@@ -2174,11 +2141,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.AdminResponse'
+                    $ref: '#/definitions/internal_admin_delivery_http.AdminResponse'
                   type: array
               type: object
       security:
@@ -2196,7 +2163,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateAdminRequest'
+          $ref: '#/definitions/internal_admin_delivery_http.CreateAdminRequest'
       produces:
       - application/json
       responses:
@@ -2204,23 +2171,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.AdminResponse'
+                  $ref: '#/definitions/internal_admin_delivery_http.AdminResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create admin sekolah
@@ -2240,15 +2207,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate admin
@@ -2268,19 +2235,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.AdminResponse'
+                  $ref: '#/definitions/internal_admin_delivery_http.AdminResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get admin by ID
@@ -2301,7 +2268,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateAdminRequest'
+          $ref: '#/definitions/internal_admin_delivery_http.UpdateAdminRequest'
       produces:
       - application/json
       responses:
@@ -2309,27 +2276,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.AdminResponse'
+                  $ref: '#/definitions/internal_admin_delivery_http.AdminResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update admin sekolah
@@ -2347,7 +2314,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.LoginRequest'
+          $ref: '#/definitions/internal_auth_delivery_http.LoginRequest'
       produces:
       - application/json
       responses:
@@ -2355,15 +2322,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.LoginResponse'
+                  $ref: '#/definitions/internal_auth_delivery_http.LoginResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       summary: Login
       tags:
       - auth
@@ -2378,15 +2345,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.MeResponse'
+                  $ref: '#/definitions/internal_auth_delivery_http.MeResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Current user identity
@@ -2403,7 +2370,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.RefreshRequest'
+          $ref: '#/definitions/internal_auth_delivery_http.RefreshRequest'
       produces:
       - application/json
       responses:
@@ -2411,15 +2378,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.LoginResponse'
+                  $ref: '#/definitions/internal_auth_delivery_http.LoginResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       summary: Refresh access token
       tags:
       - auth
@@ -2435,7 +2402,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.RegisterRequest'
+          $ref: '#/definitions/internal_auth_delivery_http.RegisterRequest'
       produces:
       - application/json
       responses:
@@ -2443,19 +2410,19 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.RegisterResponse'
+                  $ref: '#/definitions/internal_auth_delivery_http.RegisterResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       summary: Register a new user
       tags:
       - auth
@@ -2492,25 +2459,25 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.PaymentResponse'
+                    $ref: '#/definitions/internal_billing_delivery_http.PaymentResponse'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List subscription payments
@@ -2528,30 +2495,30 @@ paths:
         in: body
         name: body
         schema:
-          $ref: '#/definitions/http.MidtransNotificationRequest'
+          $ref: '#/definitions/internal_billing_delivery_http.MidtransNotificationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       summary: Handle Midtrans webhook
       tags:
       - billing
@@ -2591,21 +2558,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.ClassScheduleResponse'
+                    $ref: '#/definitions/internal_class_schedule_delivery_http.ClassScheduleResponse'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List class schedules
@@ -2627,23 +2594,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.DashboardStatsResponse'
+                  $ref: '#/definitions/internal_dashboard_delivery_http.DashboardStatsResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get dashboard stats
@@ -2677,21 +2644,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.HeadmasterResponse'
+                    $ref: '#/definitions/internal_headmaster_delivery_http.HeadmasterResponse'
                   type: array
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List headmasters
@@ -2708,7 +2675,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateHeadmasterRequest'
+          $ref: '#/definitions/internal_headmaster_delivery_http.CreateHeadmasterRequest'
       produces:
       - application/json
       responses:
@@ -2716,23 +2683,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.HeadmasterResponse'
+                  $ref: '#/definitions/internal_headmaster_delivery_http.HeadmasterResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create headmaster
@@ -2753,15 +2720,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate headmaster
@@ -2782,19 +2749,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.HeadmasterResponse'
+                  $ref: '#/definitions/internal_headmaster_delivery_http.HeadmasterResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get headmaster by ID
@@ -2815,7 +2782,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateHeadmasterRequest'
+          $ref: '#/definitions/internal_headmaster_delivery_http.UpdateHeadmasterRequest'
       produces:
       - application/json
       responses:
@@ -2823,23 +2790,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.HeadmasterResponse'
+                  $ref: '#/definitions/internal_headmaster_delivery_http.HeadmasterResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update headmaster profile
@@ -2847,9 +2814,14 @@ paths:
       - headmasters
   /parents:
     get:
-      description: Returns a paginated list of parents. Tenant-scoped.
+      description: Returns a paginated list of parents. Superadmin may filter by school_id;
+        admin_sekolah is scoped to their own school.
       parameters:
-      - description: Search by name or email
+      - description: School UUID (superadmin only)
+        in: query
+        name: school_id
+        type: string
+      - description: Search by name, email or username
         in: query
         name: search
         type: string
@@ -2857,7 +2829,7 @@ paths:
         in: query
         name: page
         type: integer
-      - description: Page size (default 20)
+      - description: Page size (default 20, max 100)
         in: query
         name: per_page
         type: integer
@@ -2868,13 +2840,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/internal_student_delivery_http.ParentResponse'
+                    $ref: '#/definitions/internal_parent_delivery_http.ParentResponse'
                   type: array
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List parents
@@ -2883,14 +2863,15 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a user account (role=orangtua) and parent profile atomically.
+      description: Creates a parent profile. Superadmin may provide school_id in the
+        request body; admin_sekolah is scoped to their own school.
       parameters:
       - description: Parent data
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/internal_student_delivery_http.CreateParentRequest'
+          $ref: '#/definitions/internal_parent_delivery_http.CreateParentRequest'
       produces:
       - application/json
       responses:
@@ -2898,23 +2879,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_student_delivery_http.ParentResponse'
+                  $ref: '#/definitions/internal_parent_delivery_http.ParentResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create parent
@@ -2922,6 +2903,7 @@ paths:
       - parents
   /parents/{id}:
     delete:
+      description: Soft-deletes a parent profile.
       parameters:
       - description: Parent profile UUID
         in: path
@@ -2934,13 +2916,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate parent
       tags:
       - parents
     get:
+      description: Returns a single parent profile.
       parameters:
       - description: Parent profile UUID
         in: path
@@ -2954,19 +2945,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_student_delivery_http.ParentResponse'
+                  $ref: '#/definitions/internal_parent_delivery_http.ParentResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get parent by ID
@@ -2975,18 +2966,19 @@ paths:
     put:
       consumes:
       - application/json
+      description: Updates mutable fields of a parent profile.
       parameters:
       - description: Parent profile UUID
         in: path
         name: id
         required: true
         type: string
-      - description: Fields to update
+      - description: Parent fields to update
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/internal_student_delivery_http.UpdateParentRequest'
+          $ref: '#/definitions/internal_parent_delivery_http.UpdateParentRequest'
       produces:
       - application/json
       responses:
@@ -2994,11 +2986,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_student_delivery_http.ParentResponse'
+                  $ref: '#/definitions/internal_parent_delivery_http.ParentResponse'
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update parent
@@ -3014,15 +3018,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.UserResponse'
+                  $ref: '#/definitions/internal_user_delivery_http.UserResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get own profile
@@ -3038,7 +3042,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateUserRequest'
+          $ref: '#/definitions/internal_user_delivery_http.UpdateUserRequest'
       produces:
       - application/json
       responses:
@@ -3046,19 +3050,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.UserResponse'
+                  $ref: '#/definitions/internal_user_delivery_http.UserResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update own profile
@@ -3092,17 +3096,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.SchoolResponse'
+                    $ref: '#/definitions/internal_school_delivery_http.SchoolResponse'
                   type: array
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List schools
@@ -3118,7 +3122,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateSchoolRequest'
+          $ref: '#/definitions/internal_school_delivery_http.CreateSchoolRequest'
       produces:
       - application/json
       responses:
@@ -3126,23 +3130,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SchoolResponse'
+                  $ref: '#/definitions/internal_school_delivery_http.SchoolResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create school
@@ -3163,15 +3167,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate school
@@ -3192,19 +3196,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SchoolResponse'
+                  $ref: '#/definitions/internal_school_delivery_http.SchoolResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get school by ID
@@ -3226,7 +3230,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateSchoolRequest'
+          $ref: '#/definitions/internal_school_delivery_http.UpdateSchoolRequest'
       produces:
       - application/json
       responses:
@@ -3234,23 +3238,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SchoolResponse'
+                  $ref: '#/definitions/internal_school_delivery_http.SchoolResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update school
@@ -3272,21 +3276,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.SchoolRuleResponse'
+                    $ref: '#/definitions/internal_school_delivery_http.SchoolRuleResponse'
                   type: array
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List school rules
@@ -3307,7 +3311,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpsertRulesRequest'
+          $ref: '#/definitions/internal_school_delivery_http.UpsertRulesRequest'
       produces:
       - application/json
       responses:
@@ -3315,21 +3319,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.SchoolRuleResponse'
+                    $ref: '#/definitions/internal_school_delivery_http.SchoolRuleResponse'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Upsert school rules
@@ -3351,19 +3355,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SubscriptionResponse'
+                  $ref: '#/definitions/internal_school_delivery_http.SubscriptionResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get school subscription
@@ -3384,7 +3388,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateSubscriptionRequest'
+          $ref: '#/definitions/internal_school_delivery_http.UpdateSubscriptionRequest'
       produces:
       - application/json
       responses:
@@ -3392,23 +3396,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SubscriptionResponse'
+                  $ref: '#/definitions/internal_school_delivery_http.SubscriptionResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Change school subscription
@@ -3432,7 +3436,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateCheckoutRequest'
+          $ref: '#/definitions/internal_billing_delivery_http.CreateCheckoutRequest'
       produces:
       - application/json
       responses:
@@ -3440,31 +3444,31 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.PaymentResponse'
+                  $ref: '#/definitions/internal_billing_delivery_http.PaymentResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create subscription checkout
@@ -3492,27 +3496,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.PaymentResponse'
+                  $ref: '#/definitions/internal_billing_delivery_http.PaymentResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get subscription payment
@@ -3528,17 +3532,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.PlanResponse'
+                    $ref: '#/definitions/internal_school_delivery_http.PlanResponse'
                   type: array
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List subscription plans
@@ -3572,11 +3576,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.StaffResponse'
+                    $ref: '#/definitions/internal_staff_delivery_http.StaffResponse'
                   type: array
               type: object
       security:
@@ -3594,7 +3598,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateStaffRequest'
+          $ref: '#/definitions/internal_staff_delivery_http.CreateStaffRequest'
       produces:
       - application/json
       responses:
@@ -3602,23 +3606,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.StaffResponse'
+                  $ref: '#/definitions/internal_staff_delivery_http.StaffResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create staff
@@ -3638,15 +3642,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate staff
@@ -3666,19 +3670,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.StaffResponse'
+                  $ref: '#/definitions/internal_staff_delivery_http.StaffResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get staff by ID
@@ -3699,7 +3703,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateStaffRequest'
+          $ref: '#/definitions/internal_staff_delivery_http.UpdateStaffRequest'
       produces:
       - application/json
       responses:
@@ -3707,27 +3711,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.StaffResponse'
+                  $ref: '#/definitions/internal_staff_delivery_http.StaffResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update staff
@@ -3754,15 +3758,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.SignedURLResponse'
+                  $ref: '#/definitions/internal_storage_delivery_http.SignedURLResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get signed URL
@@ -3791,15 +3795,15 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.UploadResponse'
+                  $ref: '#/definitions/internal_storage_delivery_http.UploadResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Upload a file
@@ -3829,21 +3833,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.PromotionResponse'
+                    $ref: '#/definitions/internal_student_promotion_delivery_http.PromotionResponse'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List student promotions
@@ -3885,21 +3889,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.StudyResponse'
+                    $ref: '#/definitions/internal_student_tracking_delivery_http.StudyResponse'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List student studies
@@ -3945,11 +3949,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.StudentResponse'
+                    $ref: '#/definitions/internal_student_delivery_http.StudentResponse'
                   type: array
               type: object
       security:
@@ -3967,7 +3971,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateStudentRequest'
+          $ref: '#/definitions/internal_student_delivery_http.CreateStudentRequest'
       produces:
       - application/json
       responses:
@@ -3975,23 +3979,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.StudentResponse'
+                  $ref: '#/definitions/internal_student_delivery_http.StudentResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create student
@@ -4012,15 +4016,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate student
@@ -4041,19 +4045,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.StudentResponse'
+                  $ref: '#/definitions/internal_student_delivery_http.StudentResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get student by ID
@@ -4074,7 +4078,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateStudentRequest'
+          $ref: '#/definitions/internal_student_delivery_http.UpdateStudentRequest'
       produces:
       - application/json
       responses:
@@ -4082,23 +4086,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.StudentResponse'
+                  $ref: '#/definitions/internal_student_delivery_http.StudentResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update student
@@ -4120,26 +4124,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.LinkParentRequest'
+          $ref: '#/definitions/internal_student_delivery_http.LinkParentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Link parent to student
@@ -4165,15 +4169,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Unlink parent from student
@@ -4207,11 +4211,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.TeacherResponse'
+                    $ref: '#/definitions/internal_teacher_delivery_http.TeacherResponse'
                   type: array
               type: object
       security:
@@ -4229,7 +4233,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.CreateTeacherRequest'
+          $ref: '#/definitions/internal_teacher_delivery_http.CreateTeacherRequest'
       produces:
       - application/json
       responses:
@@ -4237,23 +4241,23 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.TeacherResponse'
+                  $ref: '#/definitions/internal_teacher_delivery_http.TeacherResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Create teacher
@@ -4273,15 +4277,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate teacher
@@ -4301,19 +4305,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.TeacherResponse'
+                  $ref: '#/definitions/internal_teacher_delivery_http.TeacherResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get teacher by ID
@@ -4334,7 +4338,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateTeacherRequest'
+          $ref: '#/definitions/internal_teacher_delivery_http.UpdateTeacherRequest'
       produces:
       - application/json
       responses:
@@ -4342,27 +4346,27 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.TeacherResponse'
+                  $ref: '#/definitions/internal_teacher_delivery_http.TeacherResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update teacher
@@ -4396,21 +4400,21 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.PaginatedResponse'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/http.UserResponse'
+                    $ref: '#/definitions/internal_user_delivery_http.UserResponse'
                   type: array
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: List users
@@ -4431,19 +4435,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Deactivate user
@@ -4465,19 +4469,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.UserResponse'
+                  $ref: '#/definitions/internal_user_delivery_http.UserResponse'
               type: object
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Get user by ID
@@ -4499,7 +4503,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateUserRequest'
+          $ref: '#/definitions/internal_user_delivery_http.UpdateUserRequest'
       produces:
       - application/json
       responses:
@@ -4507,23 +4511,23 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/http.UserResponse'
+                  $ref: '#/definitions/internal_user_delivery_http.UserResponse'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Update user
@@ -4546,22 +4550,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/http.ChangePasswordRequest'
+          $ref: '#/definitions/internal_user_delivery_http.ChangePasswordRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response'
       security:
       - BearerAuth: []
       summary: Change password

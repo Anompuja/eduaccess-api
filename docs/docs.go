@@ -57,7 +57,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -65,7 +65,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.ClassResponse"
+                                                "$ref": "#/definitions/internal_academic_delivery_http.ClassResponse"
                                             }
                                         }
                                     }
@@ -98,7 +98,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateClassRequest"
+                            "$ref": "#/definitions/internal_academic_delivery_http.CreateClassRequest"
                         }
                     }
                 ],
@@ -108,13 +108,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.ClassResponse"
+                                            "$ref": "#/definitions/internal_academic_delivery_http.ClassResponse"
                                         }
                                     }
                                 }
@@ -155,7 +155,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.AcademicNameRequest"
+                            "$ref": "#/definitions/internal_academic_delivery_http.AcademicNameRequest"
                         }
                     }
                 ],
@@ -165,13 +165,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.ClassResponse"
+                                            "$ref": "#/definitions/internal_academic_delivery_http.ClassResponse"
                                         }
                                     }
                                 }
@@ -206,7 +206,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -241,7 +241,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -249,7 +249,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.ClassroomResponse"
+                                                "$ref": "#/definitions/internal_academic_delivery_http.ClassroomResponse"
                                             }
                                         }
                                     }
@@ -289,7 +289,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -297,7 +297,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.EducationLevelResponse"
+                                                "$ref": "#/definitions/internal_academic_delivery_http.EducationLevelResponse"
                                             }
                                         }
                                     }
@@ -330,7 +330,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.AcademicNameRequest"
+                            "$ref": "#/definitions/internal_academic_delivery_http.AcademicNameRequest"
                         }
                     }
                 ],
@@ -340,13 +340,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.EducationLevelResponse"
+                                            "$ref": "#/definitions/internal_academic_delivery_http.EducationLevelResponse"
                                         }
                                     }
                                 }
@@ -387,7 +387,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.AcademicNameRequest"
+                            "$ref": "#/definitions/internal_academic_delivery_http.AcademicNameRequest"
                         }
                     }
                 ],
@@ -397,13 +397,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.EducationLevelResponse"
+                                            "$ref": "#/definitions/internal_academic_delivery_http.EducationLevelResponse"
                                         }
                                     }
                                 }
@@ -438,7 +438,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -479,7 +479,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -487,7 +487,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.ScheduleResponse"
+                                                "$ref": "#/definitions/internal_academic_delivery_http.ScheduleResponse"
                                             }
                                         }
                                     }
@@ -498,7 +498,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -539,7 +539,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -547,7 +547,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.SubClassResponse"
+                                                "$ref": "#/definitions/internal_academic_delivery_http.SubClassResponse"
                                             }
                                         }
                                     }
@@ -580,7 +580,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateSubClassRequest"
+                            "$ref": "#/definitions/internal_academic_delivery_http.CreateSubClassRequest"
                         }
                     }
                 ],
@@ -590,13 +590,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SubClassResponse"
+                                            "$ref": "#/definitions/internal_academic_delivery_http.SubClassResponse"
                                         }
                                     }
                                 }
@@ -637,7 +637,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.AcademicNameRequest"
+                            "$ref": "#/definitions/internal_academic_delivery_http.AcademicNameRequest"
                         }
                     }
                 ],
@@ -647,13 +647,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SubClassResponse"
+                                            "$ref": "#/definitions/internal_academic_delivery_http.SubClassResponse"
                                         }
                                     }
                                 }
@@ -688,7 +688,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -723,7 +723,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -731,7 +731,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.SubjectResponse"
+                                                "$ref": "#/definitions/internal_academic_delivery_http.SubjectResponse"
                                             }
                                         }
                                     }
@@ -771,7 +771,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -779,7 +779,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.AcademicYearResponse"
+                                                "$ref": "#/definitions/internal_academic_delivery_http.AcademicYearResponse"
                                             }
                                         }
                                     }
@@ -837,7 +837,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -845,7 +845,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.AdminResponse"
+                                                "$ref": "#/definitions/internal_admin_delivery_http.AdminResponse"
                                             }
                                         }
                                     }
@@ -879,7 +879,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateAdminRequest"
+                            "$ref": "#/definitions/internal_admin_delivery_http.CreateAdminRequest"
                         }
                     }
                 ],
@@ -889,13 +889,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.AdminResponse"
+                                            "$ref": "#/definitions/internal_admin_delivery_http.AdminResponse"
                                         }
                                     }
                                 }
@@ -905,19 +905,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -952,13 +952,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.AdminResponse"
+                                            "$ref": "#/definitions/internal_admin_delivery_http.AdminResponse"
                                         }
                                     }
                                 }
@@ -968,13 +968,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1010,7 +1010,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateAdminRequest"
+                            "$ref": "#/definitions/internal_admin_delivery_http.UpdateAdminRequest"
                         }
                     }
                 ],
@@ -1020,13 +1020,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.AdminResponse"
+                                            "$ref": "#/definitions/internal_admin_delivery_http.AdminResponse"
                                         }
                                     }
                                 }
@@ -1036,25 +1036,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1085,19 +1085,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1123,7 +1123,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.LoginRequest"
+                            "$ref": "#/definitions/internal_auth_delivery_http.LoginRequest"
                         }
                     }
                 ],
@@ -1133,13 +1133,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.LoginResponse"
+                                            "$ref": "#/definitions/internal_auth_delivery_http.LoginResponse"
                                         }
                                     }
                                 }
@@ -1149,7 +1149,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1176,13 +1176,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.MeResponse"
+                                            "$ref": "#/definitions/internal_auth_delivery_http.MeResponse"
                                         }
                                     }
                                 }
@@ -1192,7 +1192,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1218,7 +1218,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.RefreshRequest"
+                            "$ref": "#/definitions/internal_auth_delivery_http.RefreshRequest"
                         }
                     }
                 ],
@@ -1228,13 +1228,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.LoginResponse"
+                                            "$ref": "#/definitions/internal_auth_delivery_http.LoginResponse"
                                         }
                                     }
                                 }
@@ -1244,7 +1244,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1270,7 +1270,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.RegisterRequest"
+                            "$ref": "#/definitions/internal_auth_delivery_http.RegisterRequest"
                         }
                     }
                 ],
@@ -1280,13 +1280,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.RegisterResponse"
+                                            "$ref": "#/definitions/internal_auth_delivery_http.RegisterResponse"
                                         }
                                     }
                                 }
@@ -1296,13 +1296,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1361,7 +1361,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1369,7 +1369,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.PaymentResponse"
+                                                "$ref": "#/definitions/internal_billing_delivery_http.PaymentResponse"
                                             }
                                         }
                                     }
@@ -1380,19 +1380,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1417,7 +1417,7 @@ const docTemplate = `{
                         "name": "body",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/http.MidtransNotificationRequest"
+                            "$ref": "#/definitions/internal_billing_delivery_http.MidtransNotificationRequest"
                         }
                     }
                 ],
@@ -1425,31 +1425,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1514,7 +1514,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1522,7 +1522,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.ClassScheduleResponse"
+                                                "$ref": "#/definitions/internal_class_schedule_delivery_http.ClassScheduleResponse"
                                             }
                                         }
                                     }
@@ -1533,13 +1533,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1574,13 +1574,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.DashboardStatsResponse"
+                                            "$ref": "#/definitions/internal_dashboard_delivery_http.DashboardStatsResponse"
                                         }
                                     }
                                 }
@@ -1590,19 +1590,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1655,7 +1655,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1663,7 +1663,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.HeadmasterResponse"
+                                                "$ref": "#/definitions/internal_headmaster_delivery_http.HeadmasterResponse"
                                             }
                                         }
                                     }
@@ -1674,13 +1674,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1709,7 +1709,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateHeadmasterRequest"
+                            "$ref": "#/definitions/internal_headmaster_delivery_http.CreateHeadmasterRequest"
                         }
                     }
                 ],
@@ -1719,13 +1719,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.HeadmasterResponse"
+                                            "$ref": "#/definitions/internal_headmaster_delivery_http.HeadmasterResponse"
                                         }
                                     }
                                 }
@@ -1735,19 +1735,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1783,13 +1783,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.HeadmasterResponse"
+                                            "$ref": "#/definitions/internal_headmaster_delivery_http.HeadmasterResponse"
                                         }
                                     }
                                 }
@@ -1799,13 +1799,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1841,7 +1841,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateHeadmasterRequest"
+                            "$ref": "#/definitions/internal_headmaster_delivery_http.UpdateHeadmasterRequest"
                         }
                     }
                 ],
@@ -1851,13 +1851,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.HeadmasterResponse"
+                                            "$ref": "#/definitions/internal_headmaster_delivery_http.HeadmasterResponse"
                                         }
                                     }
                                 }
@@ -1867,19 +1867,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1911,19 +1911,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1936,7 +1936,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns a paginated list of parents. Tenant-scoped.",
+                "description": "Returns a paginated list of parents. Superadmin may filter by school_id; admin_sekolah is scoped to their own school.",
                 "produces": [
                     "application/json"
                 ],
@@ -1947,7 +1947,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Search by name or email",
+                        "description": "School UUID (superadmin only)",
+                        "name": "school_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name, email or username",
                         "name": "search",
                         "in": "query"
                     },
@@ -1959,7 +1965,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size (default 20)",
+                        "description": "Page size (default 20, max 100)",
                         "name": "per_page",
                         "in": "query"
                     }
@@ -1970,7 +1976,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1978,12 +1984,24 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/internal_student_delivery_http.ParentResponse"
+                                                "$ref": "#/definitions/internal_parent_delivery_http.ParentResponse"
                                             }
                                         }
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -1994,7 +2012,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Creates a user account (role=orangtua) and parent profile atomically.",
+                "description": "Creates a parent profile. Superadmin may provide school_id in the request body; admin_sekolah is scoped to their own school.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2012,7 +2030,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_student_delivery_http.CreateParentRequest"
+                            "$ref": "#/definitions/internal_parent_delivery_http.CreateParentRequest"
                         }
                     }
                 ],
@@ -2022,13 +2040,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_student_delivery_http.ParentResponse"
+                                            "$ref": "#/definitions/internal_parent_delivery_http.ParentResponse"
                                         }
                                     }
                                 }
@@ -2038,19 +2056,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2063,6 +2081,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Returns a single parent profile.",
                 "produces": [
                     "application/json"
                 ],
@@ -2085,13 +2104,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_student_delivery_http.ParentResponse"
+                                            "$ref": "#/definitions/internal_parent_delivery_http.ParentResponse"
                                         }
                                     }
                                 }
@@ -2101,13 +2120,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2118,6 +2137,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Updates mutable fields of a parent profile.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2137,12 +2157,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Fields to update",
+                        "description": "Parent fields to update",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_student_delivery_http.UpdateParentRequest"
+                            "$ref": "#/definitions/internal_parent_delivery_http.UpdateParentRequest"
                         }
                     }
                 ],
@@ -2152,17 +2172,35 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_student_delivery_http.ParentResponse"
+                                            "$ref": "#/definitions/internal_parent_delivery_http.ParentResponse"
                                         }
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2173,6 +2211,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
+                "description": "Soft-deletes a parent profile.",
                 "produces": [
                     "application/json"
                 ],
@@ -2193,7 +2232,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2220,13 +2271,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.UserResponse"
+                                            "$ref": "#/definitions/internal_user_delivery_http.UserResponse"
                                         }
                                     }
                                 }
@@ -2236,7 +2287,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2265,7 +2316,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateUserRequest"
+                            "$ref": "#/definitions/internal_user_delivery_http.UpdateUserRequest"
                         }
                     }
                 ],
@@ -2275,13 +2326,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.UserResponse"
+                                            "$ref": "#/definitions/internal_user_delivery_http.UserResponse"
                                         }
                                     }
                                 }
@@ -2291,13 +2342,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2350,7 +2401,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2358,7 +2409,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.SchoolResponse"
+                                                "$ref": "#/definitions/internal_school_delivery_http.SchoolResponse"
                                             }
                                         }
                                     }
@@ -2369,7 +2420,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2398,7 +2449,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateSchoolRequest"
+                            "$ref": "#/definitions/internal_school_delivery_http.CreateSchoolRequest"
                         }
                     }
                 ],
@@ -2408,13 +2459,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SchoolResponse"
+                                            "$ref": "#/definitions/internal_school_delivery_http.SchoolResponse"
                                         }
                                     }
                                 }
@@ -2424,19 +2475,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2463,7 +2514,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2471,7 +2522,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.PlanResponse"
+                                                "$ref": "#/definitions/internal_school_delivery_http.PlanResponse"
                                             }
                                         }
                                     }
@@ -2482,7 +2533,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2518,13 +2569,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SchoolResponse"
+                                            "$ref": "#/definitions/internal_school_delivery_http.SchoolResponse"
                                         }
                                     }
                                 }
@@ -2534,13 +2585,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2576,7 +2627,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateSchoolRequest"
+                            "$ref": "#/definitions/internal_school_delivery_http.UpdateSchoolRequest"
                         }
                     }
                 ],
@@ -2586,13 +2637,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SchoolResponse"
+                                            "$ref": "#/definitions/internal_school_delivery_http.SchoolResponse"
                                         }
                                     }
                                 }
@@ -2602,19 +2653,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2646,19 +2697,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2694,7 +2745,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2702,7 +2753,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.SchoolRuleResponse"
+                                                "$ref": "#/definitions/internal_school_delivery_http.SchoolRuleResponse"
                                             }
                                         }
                                     }
@@ -2713,13 +2764,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2755,7 +2806,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpsertRulesRequest"
+                            "$ref": "#/definitions/internal_school_delivery_http.UpsertRulesRequest"
                         }
                     }
                 ],
@@ -2765,7 +2816,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2773,7 +2824,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.SchoolRuleResponse"
+                                                "$ref": "#/definitions/internal_school_delivery_http.SchoolRuleResponse"
                                             }
                                         }
                                     }
@@ -2784,13 +2835,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2826,13 +2877,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SubscriptionResponse"
+                                            "$ref": "#/definitions/internal_school_delivery_http.SubscriptionResponse"
                                         }
                                     }
                                 }
@@ -2842,13 +2893,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2884,7 +2935,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateSubscriptionRequest"
+                            "$ref": "#/definitions/internal_school_delivery_http.UpdateSubscriptionRequest"
                         }
                     }
                 ],
@@ -2894,13 +2945,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SubscriptionResponse"
+                                            "$ref": "#/definitions/internal_school_delivery_http.SubscriptionResponse"
                                         }
                                     }
                                 }
@@ -2910,19 +2961,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -2960,7 +3011,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateCheckoutRequest"
+                            "$ref": "#/definitions/internal_billing_delivery_http.CreateCheckoutRequest"
                         }
                     }
                 ],
@@ -2970,13 +3021,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.PaymentResponse"
+                                            "$ref": "#/definitions/internal_billing_delivery_http.PaymentResponse"
                                         }
                                     }
                                 }
@@ -2986,31 +3037,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3053,13 +3104,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.PaymentResponse"
+                                            "$ref": "#/definitions/internal_billing_delivery_http.PaymentResponse"
                                         }
                                     }
                                 }
@@ -3069,25 +3120,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3140,7 +3191,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3148,7 +3199,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.StaffResponse"
+                                                "$ref": "#/definitions/internal_staff_delivery_http.StaffResponse"
                                             }
                                         }
                                     }
@@ -3182,7 +3233,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateStaffRequest"
+                            "$ref": "#/definitions/internal_staff_delivery_http.CreateStaffRequest"
                         }
                     }
                 ],
@@ -3192,13 +3243,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.StaffResponse"
+                                            "$ref": "#/definitions/internal_staff_delivery_http.StaffResponse"
                                         }
                                     }
                                 }
@@ -3208,19 +3259,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3255,13 +3306,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.StaffResponse"
+                                            "$ref": "#/definitions/internal_staff_delivery_http.StaffResponse"
                                         }
                                     }
                                 }
@@ -3271,13 +3322,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3313,7 +3364,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateStaffRequest"
+                            "$ref": "#/definitions/internal_staff_delivery_http.UpdateStaffRequest"
                         }
                     }
                 ],
@@ -3323,13 +3374,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.StaffResponse"
+                                            "$ref": "#/definitions/internal_staff_delivery_http.StaffResponse"
                                         }
                                     }
                                 }
@@ -3339,25 +3390,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3388,19 +3439,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3443,13 +3494,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.SignedURLResponse"
+                                            "$ref": "#/definitions/internal_storage_delivery_http.SignedURLResponse"
                                         }
                                     }
                                 }
@@ -3459,7 +3510,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3504,13 +3555,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.UploadResponse"
+                                            "$ref": "#/definitions/internal_storage_delivery_http.UploadResponse"
                                         }
                                     }
                                 }
@@ -3520,7 +3571,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3567,7 +3618,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3575,7 +3626,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.PromotionResponse"
+                                                "$ref": "#/definitions/internal_student_promotion_delivery_http.PromotionResponse"
                                             }
                                         }
                                     }
@@ -3586,13 +3637,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3657,7 +3708,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -3665,7 +3716,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.StudyResponse"
+                                                "$ref": "#/definitions/internal_student_tracking_delivery_http.StudyResponse"
                                             }
                                         }
                                     }
@@ -3676,13 +3727,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3753,7 +3804,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3761,7 +3812,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.StudentResponse"
+                                                "$ref": "#/definitions/internal_student_delivery_http.StudentResponse"
                                             }
                                         }
                                     }
@@ -3795,7 +3846,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateStudentRequest"
+                            "$ref": "#/definitions/internal_student_delivery_http.CreateStudentRequest"
                         }
                     }
                 ],
@@ -3805,13 +3856,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.StudentResponse"
+                                            "$ref": "#/definitions/internal_student_delivery_http.StudentResponse"
                                         }
                                     }
                                 }
@@ -3821,19 +3872,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3869,13 +3920,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.StudentResponse"
+                                            "$ref": "#/definitions/internal_student_delivery_http.StudentResponse"
                                         }
                                     }
                                 }
@@ -3885,13 +3936,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3927,7 +3978,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateStudentRequest"
+                            "$ref": "#/definitions/internal_student_delivery_http.UpdateStudentRequest"
                         }
                     }
                 ],
@@ -3937,13 +3988,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.StudentResponse"
+                                            "$ref": "#/definitions/internal_student_delivery_http.StudentResponse"
                                         }
                                     }
                                 }
@@ -3953,19 +4004,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -3997,19 +4048,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4047,7 +4098,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.LinkParentRequest"
+                            "$ref": "#/definitions/internal_student_delivery_http.LinkParentRequest"
                         }
                     }
                 ],
@@ -4055,25 +4106,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4114,19 +4165,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4179,7 +4230,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4187,7 +4238,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.TeacherResponse"
+                                                "$ref": "#/definitions/internal_teacher_delivery_http.TeacherResponse"
                                             }
                                         }
                                     }
@@ -4221,7 +4272,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateTeacherRequest"
+                            "$ref": "#/definitions/internal_teacher_delivery_http.CreateTeacherRequest"
                         }
                     }
                 ],
@@ -4231,13 +4282,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.TeacherResponse"
+                                            "$ref": "#/definitions/internal_teacher_delivery_http.TeacherResponse"
                                         }
                                     }
                                 }
@@ -4247,19 +4298,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4294,13 +4345,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.TeacherResponse"
+                                            "$ref": "#/definitions/internal_teacher_delivery_http.TeacherResponse"
                                         }
                                     }
                                 }
@@ -4310,13 +4361,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4352,7 +4403,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateTeacherRequest"
+                            "$ref": "#/definitions/internal_teacher_delivery_http.UpdateTeacherRequest"
                         }
                     }
                 ],
@@ -4362,13 +4413,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.TeacherResponse"
+                                            "$ref": "#/definitions/internal_teacher_delivery_http.TeacherResponse"
                                         }
                                     }
                                 }
@@ -4378,25 +4429,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4427,19 +4478,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4492,7 +4543,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.PaginatedResponse"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4500,7 +4551,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/http.UserResponse"
+                                                "$ref": "#/definitions/internal_user_delivery_http.UserResponse"
                                             }
                                         }
                                     }
@@ -4511,13 +4562,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4553,13 +4604,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.UserResponse"
+                                            "$ref": "#/definitions/internal_user_delivery_http.UserResponse"
                                         }
                                     }
                                 }
@@ -4569,13 +4620,13 @@ const docTemplate = `{
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4611,7 +4662,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateUserRequest"
+                            "$ref": "#/definitions/internal_user_delivery_http.UpdateUserRequest"
                         }
                     }
                 ],
@@ -4621,13 +4672,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/http.UserResponse"
+                                            "$ref": "#/definitions/internal_user_delivery_http.UserResponse"
                                         }
                                     }
                                 }
@@ -4637,19 +4688,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4681,25 +4732,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4737,7 +4788,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.ChangePasswordRequest"
+                            "$ref": "#/definitions/internal_user_delivery_http.ChangePasswordRequest"
                         }
                     }
                 ],
@@ -4745,19 +4796,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Response"
                         }
                     }
                 }
@@ -4765,7 +4816,52 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "http.AcademicNameRequest": {
+        "github_com_eduaccess_eduaccess-api_internal_shared_response.PaginatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/github_com_eduaccess_eduaccess-api_internal_shared_response.Pagination"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_eduaccess_eduaccess-api_internal_shared_response.Pagination": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_eduaccess_eduaccess-api_internal_shared_response.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "errors": {},
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "internal_academic_delivery_http.AcademicNameRequest": {
             "type": "object",
             "required": [
                 "name"
@@ -4778,7 +4874,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.AcademicYearResponse": {
+        "internal_academic_delivery_http.AcademicYearResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -4810,79 +4906,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.AdminResponse": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "avatar": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "ktp_image_path": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nik": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "religion": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.ChangePasswordRequest": {
-            "type": "object",
-            "required": [
-                "new_password"
-            ],
-            "properties": {
-                "new_password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "old_password": {
-                    "type": "string",
-                    "minLength": 8
-                }
-            }
-        },
-        "http.ClassResponse": {
+        "internal_academic_delivery_http.ClassResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -4905,54 +4929,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ClassScheduleResponse": {
-            "type": "object",
-            "properties": {
-                "classroom_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "date": {
-                    "type": "string"
-                },
-                "end_period_id": {
-                    "type": "string"
-                },
-                "end_time": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "start_period_id": {
-                    "type": "string"
-                },
-                "start_time": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "teacher_attendance_time": {
-                    "type": "string"
-                },
-                "teacher_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.ClassroomResponse": {
+        "internal_academic_delivery_http.ClassroomResponse": {
             "type": "object",
             "properties": {
                 "academic_year_id": {
@@ -5005,7 +4982,204 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateAdminRequest": {
+        "internal_academic_delivery_http.CreateClassRequest": {
+            "type": "object",
+            "required": [
+                "level_id",
+                "name"
+            ],
+            "properties": {
+                "level_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                }
+            }
+        },
+        "internal_academic_delivery_http.CreateSubClassRequest": {
+            "type": "object",
+            "required": [
+                "class_id",
+                "name"
+            ],
+            "properties": {
+                "class_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                }
+            }
+        },
+        "internal_academic_delivery_http.EducationLevelResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_academic_delivery_http.ScheduleResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "day_of_week": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_break": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "period_number": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_academic_delivery_http.SubClassResponse": {
+            "type": "object",
+            "properties": {
+                "class_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_academic_delivery_http.SubjectResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "education_level_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_admin_delivery_http.AdminResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_admin_delivery_http.CreateAdminRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -5068,7 +5242,180 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateCheckoutRequest": {
+        "internal_admin_delivery_http.UpdateAdminRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "L",
+                        "P"
+                    ]
+                },
+                "ktp_image_path": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "nik": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "internal_auth_delivery_http.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_auth_delivery_http.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/internal_auth_delivery_http.LoginUserInfo"
+                }
+            }
+        },
+        "internal_auth_delivery_http.LoginUserInfo": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_auth_delivery_http.MeResponse": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_auth_delivery_http.RefreshRequest": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_auth_delivery_http.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "role": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_auth_delivery_http.RegisterResponse": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_billing_delivery_http.CreateCheckoutRequest": {
             "type": "object",
             "required": [
                 "cycle",
@@ -5087,693 +5434,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateClassRequest": {
-            "type": "object",
-            "required": [
-                "level_id",
-                "name"
-            ],
-            "properties": {
-                "level_id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 1
-                }
-            }
-        },
-        "http.CreateHeadmasterRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "L",
-                        "P"
-                    ]
-                },
-                "ktp_image_path": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
-                },
-                "nik": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "school_id": {
-                    "description": "SchoolID is required when called by superadmin (who has no school in their JWT).\nadmin_sekolah may omit it — their JWT school is used automatically.",
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 3
-                }
-            }
-        },
-        "http.CreateSchoolRequest": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "description": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "image_path": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "phone": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "time_zone": {
-                    "type": "string",
-                    "maxLength": 100
-                }
-            }
-        },
-        "http.CreateStaffRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name",
-                "password",
-                "username"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "male",
-                        "female",
-                        "other"
-                    ]
-                },
-                "ktp_image_path": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 1
-                },
-                "nik": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "religion": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 3
-                }
-            }
-        },
-        "http.CreateStudentRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "class_id": {
-                    "type": "string"
-                },
-                "education_level_id": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "L",
-                        "P"
-                    ]
-                },
-                "jalur_masuk_sekolah": {
-                    "type": "string",
-                    "enum": [
-                        "reguler",
-                        "beasiswa",
-                        "mutasi",
-                        "lainnya"
-                    ]
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "nis": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "nisn": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "sub_class_id": {
-                    "type": "string"
-                },
-                "tahun_masuk": {
-                    "type": "string",
-                    "maxLength": 10
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 3
-                }
-            }
-        },
-        "http.CreateSubClassRequest": {
-            "type": "object",
-            "required": [
-                "class_id",
-                "name"
-            ],
-            "properties": {
-                "class_id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 1
-                }
-            }
-        },
-        "http.CreateTeacherRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name",
-                "password",
-                "username"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "berat_badan": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "male",
-                        "female",
-                        "other"
-                    ]
-                },
-                "golongan_darah": {
-                    "type": "string"
-                },
-                "jurusan": {
-                    "type": "string"
-                },
-                "kelainan_jasmani": {
-                    "type": "string"
-                },
-                "kewarganegaraan": {
-                    "type": "string"
-                },
-                "kode_pos": {
-                    "type": "string"
-                },
-                "ktp_image_path": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 1
-                },
-                "nik": {
-                    "type": "string"
-                },
-                "nip": {
-                    "type": "string"
-                },
-                "nuptk": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "pendidikan_terakhir": {
-                    "type": "string"
-                },
-                "penyakit_kronis_yang_pernah_diderita": {
-                    "type": "string"
-                },
-                "penyakit_yang_sering_kambuh": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "religion": {
-                    "type": "string"
-                },
-                "rt_rw": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "tahun_lulus": {
-                    "type": "string"
-                },
-                "tahun_masuk": {
-                    "type": "string"
-                },
-                "tinggi_badan": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 3
-                }
-            }
-        },
-        "http.DashboardAttendanceResponse": {
-            "type": "object",
-            "properties": {
-                "absent": {
-                    "type": "integer"
-                },
-                "excused": {
-                    "type": "integer"
-                },
-                "late": {
-                    "type": "integer"
-                },
-                "present": {
-                    "type": "integer"
-                },
-                "rate": {
-                    "type": "number"
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
-        "http.DashboardCountsResponse": {
-            "type": "object",
-            "properties": {
-                "academic_years": {
-                    "type": "integer"
-                },
-                "active_enrollments": {
-                    "type": "integer"
-                },
-                "active_students": {
-                    "type": "integer"
-                },
-                "admins": {
-                    "type": "integer"
-                },
-                "classes": {
-                    "type": "integer"
-                },
-                "classrooms": {
-                    "type": "integer"
-                },
-                "education_levels": {
-                    "type": "integer"
-                },
-                "enrollments": {
-                    "type": "integer"
-                },
-                "headmasters": {
-                    "type": "integer"
-                },
-                "parents": {
-                    "type": "integer"
-                },
-                "schedules": {
-                    "type": "integer"
-                },
-                "school_users": {
-                    "type": "integer"
-                },
-                "staff": {
-                    "type": "integer"
-                },
-                "students": {
-                    "type": "integer"
-                },
-                "sub_classes": {
-                    "type": "integer"
-                },
-                "subjects": {
-                    "type": "integer"
-                },
-                "teachers": {
-                    "type": "integer"
-                }
-            }
-        },
-        "http.DashboardSchoolResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "time_zone": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.DashboardStatsResponse": {
-            "type": "object",
-            "properties": {
-                "attendance": {
-                    "$ref": "#/definitions/http.DashboardAttendanceResponse"
-                },
-                "counts": {
-                    "$ref": "#/definitions/http.DashboardCountsResponse"
-                },
-                "school": {
-                    "$ref": "#/definitions/http.DashboardSchoolResponse"
-                },
-                "subscription": {
-                    "$ref": "#/definitions/http.DashboardSubscriptionResponse"
-                }
-            }
-        },
-        "http.DashboardSubscriptionResponse": {
-            "type": "object",
-            "properties": {
-                "cycle": {
-                    "type": "string"
-                },
-                "ends_at": {
-                    "type": "string"
-                },
-                "plan_name": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.EducationLevelResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.HeadmasterResponse": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "avatar": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "ktp_image_path": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nik": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "religion": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.LinkParentRequest": {
-            "type": "object",
-            "required": [
-                "parent_id",
-                "relationship"
-            ],
-            "properties": {
-                "is_primary": {
-                    "type": "boolean"
-                },
-                "parent_id": {
-                    "type": "string"
-                },
-                "relationship": {
-                    "type": "string",
-                    "enum": [
-                        "father",
-                        "mother",
-                        "guardian",
-                        "other"
-                    ]
-                }
-            }
-        },
-        "http.LoginRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_in": {
-                    "type": "integer"
-                },
-                "refresh_token": {
-                    "type": "string"
-                },
-                "token_type": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/http.LoginUserInfo"
-                }
-            }
-        },
-        "http.LoginUserInfo": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.MeResponse": {
-            "type": "object",
-            "properties": {
-                "role": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.MidtransNotificationRequest": {
+        "internal_billing_delivery_http.MidtransNotificationRequest": {
             "type": "object",
             "properties": {
                 "fraud_status": {
@@ -5802,27 +5463,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ParentLinkResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "is_primary": {
-                    "type": "boolean"
-                },
-                "parent": {
-                    "$ref": "#/definitions/internal_student_delivery_http.ParentResponse"
-                },
-                "parent_id": {
-                    "type": "string"
-                },
-                "relationship": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.PaymentResponse": {
+        "internal_billing_delivery_http.PaymentResponse": {
             "type": "object",
             "properties": {
                 "activated_subscription_id": {
@@ -5896,156 +5537,19 @@ const docTemplate = `{
                 }
             }
         },
-        "http.PlanResponse": {
+        "internal_class_schedule_delivery_http.ClassScheduleResponse": {
             "type": "object",
             "properties": {
-                "description": {
+                "classroom_id": {
                     "type": "string"
                 },
-                "features": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "id": {
-                    "type": "string"
-                },
-                "max_students": {
-                    "type": "integer"
-                },
-                "monthly_price": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "yearly_price": {
-                    "type": "integer"
-                }
-            }
-        },
-        "http.PromotionResponse": {
-            "type": "object",
-            "properties": {
-                "academic_year_id": {
-                    "type": "string"
-                },
-                "academic_year_name": {
-                    "type": "string"
-                },
-                "from_classroom_id": {
-                    "type": "string"
-                },
-                "from_classroom_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "nis": {
-                    "type": "string"
-                },
-                "notes": {
-                    "type": "string"
-                },
-                "promotion_date": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "student_name": {
-                    "type": "string"
-                },
-                "to_classroom_id": {
-                    "type": "string"
-                },
-                "to_classroom_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.RefreshRequest": {
-            "type": "object",
-            "required": [
-                "refresh_token"
-            ],
-            "properties": {
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.RegisterRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name",
-                "password",
-                "role"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "role": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.RegisterResponse": {
-            "type": "object",
-            "properties": {
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.RuleInput": {
-            "type": "object",
-            "required": [
-                "key",
-                "value"
-            ],
-            "properties": {
-                "key": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 1
-                },
-                "note": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "string",
-                    "maxLength": 191
-                }
-            }
-        },
-        "http.ScheduleResponse": {
-            "type": "object",
-            "properties": {
                 "created_at": {
                     "type": "string"
                 },
-                "day_of_week": {
+                "date": {
+                    "type": "string"
+                },
+                "end_period_id": {
                     "type": "string"
                 },
                 "end_time": {
@@ -6054,102 +5558,230 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "is_break": {
-                    "type": "boolean"
-                },
-                "label": {
+                "school_id": {
                     "type": "string"
                 },
-                "period_number": {
-                    "type": "integer"
-                },
-                "school_id": {
+                "start_period_id": {
                     "type": "string"
                 },
                 "start_time": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "string"
+                },
+                "teacher_attendance_time": {
+                    "type": "string"
+                },
+                "teacher_id": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
             }
         },
-        "http.SchoolResponse": {
+        "internal_dashboard_delivery_http.DashboardAttendanceResponse": {
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
+                "absent": {
+                    "type": "integer"
                 },
-                "created_at": {
-                    "type": "string"
+                "excused": {
+                    "type": "integer"
                 },
-                "description": {
-                    "type": "string"
+                "late": {
+                    "type": "integer"
                 },
-                "email": {
-                    "type": "string"
+                "present": {
+                    "type": "integer"
                 },
-                "headmaster_id": {
-                    "type": "string"
+                "rate": {
+                    "type": "number"
                 },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_dashboard_delivery_http.DashboardCountsResponse": {
+            "type": "object",
+            "properties": {
+                "academic_years": {
+                    "type": "integer"
+                },
+                "active_enrollments": {
+                    "type": "integer"
+                },
+                "active_students": {
+                    "type": "integer"
+                },
+                "admins": {
+                    "type": "integer"
+                },
+                "classes": {
+                    "type": "integer"
+                },
+                "classrooms": {
+                    "type": "integer"
+                },
+                "education_levels": {
+                    "type": "integer"
+                },
+                "enrollments": {
+                    "type": "integer"
+                },
+                "headmasters": {
+                    "type": "integer"
+                },
+                "parents": {
+                    "type": "integer"
+                },
+                "schedules": {
+                    "type": "integer"
+                },
+                "school_users": {
+                    "type": "integer"
+                },
+                "staff": {
+                    "type": "integer"
+                },
+                "students": {
+                    "type": "integer"
+                },
+                "sub_classes": {
+                    "type": "integer"
+                },
+                "subjects": {
+                    "type": "integer"
+                },
+                "teachers": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_dashboard_delivery_http.DashboardSchoolResponse": {
+            "type": "object",
+            "properties": {
                 "id": {
-                    "type": "string"
-                },
-                "image_path": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
-                "phone": {
-                    "type": "string"
-                },
                 "status": {
                     "type": "string"
                 },
-                "subscription": {
-                    "$ref": "#/definitions/http.SubscriptionResponse"
-                },
                 "time_zone": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_dashboard_delivery_http.DashboardStatsResponse": {
+            "type": "object",
+            "properties": {
+                "attendance": {
+                    "$ref": "#/definitions/internal_dashboard_delivery_http.DashboardAttendanceResponse"
                 },
-                "updated_at": {
+                "counts": {
+                    "$ref": "#/definitions/internal_dashboard_delivery_http.DashboardCountsResponse"
+                },
+                "school": {
+                    "$ref": "#/definitions/internal_dashboard_delivery_http.DashboardSchoolResponse"
+                },
+                "subscription": {
+                    "$ref": "#/definitions/internal_dashboard_delivery_http.DashboardSubscriptionResponse"
+                }
+            }
+        },
+        "internal_dashboard_delivery_http.DashboardSubscriptionResponse": {
+            "type": "object",
+            "properties": {
+                "cycle": {
+                    "type": "string"
+                },
+                "ends_at": {
+                    "type": "string"
+                },
+                "plan_name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "string"
                 }
             }
         },
-        "http.SchoolRuleResponse": {
+        "internal_headmaster_delivery_http.CreateHeadmasterRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
             "properties": {
-                "id": {
+                "address": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "birth_date": {
                     "type": "string"
                 },
-                "key": {
+                "birth_place": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "email": {
                     "type": "string"
                 },
-                "note": {
-                    "type": "string"
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "L",
+                        "P"
+                    ]
+                },
+                "ktp_image_path": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "nik": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "religion": {
+                    "type": "string",
+                    "maxLength": 100
                 },
                 "school_id": {
+                    "description": "SchoolID is required when called by superadmin (who has no school in their JWT).\nadmin_sekolah may omit it — their JWT school is used automatically.",
                     "type": "string"
                 },
-                "updated_at": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "string"
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
                 }
             }
         },
-        "http.SignedURLResponse": {
-            "type": "object",
-            "properties": {
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.StaffResponse": {
+        "internal_headmaster_delivery_http.HeadmasterResponse": {
             "type": "object",
             "properties": {
                 "address": {
@@ -6205,7 +5837,810 @@ const docTemplate = `{
                 }
             }
         },
-        "http.StudentResponse": {
+        "internal_headmaster_delivery_http.UpdateHeadmasterRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "L",
+                        "P"
+                    ]
+                },
+                "ktp_image_path": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "nik": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "religion": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "internal_parent_delivery_http.CreateParentRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "father_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "father_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "mother_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "mother_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "internal_parent_delivery_http.ParentResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "father_name": {
+                    "type": "string"
+                },
+                "father_religion": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mother_name": {
+                    "type": "string"
+                },
+                "mother_religion": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_parent_delivery_http.UpdateParentRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "father_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "father_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "mother_name": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "mother_religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                }
+            }
+        },
+        "internal_school_delivery_http.CreateSchoolRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "image_path": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "time_zone": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "internal_school_delivery_http.PlanResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "max_students": {
+                    "type": "integer"
+                },
+                "monthly_price": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "yearly_price": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_school_delivery_http.RuleInput": {
+            "type": "object",
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "note": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string",
+                    "maxLength": 191
+                }
+            }
+        },
+        "internal_school_delivery_http.SchoolResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "headmaster_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subscription": {
+                    "$ref": "#/definitions/internal_school_delivery_http.SubscriptionResponse"
+                },
+                "time_zone": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_school_delivery_http.SchoolRuleResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_school_delivery_http.SubscriptionResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "cycle": {
+                    "type": "string"
+                },
+                "ends_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "plan": {
+                    "$ref": "#/definitions/internal_school_delivery_http.PlanResponse"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_school_delivery_http.UpdateSchoolRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "image_path": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "nonactive"
+                    ]
+                },
+                "time_zone": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "internal_school_delivery_http.UpdateSubscriptionRequest": {
+            "type": "object",
+            "required": [
+                "cycle",
+                "plan_id"
+            ],
+            "properties": {
+                "cycle": {
+                    "type": "string",
+                    "enum": [
+                        "month",
+                        "year",
+                        "onetime"
+                    ]
+                },
+                "plan_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_school_delivery_http.UpsertRulesRequest": {
+            "type": "object",
+            "required": [
+                "rules"
+            ],
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/internal_school_delivery_http.RuleInput"
+                    }
+                }
+            }
+        },
+        "internal_staff_delivery_http.CreateStaffRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 3
+                }
+            }
+        },
+        "internal_staff_delivery_http.StaffResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_staff_delivery_http.UpdateStaffRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 3
+                }
+            }
+        },
+        "internal_storage_delivery_http.SignedURLResponse": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_storage_delivery_http.UploadResponse": {
+            "type": "object",
+            "properties": {
+                "bucket": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_student_delivery_http.CreateStudentRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "class_id": {
+                    "type": "string"
+                },
+                "education_level_id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "L",
+                        "P"
+                    ]
+                },
+                "jalur_masuk_sekolah": {
+                    "type": "string",
+                    "enum": [
+                        "reguler",
+                        "beasiswa",
+                        "mutasi",
+                        "lainnya"
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 2
+                },
+                "nis": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "nisn": {
+                    "type": "string",
+                    "maxLength": 191
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "religion": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "sub_class_id": {
+                    "type": "string"
+                },
+                "tahun_masuk": {
+                    "type": "string",
+                    "maxLength": 10
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "internal_student_delivery_http.LinkParentRequest": {
+            "type": "object",
+            "required": [
+                "parent_id",
+                "relationship"
+            ],
+            "properties": {
+                "is_primary": {
+                    "type": "boolean"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "relationship": {
+                    "type": "string",
+                    "enum": [
+                        "father",
+                        "mother",
+                        "guardian",
+                        "other"
+                    ]
+                }
+            }
+        },
+        "internal_student_delivery_http.ParentLinkResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "is_primary": {
+                    "type": "boolean"
+                },
+                "parent": {
+                    "$ref": "#/definitions/internal_student_delivery_http.ParentResponse"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "relationship": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_student_delivery_http.ParentResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "father_name": {
+                    "type": "string"
+                },
+                "father_religion": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mother_name": {
+                    "type": "string"
+                },
+                "mother_religion": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_student_delivery_http.StudentResponse": {
             "type": "object",
             "properties": {
                 "address": {
@@ -6253,7 +6688,7 @@ const docTemplate = `{
                 "parents": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.ParentLinkResponse"
+                        "$ref": "#/definitions/internal_student_delivery_http.ParentLinkResponse"
                     }
                 },
                 "phone_number": {
@@ -6282,417 +6717,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.StudyResponse": {
-            "type": "object",
-            "properties": {
-                "academic_year_id": {
-                    "type": "string"
-                },
-                "academic_year_name": {
-                    "type": "string"
-                },
-                "class_id": {
-                    "type": "string"
-                },
-                "class_name": {
-                    "type": "string"
-                },
-                "classroom_id": {
-                    "type": "string"
-                },
-                "classroom_name": {
-                    "type": "string"
-                },
-                "enrollment_date": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "nis": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "student_name": {
-                    "type": "string"
-                },
-                "sub_class_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.SubClassResponse": {
-            "type": "object",
-            "properties": {
-                "class_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.SubjectResponse": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "code": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "education_level_id": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.SubscriptionResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "cycle": {
-                    "type": "string"
-                },
-                "ends_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "plan": {
-                    "$ref": "#/definitions/http.PlanResponse"
-                },
-                "price": {
-                    "type": "integer"
-                },
-                "quantity": {
-                    "type": "integer"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.TeacherResponse": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "avatar": {
-                    "type": "string"
-                },
-                "berat_badan": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "golongan_darah": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "jurusan": {
-                    "type": "string"
-                },
-                "kelainan_jasmani": {
-                    "type": "string"
-                },
-                "kewarganegaraan": {
-                    "type": "string"
-                },
-                "kode_pos": {
-                    "type": "string"
-                },
-                "ktp_image_path": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nik": {
-                    "type": "string"
-                },
-                "nip": {
-                    "type": "string"
-                },
-                "nuptk": {
-                    "type": "string"
-                },
-                "pendidikan_terakhir": {
-                    "type": "string"
-                },
-                "penyakit_kronis_yang_pernah_diderita": {
-                    "type": "string"
-                },
-                "penyakit_yang_sering_kambuh": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "religion": {
-                    "type": "string"
-                },
-                "rt_rw": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "tahun_lulus": {
-                    "type": "string"
-                },
-                "tahun_masuk": {
-                    "type": "string"
-                },
-                "tinggi_badan": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.UpdateAdminRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "L",
-                        "P"
-                    ]
-                },
-                "ktp_image_path": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "nik": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 3
-                }
-            }
-        },
-        "http.UpdateHeadmasterRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "L",
-                        "P"
-                    ]
-                },
-                "ktp_image_path": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "nik": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "religion": {
-                    "type": "string",
-                    "maxLength": 100
-                }
-            }
-        },
-        "http.UpdateSchoolRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "description": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "image_path": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "phone": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "status": {
-                    "type": "string",
-                    "enum": [
-                        "active",
-                        "nonactive"
-                    ]
-                },
-                "time_zone": {
-                    "type": "string",
-                    "maxLength": 100
-                }
-            }
-        },
-        "http.UpdateStaffRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "birth_place": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "male",
-                        "female",
-                        "other"
-                    ]
-                },
-                "ktp_image_path": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 1
-                },
-                "nik": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "religion": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 3
-                }
-            }
-        },
-        "http.UpdateStudentRequest": {
+        "internal_student_delivery_http.UpdateStudentRequest": {
             "type": "object",
             "properties": {
                 "address": {
@@ -6752,27 +6777,301 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UpdateSubscriptionRequest": {
+        "internal_student_promotion_delivery_http.PromotionResponse": {
             "type": "object",
-            "required": [
-                "cycle",
-                "plan_id"
-            ],
             "properties": {
-                "cycle": {
-                    "type": "string",
-                    "enum": [
-                        "month",
-                        "year",
-                        "onetime"
-                    ]
+                "academic_year_id": {
+                    "type": "string"
                 },
-                "plan_id": {
+                "academic_year_name": {
+                    "type": "string"
+                },
+                "from_classroom_id": {
+                    "type": "string"
+                },
+                "from_classroom_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nis": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "promotion_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "student_name": {
+                    "type": "string"
+                },
+                "to_classroom_id": {
+                    "type": "string"
+                },
+                "to_classroom_name": {
                     "type": "string"
                 }
             }
         },
-        "http.UpdateTeacherRequest": {
+        "internal_student_tracking_delivery_http.StudyResponse": {
+            "type": "object",
+            "properties": {
+                "academic_year_id": {
+                    "type": "string"
+                },
+                "academic_year_name": {
+                    "type": "string"
+                },
+                "class_id": {
+                    "type": "string"
+                },
+                "class_name": {
+                    "type": "string"
+                },
+                "classroom_id": {
+                    "type": "string"
+                },
+                "classroom_name": {
+                    "type": "string"
+                },
+                "enrollment_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nis": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "student_name": {
+                    "type": "string"
+                },
+                "sub_class_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_teacher_delivery_http.CreateTeacherRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "berat_badan": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ]
+                },
+                "golongan_darah": {
+                    "type": "string"
+                },
+                "jurusan": {
+                    "type": "string"
+                },
+                "kelainan_jasmani": {
+                    "type": "string"
+                },
+                "kewarganegaraan": {
+                    "type": "string"
+                },
+                "kode_pos": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 1
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "nip": {
+                    "type": "string"
+                },
+                "nuptk": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "pendidikan_terakhir": {
+                    "type": "string"
+                },
+                "penyakit_kronis_yang_pernah_diderita": {
+                    "type": "string"
+                },
+                "penyakit_yang_sering_kambuh": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "rt_rw": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "tahun_lulus": {
+                    "type": "string"
+                },
+                "tahun_masuk": {
+                    "type": "string"
+                },
+                "tinggi_badan": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 191,
+                    "minLength": 3
+                }
+            }
+        },
+        "internal_teacher_delivery_http.TeacherResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "berat_badan": {
+                    "type": "string"
+                },
+                "birth_date": {
+                    "type": "string"
+                },
+                "birth_place": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "golongan_darah": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jurusan": {
+                    "type": "string"
+                },
+                "kelainan_jasmani": {
+                    "type": "string"
+                },
+                "kewarganegaraan": {
+                    "type": "string"
+                },
+                "kode_pos": {
+                    "type": "string"
+                },
+                "ktp_image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nik": {
+                    "type": "string"
+                },
+                "nip": {
+                    "type": "string"
+                },
+                "nuptk": {
+                    "type": "string"
+                },
+                "pendidikan_terakhir": {
+                    "type": "string"
+                },
+                "penyakit_kronis_yang_pernah_diderita": {
+                    "type": "string"
+                },
+                "penyakit_yang_sering_kambuh": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "religion": {
+                    "type": "string"
+                },
+                "rt_rw": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "tahun_lulus": {
+                    "type": "string"
+                },
+                "tahun_masuk": {
+                    "type": "string"
+                },
+                "tinggi_badan": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_teacher_delivery_http.UpdateTeacherRequest": {
             "type": "object",
             "properties": {
                 "address": {
@@ -6864,7 +7163,23 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UpdateUserRequest": {
+        "internal_user_delivery_http.ChangePasswordRequest": {
+            "type": "object",
+            "required": [
+                "new_password"
+            ],
+            "properties": {
+                "new_password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "old_password": {
+                    "type": "string",
+                    "minLength": 8
+                }
+            }
+        },
+        "internal_user_delivery_http.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -6887,36 +7202,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UploadResponse": {
-            "type": "object",
-            "properties": {
-                "bucket": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.UpsertRulesRequest": {
-            "type": "object",
-            "required": [
-                "rules"
-            ],
-            "properties": {
-                "rules": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/http.RuleInput"
-                    }
-                }
-            }
-        },
-        "http.UserResponse": {
+        "internal_user_delivery_http.UserResponse": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -6947,286 +7233,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "verified": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "internal_parent_delivery_http.CreateParentRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "religion": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 3
-                }
-            }
-        },
-        "internal_parent_delivery_http.ParentResponse": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "avatar": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "religion": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_parent_delivery_http.UpdateParentRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "religion": {
-                    "type": "string",
-                    "maxLength": 50
-                }
-            }
-        },
-        "internal_student_delivery_http.CreateParentRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "name"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "father_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "father_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "mother_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "mother_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 191,
-                    "minLength": 2
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "username": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 3
-                }
-            }
-        },
-        "internal_student_delivery_http.ParentResponse": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "avatar": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "father_name": {
-                    "type": "string"
-                },
-                "father_religion": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "mother_name": {
-                    "type": "string"
-                },
-                "mother_religion": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "school_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_student_delivery_http.UpdateParentRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "father_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "father_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "mother_name": {
-                    "type": "string",
-                    "maxLength": 191
-                },
-                "mother_religion": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "phone_number": {
-                    "type": "string",
-                    "maxLength": 50
-                }
-            }
-        },
-        "response.PaginatedResponse": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "message": {
-                    "type": "string"
-                },
-                "pagination": {
-                    "$ref": "#/definitions/response.Pagination"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "response.Pagination": {
-            "type": "object",
-            "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "per_page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "response.Response": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "errors": {},
-                "message": {
-                    "type": "string"
-                },
-                "success": {
                     "type": "boolean"
                 }
             }

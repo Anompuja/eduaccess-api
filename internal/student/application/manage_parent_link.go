@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	parentdomain "github.com/eduaccess/eduaccess-api/internal/parent/domain"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/student/domain"
 	"github.com/google/uuid"
@@ -21,11 +22,12 @@ type LinkParentCommand struct {
 
 // LinkParentHandler links a parent to a student.
 type LinkParentHandler struct {
-	repo domain.StudentRepository
+	students domain.StudentRepository
+	parents  parentdomain.ParentRepository
 }
 
-func NewLinkParentHandler(repo domain.StudentRepository) *LinkParentHandler {
-	return &LinkParentHandler{repo: repo}
+func NewLinkParentHandler(students domain.StudentRepository, parents parentdomain.ParentRepository) *LinkParentHandler {
+	return &LinkParentHandler{students: students, parents: parents}
 }
 
 func (h *LinkParentHandler) Handle(ctx context.Context, cmd LinkParentCommand) error {
@@ -33,7 +35,7 @@ func (h *LinkParentHandler) Handle(ctx context.Context, cmd LinkParentCommand) e
 		return apperror.New(apperror.ErrForbidden, "only admin_sekolah or superadmin can manage parent links")
 	}
 
-	student, err := h.repo.FindStudentByID(ctx, cmd.StudentID)
+	student, err := h.students.FindStudentByID(ctx, cmd.StudentID)
 	if err != nil {
 		return err
 	}
@@ -43,7 +45,7 @@ func (h *LinkParentHandler) Handle(ctx context.Context, cmd LinkParentCommand) e
 		}
 	}
 
-	parent, err := h.repo.FindParentByID(ctx, cmd.ParentID)
+	parent, err := h.parents.FindParentByID(ctx, cmd.ParentID)
 	if err != nil {
 		return err
 	}
@@ -62,7 +64,7 @@ func (h *LinkParentHandler) Handle(ctx context.Context, cmd LinkParentCommand) e
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
-	return h.repo.LinkParent(ctx, link)
+	return h.students.LinkParent(ctx, link)
 }
 
 // UnlinkParentCommand removes a parent-student link.

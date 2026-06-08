@@ -13,33 +13,39 @@ import (
 )
 
 type parentProfileModel struct {
-	ID          uuid.UUID  `gorm:"column:id;primaryKey"`
-	UserID      uuid.UUID  `gorm:"column:user_id"`
-	SchoolID    uuid.UUID  `gorm:"column:school_id"`
-	Religion    string     `gorm:"column:religion"`
-	PhoneNumber string     `gorm:"column:phone_number"`
-	Address     string     `gorm:"column:address"`
-	DeletedAt   *time.Time `gorm:"column:deleted_at"`
-	CreatedAt   time.Time  `gorm:"column:created_at"`
-	UpdatedAt   time.Time  `gorm:"column:updated_at"`
+	ID             uuid.UUID  `gorm:"column:id;primaryKey"`
+	UserID         uuid.UUID  `gorm:"column:user_id"`
+	SchoolID       uuid.UUID  `gorm:"column:school_id"`
+	FatherName     string     `gorm:"column:father_name"`
+	MotherName     string     `gorm:"column:mother_name"`
+	FatherReligion string     `gorm:"column:father_religion"`
+	MotherReligion string     `gorm:"column:mother_religion"`
+	PhoneNumber    string     `gorm:"column:phone_number"`
+	Address        string     `gorm:"column:address"`
+	DeletedAt      *time.Time `gorm:"column:deleted_at"`
+	CreatedAt      time.Time  `gorm:"column:created_at"`
+	UpdatedAt      time.Time  `gorm:"column:updated_at"`
 }
 
 func (parentProfileModel) TableName() string { return "parent_profiles" }
 
 type parentWithUser struct {
-	ID          uuid.UUID  `gorm:"column:id"`
-	UserID      uuid.UUID  `gorm:"column:user_id"`
-	SchoolID    uuid.UUID  `gorm:"column:school_id"`
-	Religion    string     `gorm:"column:religion"`
-	PhoneNumber string     `gorm:"column:phone_number"`
-	Address     string     `gorm:"column:address"`
-	DeletedAt   *time.Time `gorm:"column:deleted_at"`
-	CreatedAt   time.Time  `gorm:"column:created_at"`
-	UpdatedAt   time.Time  `gorm:"column:updated_at"`
-	UserName    string     `gorm:"column:user_name"`
-	UserEmail   string     `gorm:"column:user_email"`
-	Username    string     `gorm:"column:username"`
-	Avatar      string     `gorm:"column:avatar"`
+	ID             uuid.UUID  `gorm:"column:id"`
+	UserID         uuid.UUID  `gorm:"column:user_id"`
+	SchoolID       uuid.UUID  `gorm:"column:school_id"`
+	FatherName     string     `gorm:"column:father_name"`
+	MotherName     string     `gorm:"column:mother_name"`
+	FatherReligion string     `gorm:"column:father_religion"`
+	MotherReligion string     `gorm:"column:mother_religion"`
+	PhoneNumber    string     `gorm:"column:phone_number"`
+	Address        string     `gorm:"column:address"`
+	DeletedAt      *time.Time `gorm:"column:deleted_at"`
+	CreatedAt      time.Time  `gorm:"column:created_at"`
+	UpdatedAt      time.Time  `gorm:"column:updated_at"`
+	UserName       string     `gorm:"column:user_name"`
+	UserEmail      string     `gorm:"column:user_email"`
+	Username       string     `gorm:"column:username"`
+	Avatar         string     `gorm:"column:avatar"`
 }
 
 // GormParentRepository implements domain.ParentRepository.
@@ -53,14 +59,17 @@ func NewGormParentRepository(db *gorm.DB) *GormParentRepository {
 
 func (r *GormParentRepository) CreateParentProfile(ctx context.Context, p *domain.ParentProfile) error {
 	m := parentProfileModel{
-		ID:          p.ID,
-		UserID:      p.UserID,
-		SchoolID:    p.SchoolID,
-		Religion:    p.Religion,
-		PhoneNumber: p.PhoneNumber,
-		Address:     p.Address,
-		CreatedAt:   p.CreatedAt,
-		UpdatedAt:   p.UpdatedAt,
+		ID:             p.ID,
+		UserID:         p.UserID,
+		SchoolID:       p.SchoolID,
+		FatherName:     p.FatherName,
+		MotherName:     p.MotherName,
+		FatherReligion: p.FatherReligion,
+		MotherReligion: p.MotherReligion,
+		PhoneNumber:    p.PhoneNumber,
+		Address:        p.Address,
+		CreatedAt:      p.CreatedAt,
+		UpdatedAt:      p.UpdatedAt,
 	}
 	return r.db.WithContext(ctx).Create(&m).Error
 }
@@ -136,10 +145,13 @@ func (r *GormParentRepository) UpdateParentProfile(ctx context.Context, p *domai
 		Table("parent_profiles").
 		Where("id = ?", p.ID).
 		Updates(map[string]interface{}{
-			"religion":     p.Religion,
-			"phone_number": p.PhoneNumber,
-			"address":      p.Address,
-			"updated_at":   p.UpdatedAt,
+			"father_name":     p.FatherName,
+			"mother_name":     p.MotherName,
+			"father_religion": p.FatherReligion,
+			"mother_religion": p.MotherReligion,
+			"phone_number":    p.PhoneNumber,
+			"address":         p.Address,
+			"updated_at":      p.UpdatedAt,
 		}).Error
 }
 
@@ -153,18 +165,21 @@ func (r *GormParentRepository) SoftDeleteParent(ctx context.Context, id uuid.UUI
 
 func toParentDomain(row parentWithUser) *domain.ParentProfile {
 	return &domain.ParentProfile{
-		ID:          row.ID,
-		UserID:      row.UserID,
-		SchoolID:    row.SchoolID,
-		Religion:    row.Religion,
-		PhoneNumber: row.PhoneNumber,
-		Address:     row.Address,
-		DeletedAt:   row.DeletedAt,
-		CreatedAt:   row.CreatedAt,
-		UpdatedAt:   row.UpdatedAt,
-		Name:        row.UserName,
-		Email:       row.UserEmail,
-		Username:    row.Username,
-		Avatar:      row.Avatar,
+		ID:             row.ID,
+		UserID:         row.UserID,
+		SchoolID:       row.SchoolID,
+		FatherName:     row.FatherName,
+		MotherName:     row.MotherName,
+		FatherReligion: row.FatherReligion,
+		MotherReligion: row.MotherReligion,
+		PhoneNumber:    row.PhoneNumber,
+		Address:        row.Address,
+		DeletedAt:      row.DeletedAt,
+		CreatedAt:      row.CreatedAt,
+		UpdatedAt:      row.UpdatedAt,
+		Name:           row.UserName,
+		Email:          row.UserEmail,
+		Username:       row.Username,
+		Avatar:         row.Avatar,
 	}
 }

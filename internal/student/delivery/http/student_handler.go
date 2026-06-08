@@ -99,14 +99,7 @@ func (h *Handler) UnlinkParent(c echo.Context) error {
 	return response.OK(c, "parent unlinked", nil)
 }
 
-func (h *Handler) registerParentRoutes(v1 *echo.Group, auth echo.MiddlewareFunc) {
-	parents := v1.Group("/parents", auth)
-	parents.POST("", h.CreateParent)
-	parents.GET("", h.ListParents)
-	parents.GET("/:id", h.GetParent)
-	parents.PUT("/:id", h.UpdateParent)
-	parents.DELETE("/:id", h.DeactivateParent)
-}
+func (h *Handler) registerParentRoutes(_ *echo.Group, _ echo.MiddlewareFunc) {}
 
 // ── Students ──────────────────────────────────────────────────────────────────
 
