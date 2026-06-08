@@ -18,6 +18,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
 
 	"github.com/eduaccess/eduaccess-api/internal/shared/response"
@@ -41,11 +42,12 @@ type supabaseClaims struct {
 
 var (
 	jwksMu     sync.RWMutex
-	jwksKeys   map[string]*ecdsa.PublicKey
-	jwksExpiry time.Time
-	authDBOnce sync.Once
-	authDB     *gorm.DB
-	authDBErr  error
+	jwksKeys     map[string]*ecdsa.PublicKey
+	jwksExpiry   time.Time
+	authDBOnce   sync.Once
+	authDB       *gorm.DB
+	authDBErr    error
+	fallbackCache = cache.New(5*time.Minute, 10*time.Minute)
 )
 
 type jwksResponse struct {
@@ -204,7 +206,17 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		if role == "" {
-			if db, err := loadAuthDB(); err == nil {
+			if cached, found := fallbackCache.Get(userID.String()); found {
+				row := cached.(fallbackAuthRow)
+				if row.RoleName != nil {
+					role = *row.RoleName
+				}
+				if row.SchoolID != nil && *row.SchoolID != "" && *row.SchoolID != "null" {
+					if parsedSchoolID, err := uuid.Parse(*row.SchoolID); err == nil {
+						schoolID = &parsedSchoolID
+					}
+				}
+			} else if db, err := loadAuthDB(); err == nil {
 				var row fallbackAuthRow
 				fallbackSQL := `
 SELECT
@@ -229,6 +241,7 @@ LEFT JOIN LATERAL (
 WHERE u.id = ? AND u.deleted_at IS NULL
 LIMIT 1`
 				if err := db.WithContext(c.Request().Context()).Raw(fallbackSQL, userID).Scan(&row).Error; err == nil {
+					fallbackCache.Set(userID.String(), row, cache.DefaultExpiration)
 					if row.RoleName != nil {
 						role = *row.RoleName
 					}
