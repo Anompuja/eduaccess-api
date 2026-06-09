@@ -1,12 +1,17 @@
 package http
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/academic/application"
 	"github.com/eduaccess/eduaccess-api/internal/academic/domain"
+	"github.com/eduaccess/eduaccess-api/internal/academic/infrastructure"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/eduaccess/eduaccess-api/internal/shared/httpcache"
 	authmw "github.com/eduaccess/eduaccess-api/internal/shared/middleware"
@@ -47,6 +52,7 @@ type Handler struct {
 	listSchedules        *application.ListSchedulesHandler
 	updateSchedule       *application.UpdateScheduleHandler
 	deleteSchedule       *application.DeleteScheduleHandler
+	academicCache        *infrastructure.AcademicCache
 }
 
 // NewHandler registers academic routes and returns the handler.
@@ -81,6 +87,7 @@ func NewHandler(
 	listSchedules *application.ListSchedulesHandler,
 	updateSchedule *application.UpdateScheduleHandler,
 	deleteSchedule *application.DeleteScheduleHandler,
+	academicCache *infrastructure.AcademicCache,
 ) *Handler {
 	h := &Handler{
 		createLevel:          createLevel,
@@ -112,49 +119,49 @@ func NewHandler(
 		listSchedules:        listSchedules,
 		updateSchedule:       updateSchedule,
 		deleteSchedule:       deleteSchedule,
+		academicCache:        academicCache,
 	}
 
 	auth := authmw.RequireAuth
-	cache := httpcache.Middleware(httpcache.Reference)
 
-	levels := v1.Group("/academic/levels", auth, cache)
+	levels := v1.Group("/academic/levels", auth)
 	levels.POST("", h.CreateLevel)
 	levels.GET("", h.ListLevels)
 	levels.PUT("/:id", h.UpdateLevel)
 	levels.DELETE("/:id", h.DeleteLevel)
 
-	classes := v1.Group("/academic/classes", auth, cache)
+	classes := v1.Group("/academic/classes", auth)
 	classes.POST("", h.CreateClass)
 	classes.GET("", h.ListClasses)
 	classes.PUT("/:id", h.UpdateClass)
 	classes.DELETE("/:id", h.DeleteClass)
 
-	subClasses := v1.Group("/academic/sub-classes", auth, cache)
+	subClasses := v1.Group("/academic/sub-classes", auth)
 	subClasses.POST("", h.CreateSubClass)
 	subClasses.GET("", h.ListSubClasses)
 	subClasses.PUT("/:id", h.UpdateSubClass)
 	subClasses.DELETE("/:id", h.DeleteSubClass)
 
-	academicYears := v1.Group("/academic/academic-years", auth, cache)
+	academicYears := v1.Group("/academic/academic-years", auth)
 	academicYears.POST("", h.CreateAcademicYear)
 	academicYears.GET("", h.ListAcademicYears)
 	academicYears.PUT("/:id", h.UpdateAcademicYear)
 	academicYears.DELETE("/:id", h.DeleteAcademicYear)
 	academicYears.PATCH("/:id/activate", h.ActivateAcademicYear)
 
-	subjects := v1.Group("/academic/subjects", auth, cache)
+	subjects := v1.Group("/academic/subjects", auth)
 	subjects.POST("", h.CreateSubject)
 	subjects.GET("", h.ListSubjects)
 	subjects.PUT("/:id", h.UpdateSubject)
 	subjects.DELETE("/:id", h.DeleteSubject)
 
-	classrooms := v1.Group("/academic/classrooms", auth, cache)
+	classrooms := v1.Group("/academic/classrooms", auth)
 	classrooms.POST("", h.CreateClassroom)
 	classrooms.GET("", h.ListClassrooms)
 	classrooms.PUT("/:id", h.UpdateClassroom)
 	classrooms.DELETE("/:id", h.DeleteClassroom)
 
-	schedules := v1.Group("/academic/schedules", auth, cache)
+	schedules := v1.Group("/academic/schedules", auth)
 	schedules.POST("", h.CreateSchedule)
 	schedules.GET("", h.ListSchedules)
 	schedules.PUT("/:id", h.UpdateSchedule)
@@ -186,6 +193,10 @@ func (h *Handler) CreateLevel(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:levels:")
+		h.academicCache.InvalidatePrefix("academic:classes:")
+	}
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "level created", Data: toLevelResponse(level)})
 }
 
@@ -200,9 +211,36 @@ func (h *Handler) CreateLevel(c echo.Context) error {
 //	@Success      200  {object}  response.Response{data=[]EducationLevelResponse}
 //	@Router       /academic/levels [get]
 func (h *Handler) ListLevels(c echo.Context) error {
+	role := authmw.GetRole(c)
+	schoolID := getSchoolID(c)
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
+	}
+	cacheKey := fmt.Sprintf("academic:levels:%s:%s", role, schoolIDStr)
+
+	if h.academicCache != nil {
+		if cachedResp, found := h.academicCache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", httpcache.Reference)
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	levels, err := h.listLevels.Handle(c.Request().Context(), application.ListLevelsQuery{
-		RequesterSchoolID: getSchoolID(c),
-		RequesterRole:     authmw.GetRole(c),
+		RequesterSchoolID: schoolID,
+		RequesterRole:     role,
 	})
 	if err != nil {
 		return handleAppError(c, err)
@@ -211,7 +249,25 @@ func (h *Handler) ListLevels(c echo.Context) error {
 	for _, l := range levels {
 		dtos = append(dtos, toLevelResponse(l))
 	}
-	return response.OK(c, "levels retrieved", dtos)
+
+	resp := response.Response{Success: true, Message: "levels retrieved", Data: dtos}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.academicCache != nil {
+		h.academicCache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", httpcache.Reference)
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // UpdateLevel godoc
@@ -243,6 +299,10 @@ func (h *Handler) UpdateLevel(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:levels:")
+		h.academicCache.InvalidatePrefix("academic:classes:")
+	}
 	return response.OK(c, "level updated", toLevelResponse(level))
 }
 
@@ -266,6 +326,10 @@ func (h *Handler) DeleteLevel(c echo.Context) error {
 		LevelID:           id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:levels:")
+		h.academicCache.InvalidatePrefix("academic:classes:")
 	}
 	return response.OK(c, "level deleted", nil)
 }
@@ -298,6 +362,11 @@ func (h *Handler) CreateClass(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:classes:")
+		h.academicCache.InvalidatePrefix("academic:sub-classes:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "class created", Data: toClassResponse(class)})
 }
 
@@ -313,15 +382,46 @@ func (h *Handler) CreateClass(c echo.Context) error {
 //	@Success      200  {object}  response.Response{data=[]ClassResponse}
 //	@Router       /academic/classes [get]
 func (h *Handler) ListClasses(c echo.Context) error {
-	q := application.ListClassesQuery{
-		RequesterSchoolID: getSchoolID(c),
-		RequesterRole:     authmw.GetRole(c),
+	role := authmw.GetRole(c)
+	schoolID := getSchoolID(c)
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
 	}
+
+	q := application.ListClassesQuery{
+		RequesterSchoolID: schoolID,
+		RequesterRole:     role,
+	}
+	levelIDStr := "all"
 	if raw := c.QueryParam("level_id"); raw != "" {
 		if id, err := uuid.Parse(raw); err == nil {
 			q.LevelID = &id
+			levelIDStr = id.String()
 		}
 	}
+
+	cacheKey := fmt.Sprintf("academic:classes:%s:%s:%s", role, schoolIDStr, levelIDStr)
+
+	if h.academicCache != nil {
+		if cachedResp, found := h.academicCache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", httpcache.Reference)
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	classes, err := h.listClasses.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
@@ -330,7 +430,25 @@ func (h *Handler) ListClasses(c echo.Context) error {
 	for _, cl := range classes {
 		dtos = append(dtos, toClassResponse(cl))
 	}
-	return response.OK(c, "classes retrieved", dtos)
+
+	resp := response.Response{Success: true, Message: "classes retrieved", Data: dtos}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.academicCache != nil {
+		h.academicCache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", httpcache.Reference)
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // UpdateClass godoc
@@ -362,6 +480,11 @@ func (h *Handler) UpdateClass(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:classes:")
+		h.academicCache.InvalidatePrefix("academic:sub-classes:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return response.OK(c, "class updated", toClassResponse(class))
 }
 
@@ -385,6 +508,11 @@ func (h *Handler) DeleteClass(c echo.Context) error {
 		ClassID:           id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:classes:")
+		h.academicCache.InvalidatePrefix("academic:sub-classes:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
 	}
 	return response.OK(c, "class deleted", nil)
 }
@@ -417,6 +545,10 @@ func (h *Handler) CreateSubClass(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:sub-classes:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "sub-class created", Data: toSubClassResponse(sub)})
 }
 
@@ -432,15 +564,46 @@ func (h *Handler) CreateSubClass(c echo.Context) error {
 //	@Success      200  {object}  response.Response{data=[]SubClassResponse}
 //	@Router       /academic/sub-classes [get]
 func (h *Handler) ListSubClasses(c echo.Context) error {
-	q := application.ListSubClassesQuery{
-		RequesterSchoolID: getSchoolID(c),
-		RequesterRole:     authmw.GetRole(c),
+	role := authmw.GetRole(c)
+	schoolID := getSchoolID(c)
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
 	}
+
+	q := application.ListSubClassesQuery{
+		RequesterSchoolID: schoolID,
+		RequesterRole:     role,
+	}
+	classIDStr := "all"
 	if raw := c.QueryParam("class_id"); raw != "" {
 		if id, err := uuid.Parse(raw); err == nil {
 			q.ClassID = &id
+			classIDStr = id.String()
 		}
 	}
+
+	cacheKey := fmt.Sprintf("academic:sub-classes:%s:%s:%s", role, schoolIDStr, classIDStr)
+
+	if h.academicCache != nil {
+		if cachedResp, found := h.academicCache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", httpcache.Reference)
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	subs, err := h.listSubClasses.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
@@ -449,7 +612,25 @@ func (h *Handler) ListSubClasses(c echo.Context) error {
 	for _, s := range subs {
 		dtos = append(dtos, toSubClassResponse(s))
 	}
-	return response.OK(c, "sub-classes retrieved", dtos)
+
+	resp := response.Response{Success: true, Message: "sub-classes retrieved", Data: dtos}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.academicCache != nil {
+		h.academicCache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", httpcache.Reference)
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // UpdateSubClass godoc
@@ -481,6 +662,10 @@ func (h *Handler) UpdateSubClass(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:sub-classes:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return response.OK(c, "sub-class updated", toSubClassResponse(sub))
 }
 
@@ -504,6 +689,10 @@ func (h *Handler) DeleteSubClass(c echo.Context) error {
 		SubClassID:        id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:sub-classes:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
 	}
 	return response.OK(c, "sub-class deleted", nil)
 }
@@ -530,6 +719,10 @@ func (h *Handler) CreateAcademicYear(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:academic-years:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "academic year created", Data: toAcademicYearResponse(ay)})
 }
 
@@ -544,8 +737,35 @@ func (h *Handler) CreateAcademicYear(c echo.Context) error {
 //	@Success      200  {object}  response.Response{data=[]AcademicYearResponse}
 //	@Router       /academic/years [get]
 func (h *Handler) ListAcademicYears(c echo.Context) error {
+	role := authmw.GetRole(c)
+	schoolID := getSchoolID(c)
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
+	}
+	cacheKey := fmt.Sprintf("academic:academic-years:%s:%s", role, schoolIDStr)
+
+	if h.academicCache != nil {
+		if cachedResp, found := h.academicCache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", httpcache.Reference)
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	list, err := h.listAcademicYears.Handle(c.Request().Context(), application.ListAcademicYearsQuery{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+		RequesterSchoolID: schoolID, RequesterRole: role,
 	})
 	if err != nil {
 		return handleAppError(c, err)
@@ -554,7 +774,25 @@ func (h *Handler) ListAcademicYears(c echo.Context) error {
 	for _, ay := range list {
 		dtos = append(dtos, toAcademicYearResponse(ay))
 	}
-	return response.OK(c, "academic years retrieved", dtos)
+
+	resp := response.Response{Success: true, Message: "academic years retrieved", Data: dtos}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.academicCache != nil {
+		h.academicCache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", httpcache.Reference)
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (h *Handler) UpdateAcademicYear(c echo.Context) error {
@@ -581,6 +819,10 @@ func (h *Handler) UpdateAcademicYear(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:academic-years:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return response.OK(c, "academic year updated", toAcademicYearResponse(ay))
 }
 
@@ -594,6 +836,10 @@ func (h *Handler) DeleteAcademicYear(c echo.Context) error {
 	}); err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:academic-years:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return response.OK(c, "academic year deleted", nil)
 }
 
@@ -606,6 +852,10 @@ func (h *Handler) ActivateAcademicYear(c echo.Context) error {
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), AcademicYearID: id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:academic-years:")
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
 	}
 	return response.OK(c, "academic year activated", nil)
 }
@@ -630,6 +880,9 @@ func (h *Handler) CreateSubject(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:subjects:")
+	}
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "subject created", Data: toSubjectResponse(s)})
 }
 
@@ -644,8 +897,35 @@ func (h *Handler) CreateSubject(c echo.Context) error {
 //	@Success      200  {object}  response.Response{data=[]SubjectResponse}
 //	@Router       /academic/subjects [get]
 func (h *Handler) ListSubjects(c echo.Context) error {
+	role := authmw.GetRole(c)
+	schoolID := getSchoolID(c)
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
+	}
+	cacheKey := fmt.Sprintf("academic:subjects:%s:%s", role, schoolIDStr)
+
+	if h.academicCache != nil {
+		if cachedResp, found := h.academicCache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", httpcache.Reference)
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	list, err := h.listSubjects.Handle(c.Request().Context(), application.ListSubjectsQuery{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+		RequesterSchoolID: schoolID, RequesterRole: role,
 	})
 	if err != nil {
 		return handleAppError(c, err)
@@ -654,7 +934,25 @@ func (h *Handler) ListSubjects(c echo.Context) error {
 	for _, s := range list {
 		dtos = append(dtos, toSubjectResponse(s))
 	}
-	return response.OK(c, "subjects retrieved", dtos)
+
+	resp := response.Response{Success: true, Message: "subjects retrieved", Data: dtos}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.academicCache != nil {
+		h.academicCache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", httpcache.Reference)
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (h *Handler) UpdateSubject(c echo.Context) error {
@@ -679,6 +977,9 @@ func (h *Handler) UpdateSubject(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:subjects:")
+	}
 	return response.OK(c, "subject updated", toSubjectResponse(s))
 }
 
@@ -691,6 +992,9 @@ func (h *Handler) DeleteSubject(c echo.Context) error {
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), SubjectID: id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:subjects:")
 	}
 	return response.OK(c, "subject deleted", nil)
 }
@@ -724,6 +1028,9 @@ func (h *Handler) CreateClassroom(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "classroom created", Data: toClassroomResponse(cr)})
 }
 
@@ -738,8 +1045,35 @@ func (h *Handler) CreateClassroom(c echo.Context) error {
 //	@Success      200  {object}  response.Response{data=[]ClassroomResponse}
 //	@Router       /academic/classrooms [get]
 func (h *Handler) ListClassrooms(c echo.Context) error {
+	role := authmw.GetRole(c)
+	schoolID := getSchoolID(c)
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
+	}
+	cacheKey := fmt.Sprintf("academic:classrooms:%s:%s", role, schoolIDStr)
+
+	if h.academicCache != nil {
+		if cachedResp, found := h.academicCache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", httpcache.Reference)
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	list, err := h.listClassrooms.Handle(c.Request().Context(), application.ListClassroomsQuery{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+		RequesterSchoolID: schoolID, RequesterRole: role,
 	})
 	if err != nil {
 		return handleAppError(c, err)
@@ -748,7 +1082,25 @@ func (h *Handler) ListClassrooms(c echo.Context) error {
 	for _, cr := range list {
 		dtos = append(dtos, toClassroomResponse(cr))
 	}
-	return response.OK(c, "classrooms retrieved", dtos)
+
+	resp := response.Response{Success: true, Message: "classrooms retrieved", Data: dtos}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.academicCache != nil {
+		h.academicCache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", httpcache.Reference)
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (h *Handler) UpdateClassroom(c echo.Context) error {
@@ -782,6 +1134,9 @@ func (h *Handler) UpdateClassroom(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
+	}
 	return response.OK(c, "classroom updated", toClassroomResponse(cr))
 }
 
@@ -794,6 +1149,9 @@ func (h *Handler) DeleteClassroom(c echo.Context) error {
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), ClassroomID: id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:classrooms:")
 	}
 	return response.OK(c, "classroom deleted", nil)
 }
@@ -813,6 +1171,9 @@ func (h *Handler) CreateSchedule(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:schedules:")
+	}
 	return c.JSON(http.StatusCreated, response.Response{Success: true, Message: "schedule created", Data: toScheduleResponse(s)})
 }
 
@@ -829,16 +1190,47 @@ func (h *Handler) CreateSchedule(c echo.Context) error {
 //	@Failure      400  {object}  response.Response
 //	@Router       /academic/schedules [get]
 func (h *Handler) ListSchedules(c echo.Context) error {
-	q := application.ListSchedulesQuery{
-		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c),
+	role := authmw.GetRole(c)
+	schoolID := getSchoolID(c)
+	schoolIDStr := "all"
+	if schoolID != nil {
+		schoolIDStr = schoolID.String()
 	}
+
+	q := application.ListSchedulesQuery{
+		RequesterSchoolID: schoolID, RequesterRole: role,
+	}
+	dayOfWeekStr := "all"
 	if raw := c.QueryParam("day_of_week"); raw != "" {
 		validDays := map[string]bool{"monday": true, "tuesday": true, "wednesday": true, "thursday": true, "friday": true, "saturday": true, "sunday": true}
 		if !validDays[raw] {
 			return response.BadRequest(c, "invalid day_of_week: must be monday, tuesday, wednesday, thursday, friday, saturday, or sunday")
 		}
 		q.DayOfWeek = &raw
+		dayOfWeekStr = raw
 	}
+
+	cacheKey := fmt.Sprintf("academic:schedules:%s:%s:%s", role, schoolIDStr, dayOfWeekStr)
+
+	if h.academicCache != nil {
+		if cachedResp, found := h.academicCache.Get(cacheKey); found {
+			cacheData := cachedResp.(map[string]interface{})
+			etag := cacheData["etag"].(string)
+
+			c.Response().Header().Set("Cache-Control", httpcache.Reference)
+			c.Response().Header().Set("ETag", `"`+etag+`"`)
+			c.Response().Header().Set("Vary", "Authorization")
+
+			if match := c.Request().Header.Get("If-None-Match"); match != "" {
+				if match == `"`+etag+`"` {
+					return c.NoContent(http.StatusNotModified)
+				}
+			}
+
+			return c.JSON(http.StatusOK, cacheData["response"])
+		}
+	}
+
 	list, err := h.listSchedules.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
@@ -847,7 +1239,25 @@ func (h *Handler) ListSchedules(c echo.Context) error {
 	for _, s := range list {
 		dtos = append(dtos, toScheduleResponse(s))
 	}
-	return response.OK(c, "schedules retrieved", dtos)
+
+	resp := response.Response{Success: true, Message: "schedules retrieved", Data: dtos}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	if h.academicCache != nil {
+		h.academicCache.Set(cacheKey, map[string]interface{}{
+			"response": resp,
+			"etag":     etag,
+		})
+	}
+
+	c.Response().Header().Set("Cache-Control", httpcache.Reference)
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (h *Handler) UpdateSchedule(c echo.Context) error {
@@ -867,6 +1277,9 @@ func (h *Handler) UpdateSchedule(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:schedules:")
+	}
 	return response.OK(c, "schedule updated", toScheduleResponse(s))
 }
 
@@ -879,6 +1292,9 @@ func (h *Handler) DeleteSchedule(c echo.Context) error {
 		RequesterSchoolID: getSchoolID(c), RequesterRole: authmw.GetRole(c), ScheduleID: id,
 	}); err != nil {
 		return handleAppError(c, err)
+	}
+	if h.academicCache != nil {
+		h.academicCache.InvalidatePrefix("academic:schedules:")
 	}
 	return response.OK(c, "schedule deleted", nil)
 }
