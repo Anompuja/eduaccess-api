@@ -9,8 +9,10 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.15.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/swaggo/echo-swagger v1.5.2
 	github.com/swaggo/swag v1.16.6
+	github.com/xuri/excelize/v2 v2.10.1
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 )
@@ -24,6 +26,7 @@ require (
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.6.0 // indirect
@@ -40,7 +43,6 @@ require (
 	github.com/richardlehane/mscfb v1.0.6 // indirect
 	github.com/richardlehane/msoleps v1.0.6 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
-	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	github.com/sv-tools/openapi v0.2.1 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/swaggo/swag/v2 v2.0.0-rc4 // indirect
@@ -48,7 +50,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xuri/efp v0.0.1 // indirect
-	github.com/xuri/excelize/v2 v2.10.1 // indirect
 	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
 	golang.org/x/crypto v0.49.0 // indirect
 	golang.org/x/mod v0.33.0 // indirect

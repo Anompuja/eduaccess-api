@@ -30,6 +30,10 @@ import (
 	classScheduleApp "github.com/eduaccess/eduaccess-api/internal/class_schedule/application"
 	classScheduleHTTP "github.com/eduaccess/eduaccess-api/internal/class_schedule/delivery/http"
 	classScheduleInfra "github.com/eduaccess/eduaccess-api/internal/class_schedule/infrastructure"
+	notificationApp "github.com/eduaccess/eduaccess-api/internal/notification/application"
+	notificationHTTP "github.com/eduaccess/eduaccess-api/internal/notification/delivery/http"
+	notificationWS "github.com/eduaccess/eduaccess-api/internal/notification/delivery/websocket"
+	notificationInfra "github.com/eduaccess/eduaccess-api/internal/notification/infrastructure"
 	dashboardApp "github.com/eduaccess/eduaccess-api/internal/dashboard/application"
 	dashboardHTTP "github.com/eduaccess/eduaccess-api/internal/dashboard/delivery/http"
 	dashboardInfra "github.com/eduaccess/eduaccess-api/internal/dashboard/infrastructure"
@@ -295,6 +299,24 @@ func main() {
 		staffCache,
 	)
 
+	// ── Notification module ──────────────────────────────────────────────────
+	notifHub := notificationWS.NewHub()
+	go notifHub.Run()
+
+	notifRepo := notificationInfra.NewGormNotificationRepository(db)
+	notifHTTPHandler := notificationHTTP.NewHandler(
+		v1,
+		notificationApp.NewListNotificationsHandler(notifRepo),
+		notificationApp.NewMarkReadHandler(notifRepo),
+		notificationApp.NewMarkAllReadHandler(notifRepo),
+	)
+	_ = notifHTTPHandler
+
+	notifyParentsHandler := notificationApp.NewNotifyAttendanceParentsHandler(notifRepo, notifHub)
+
+	// WebSocket endpoint (outside /api/v1 — JWT passed via query param)
+	e.GET("/ws/notifications", notificationWS.NewHandler(notifHub).ServeWS)
+
 	// ── Class Schedule module ────────────────────────────────────────────────
 	classScheduleRepo := classScheduleInfra.NewGormClassScheduleRepository(db)
 	classScheduleHTTP.NewHandler(
@@ -311,7 +333,7 @@ func main() {
 		classScheduleApp.NewListAttendancesHandler(classScheduleRepo),
 		classScheduleApp.NewUpdateAttendanceHandler(classScheduleRepo),
 		classScheduleApp.NewGenerateQRHandler(classScheduleRepo),
-		classScheduleApp.NewScanQRHandler(classScheduleRepo),
+		classScheduleApp.NewScanQRHandler(classScheduleRepo, notifyParentsHandler),
 	)
 
 	// ΓöÇΓöÇ Student Tracking module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ

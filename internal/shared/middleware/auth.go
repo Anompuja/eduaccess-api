@@ -302,3 +302,61 @@ func GetRole(c echo.Context) string {
 	role, _ := c.Get(ContextKeyRole).(string)
 	return role
 }
+
+// ValidateToken parses a raw Supabase JWT string and returns the auth.users UUID.
+// Used by non-HTTP transports (e.g. WebSocket) that cannot use the RequireAuth middleware.
+func ValidateToken(tokenStr string) (uuid.UUID, error) {
+	if tokenStr == "" {
+		return uuid.Nil, errors.New("empty token")
+	}
+	unverified, _, _ := jwt.NewParser().ParseUnverified(tokenStr, &supabaseClaims{})
+	if unverified == nil {
+		return uuid.Nil, errors.New("invalid token format")
+	}
+	kid, _ := unverified.Header["kid"].(string)
+
+	signingKeys, err := loadJWKS(kid)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	token, err := jwt.ParseWithClaims(tokenStr, &supabaseClaims{}, func(t *jwt.Token) (interface{}, error) {
+		k, _ := t.Header["kid"].(string)
+		alg, _ := t.Header["alg"].(string)
+		switch alg {
+		case "ES256":
+			if k == "" {
+				for _, key := range signingKeys {
+					return key, nil
+				}
+				return nil, errors.New("missing kid in token header")
+			}
+			key, ok := signingKeys[k]
+			if !ok {
+				return nil, fmt.Errorf("unknown signing key: %s", k)
+			}
+			return key, nil
+		default:
+			secret := strings.TrimSpace(os.Getenv("SUPABASE_JWT_SECRET"))
+			if secret == "" {
+				return nil, errors.New("SUPABASE_JWT_SECRET not configured")
+			}
+			return []byte(secret), nil
+		}
+	})
+	if err != nil || !token.Valid {
+		return uuid.Nil, errors.New("invalid or expired token")
+	}
+
+	claims, ok := token.Claims.(*supabaseClaims)
+	if !ok {
+		return uuid.Nil, errors.New("malformed token claims")
+	}
+
+	userID, err := uuid.Parse(claims.Subject)
+	if err != nil {
+		return uuid.Nil, errors.New("invalid token subject")
+	}
+
+	return userID, nil
+}

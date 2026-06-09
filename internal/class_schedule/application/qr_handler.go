@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/eduaccess/eduaccess-api/internal/class_schedule/domain"
+	notificationApp "github.com/eduaccess/eduaccess-api/internal/notification/application"
 	"github.com/eduaccess/eduaccess-api/internal/shared/apperror"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -117,10 +118,13 @@ type ScanQRResult struct {
 
 // ScanQRHandler verifies the QR token and marks the student's attendance as
 // "present" or "late" depending on how far past the class start time they are.
-type ScanQRHandler struct{ repo domain.ClassScheduleRepository }
+type ScanQRHandler struct {
+	repo          domain.ClassScheduleRepository
+	notifyParents *notificationApp.NotifyAttendanceParentsHandler
+}
 
-func NewScanQRHandler(repo domain.ClassScheduleRepository) *ScanQRHandler {
-	return &ScanQRHandler{repo: repo}
+func NewScanQRHandler(repo domain.ClassScheduleRepository, notifyParents *notificationApp.NotifyAttendanceParentsHandler) *ScanQRHandler {
+	return &ScanQRHandler{repo: repo, notifyParents: notifyParents}
 }
 
 func (h *ScanQRHandler) Handle(ctx context.Context, cmd ScanQRCommand) (*ScanQRResult, error) {
@@ -191,6 +195,19 @@ func (h *ScanQRHandler) Handle(ctx context.Context, cmd ScanQRCommand) (*ScanQRR
 	att.UpdatedAt = now
 	if err := h.repo.UpdateAttendance(ctx, att); err != nil {
 		return nil, err
+	}
+
+	if h.notifyParents != nil {
+		go h.notifyParents.Handle(context.Background(), notificationApp.NotifyAttendanceParentsCommand{
+			StudentUserID:    cmd.StudentUserID,
+			SchoolID:         *cmd.RequesterSchoolID,
+			ClassScheduleID:  cs.ID,
+			SubjectName:      cs.SubjectName,
+			ClassroomName:    cs.ClassroomName,
+			AttendanceStatus: newStatus,
+			AttendanceTime:   now,
+			StudentName:      att.StudentName,
+		})
 	}
 
 	msg := "Berhasil hadir!"
