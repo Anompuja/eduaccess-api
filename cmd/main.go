@@ -83,7 +83,7 @@ import (
 
 // @host      localhost:8080
 // @BasePath  /api/v1
-// @schemes   http
+// @schemes   https http
 
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -94,9 +94,12 @@ func main() {
 		log.Println("No .env file found, reading from environment")
 	}
 
-	// Set Swagger host dynamically from environment
+	// Set Swagger host and scheme dynamically from environment
 	if host := os.Getenv("SWAGGER_HOST"); host != "" {
 		docs.SwaggerInfo.Host = host
+	}
+	if scheme := os.Getenv("SWAGGER_SCHEME"); scheme != "" {
+		docs.SwaggerInfo.Schemes = []string{scheme}
 	}
 
 	db, err := database.Connect()
