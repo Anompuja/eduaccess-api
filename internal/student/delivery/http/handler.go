@@ -1,7 +1,11 @@
 package http
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +16,7 @@ import (
 	"github.com/eduaccess/eduaccess-api/internal/shared/validator"
 	"github.com/eduaccess/eduaccess-api/internal/student/application"
 	"github.com/eduaccess/eduaccess-api/internal/student/domain"
+	"github.com/eduaccess/eduaccess-api/internal/student/infrastructure"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -26,6 +31,7 @@ type Handler struct {
 	deactivateStudent *application.DeactivateStudentHandler
 	linkParent        *application.LinkParentHandler
 	unlinkParent      *application.UnlinkParentHandler
+	studentCache      *infrastructure.StudentCache
 }
 
 // NewHandler registers student routes and returns the handler.
@@ -39,6 +45,7 @@ func NewHandler(
 	deactivateStudent *application.DeactivateStudentHandler,
 	linkParent *application.LinkParentHandler,
 	unlinkParent *application.UnlinkParentHandler,
+	studentCache *infrastructure.StudentCache,
 ) *Handler {
 	h := &Handler{
 		createStudent:     createStudent,
@@ -49,6 +56,7 @@ func NewHandler(
 		deactivateStudent: deactivateStudent,
 		linkParent:        linkParent,
 		unlinkParent:      unlinkParent,
+		studentCache:      studentCache,
 	}
 
 	h.registerStudentRoutes(v1, authmw.RequireAuth)
@@ -197,6 +205,7 @@ func (h *Handler) CreateStudent(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	h.studentCache.InvalidatePrefix("student:list:")
 	return c.JSON(http.StatusCreated, response.Response{
 		Success: true,
 		Message: "student created",
@@ -252,6 +261,42 @@ func (h *Handler) ListStudents(c echo.Context) error {
 		}
 	}
 
+	schoolIDStr := "all"
+	if q.SchoolID != nil {
+		schoolIDStr = q.SchoolID.String()
+	}
+	eduLevelStr := "all"
+	if q.EducationLevelID != nil {
+		eduLevelStr = q.EducationLevelID.String()
+	}
+	classIDStr := "all"
+	if q.ClassID != nil {
+		classIDStr = q.ClassID.String()
+	}
+	subClassIDStr := "all"
+	if q.SubClassID != nil {
+		subClassIDStr = q.SubClassID.String()
+	}
+	cacheKey := fmt.Sprintf("student:list:%s:%s:%s:%s:%s:%d:%d:%s",
+		q.RequesterRole, schoolIDStr, eduLevelStr, classIDStr, subClassIDStr, page, perPage, q.Search)
+
+	if cachedResp, found := h.studentCache.Get(cacheKey); found {
+		cacheData := cachedResp.(map[string]interface{})
+		etag := cacheData["etag"].(string)
+
+		c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+		c.Response().Header().Set("ETag", `"`+etag+`"`)
+		c.Response().Header().Set("Vary", "Authorization")
+
+		if match := c.Request().Header.Get("If-None-Match"); match != "" {
+			if match == `"`+etag+`"` {
+				return c.NoContent(http.StatusNotModified)
+			}
+		}
+
+		return c.JSON(http.StatusOK, cacheData["response"])
+	}
+
 	result, err := h.listStudents.Handle(c.Request().Context(), q)
 	if err != nil {
 		return handleAppError(c, err)
@@ -260,7 +305,38 @@ func (h *Handler) ListStudents(c echo.Context) error {
 	for _, s := range result.Students {
 		dtos = append(dtos, toStudentResponse(s))
 	}
-	return response.Paginated(c, "students retrieved", dtos, result.Page, result.PerPage, result.Total)
+
+	totalPages := int(result.Total) / result.PerPage
+	if int(result.Total)%result.PerPage != 0 {
+		totalPages++
+	}
+
+	resp := response.PaginatedResponse{
+		Success: true,
+		Message: "students retrieved",
+		Data:    dtos,
+		Pagination: response.Pagination{
+			Page:       result.Page,
+			PerPage:    result.PerPage,
+			Total:      result.Total,
+			TotalPages: totalPages,
+		},
+	}
+
+	respBytes, _ := json.Marshal(resp)
+	hash := sha256.Sum256(respBytes)
+	etag := hex.EncodeToString(hash[:])
+
+	h.studentCache.Set(cacheKey, map[string]interface{}{
+		"response": resp,
+		"etag":     etag,
+	})
+
+	c.Response().Header().Set("Cache-Control", "private, max-age=30, must-revalidate")
+	c.Response().Header().Set("ETag", `"`+etag+`"`)
+	c.Response().Header().Set("Vary", "Authorization")
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 // GetStudent godoc
@@ -350,6 +426,7 @@ func (h *Handler) UpdateStudent(c echo.Context) error {
 	if err != nil {
 		return handleAppError(c, err)
 	}
+	h.studentCache.InvalidatePrefix("student:list:")
 	return response.OK(c, "student updated", toStudentResponse(student))
 }
 
@@ -377,6 +454,7 @@ func (h *Handler) DeactivateStudent(c echo.Context) error {
 	}); err != nil {
 		return handleAppError(c, err)
 	}
+	h.studentCache.InvalidatePrefix("student:list:")
 	return response.OK(c, "student deactivated", nil)
 }
 

@@ -197,7 +197,7 @@ func main() {
 	)
 
 	// ΓöÇΓöÇ Student module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-	// studentCache := studentInfra.NewStudentCache(5*time.Minute, 10*time.Minute)
+	studentCache := studentInfra.NewStudentCache(5*time.Minute, 10*time.Minute)
 	academicRepo := academicInfra.NewGormAcademicRepository(db)
 	createStudentHandler := studentApp.NewCreateStudentHandler(userRepo, studentRepo, academicRepo, schoolRepo)
 	studentHTTP.NewHandler(
@@ -210,7 +210,7 @@ func main() {
 		studentApp.NewDeactivateStudentHandler(studentRepo),
 		studentApp.NewLinkParentHandler(studentRepo, parentRepo),
 		studentApp.NewUnlinkParentHandler(studentRepo),
-		// studentCache,
+		studentCache,
 	)
 
 	academicHTTP.NewHandler(
