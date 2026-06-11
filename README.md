@@ -1,793 +1,265 @@
 # EduAccess API
 
----
-
-BIG DISCLAIMER
-THE FIRST INITIAL COMMIT WE USE A TEMPLATE USING GO SAAS TEMPLATE AND MERGE IT WITH OUR INTERN PROJECT INSPIRATION THE FIRST INITIAL COMMIT IS NOT FULLY COMPLETED ITS BASE REFRENCE FOR OUR TEAM TO WORK ON
-Multi-tenant School Management SaaS backend built with Go, Echo, GORM, and PostgreSQL (Supabase-ready).
+Multi-tenant School Management SaaS backend — Go, Echo, GORM, Supabase Auth, PostgreSQL.
 
 ---
 
-## Table of Contents
+## Quick Start (5 menit)
 
--[Midtermneeds](#midtermneeds)
+```bash
+# 1. Clone & masuk ke folder
+git clone https://github.com/Anompuja/eduaccess-api.git
+cd eduaccess-api
 
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Environment Variables](#environment-variables)
-  - [Option A — Local PostgreSQL (Docker Compose)](#option-a--local-postgresql-docker-compose)
-  - [Option B — Connect to Supabase](#option-b--connect-to-supabase)
-  - [Run Without Docker](#run-without-docker)
-- [Database Setup](#database-setup)
-- [Roles & Permissions](#roles--permissions)
-- [API Reference](#api-reference)
-  - [Authentication](#authentication)
-  - [Users & Profile](#users--profile)
-  - [Schools](#schools)
-  - [Admins](#admins)
-  - [Students](#students)
-  - [Parents](#parents)
-  - [Academic Structure](#academic-structure)
-- [Authentication Flow](#authentication-flow)
-- [Response Format](#response-format)
-- [Swagger / Interactive Docs](#swagger--interactive-docs)
-- [Docker](#docker)
-- [Contributing](#contributing)
+# 2. Install dependencies
+go mod tidy
+
+# 3. Salin file environment dan isi kredensial Supabase
+cp .env.example .env
+# Buka .env dan isi: DATABASE_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET
+
+# 4. Generate Swagger docs
+swag init -g cmd/main.go --output docs
+
+# 5. Jalankan server
+go run ./cmd/main.go
+```
+
+Server berjalan di `http://localhost:8080`
+Swagger UI tersedia di `http://localhost:8080/swagger/index.html`
 
 ---
 
-## Midtermneeds
+## Test Accounts
 
-**Auth is enabled on all routes. You MUST send a Bearer token on every request (except login and registration). Here's the only thing you need to do:**
+> Gunakan akun berikut untuk mencoba API. Kredensial ini sudah terseed di Supabase project yang digunakan.
 
-## Step 1 — Login
+| Role           | Email                          | Password   | Catatan                            |
+| -------------- | ------------------------------ | ---------- | ---------------------------------- |
+| `superadmin`   | `superadmin@eduaccess.com`     | `Test1234!`| Akses penuh platform, tanpa school |
+| `admin_sekolah`| `adminsekolah@eduaccess.com`   | `Test1234!`| Akses penuh dalam satu sekolah     |
 
-````json
-POST /api/v1/auth/login
+**Login:**
+```bash
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
 {
   "email": "superadmin@eduaccess.com",
   "password": "Test1234!"
 }
-```(this is not a superadmin account for a better case this is admin_sekolah account)
-
-Copy the `access_token` from the response.
-
-## Step 2 — Use the Token on Every Request
-
-In every subsequent request, set the Authorization header:
-
-````
-
-Authorization: Bearer <paste_your_access_token_here>
-
 ```
 
-In Swagger UI: click the **Authorize** button (lock icon) on the most upper right, type `Bearer <token>`, click Authorize.
+Salin `access_token` dari response, gunakan sebagai `Authorization: Bearer <token>` di semua request berikutnya.
 
-## That's It. You Do NOT Need to Pass school_id Anywhere(except if your a superadmin account).
+> Di Swagger UI: klik tombol **Authorize** (kanan atas) → masukkan `Bearer <token>`.
 
-The `school_id` is **automatically embedded in your token** when you log in. The server reads it from the token you never include it manually in request bodies or headers. (except for superadmin)
-
-> **Two account types you:**
->
-> - **superadmin** — for platform-level routes: creating schools, listing all users, etc due to this roles it not attach to any schools, this roles need to inclue school_id on spesific request.
-> - **admin_sekolah** (linked to a school) — for school-scoped routes: headmasters, students, etc.
-
----
-## Overview
-
-EduAccess is a multi-tenant API that powers school management for multiple schools from a single deployment. Each school is a tenant; data is scoped by `school_id`. A **superadmin** manages the platform across all tenants; each school has its own **admin_sekolah**.
+**Catatan penting:** `school_id` otomatis dibaca dari JWT — tidak perlu dikirim manual di request body (kecuali untuk superadmin pada endpoint tertentu).
 
 ---
 
-## Tech Stack
+## Prerequisites
 
-| Layer     | Technology                            |
-| --------- | ------------------------------------- |
-| Language  | Go 1.25+                              |
-| HTTP      | Echo v4                               |
-| ORM       | GORM (PostgreSQL driver via pgx)      |
-| Auth      | JWT (HS256) — access + refresh tokens |
-| Database  | PostgreSQL 15+ / Supabase             |
-| API Docs  | Swagger (swaggo/swag)                 |
-| Container | Docker + Docker Compose               |
+- Go 1.22+
+- `swag` CLI — install sekali:
+  ```bash
+  go install github.com/swaggo/swag/cmd/swag@latest
+  ```
+- Akses ke Supabase project (credentials diberikan via LMS)
 
 ---
 
-## Project Structure
+## Environment Variables
 
-```
+Salin `.env.example` ke `.env`:
 
-eduaccess-api/
-├── cmd/
-│ └── main.go # Entrypoint — wires all modules
-├── database/
-│ └── migrations/
-│ └── 001_initial_schema.sql # Full schema + seed data (roles, plans)
-├── docs/ # Auto-generated Swagger docs
-│ ├── docs.go
-│ ├── swagger.json
-│ └── swagger.yaml
-├── internal/
-│ ├── admin/ # Admin sekolah CRUD
-│ │ ├── application/
-│ │ │ ├── create_admin.go
-│ │ │ ├── deactivate_admin.go
-│ │ │ ├── get_admin.go
-│ │ │ ├── list_admins.go
-│ │ │ ├── update_admin.go
-│ │ │ ├── user_creator.go
-│ │ │ └── user_updater.go
-│ │ ├── delivery/http/
-│ │ │ ├── dto.go
-│ │ │ └── handler.go
-│ │ ├── domain/
-│ │ │ ├── admin.go
-│ │ │ └── repository.go
-│ │ └── infrastructure/
-│ │ └── admin_repository.go
-│ ├── auth/ # Register, login, refresh, logout
-│ │ ├── application/
-│ │ │ ├── login.go
-│ │ │ ├── logout.go
-│ │ │ ├── refresh.go
-│ │ │ └── register.go
-│ │ ├── delivery/http/
-│ │ │ ├── dto.go
-│ │ │ └── handler.go
-│ │ ├── domain/
-│ │ │ ├── repository.go
-│ │ │ └── user.go
-│ │ └── infrastructure/
-│ │ ├── refresh_token_repository.go
-│ │ ├── user_model.go
-│ │ └── user_repository.go
-│ ├── headmaster/ # Kepala sekolah CRUD
-│ │ ├── application/
-│ │ │ ├── create_headmaster.go
-│ │ │ ├── deactivate_headmaster.go
-│ │ │ ├── get_headmaster.go
-│ │ │ ├── list_headmasters.go
-│ │ │ ├── school_updater.go
-│ │ │ ├── update_headmaster.go
-│ │ │ └── user_creator.go
-│ │ ├── delivery/http/
-│ │ │ ├── dto.go
-│ │ │ └── handler.go
-│ │ ├── domain/
-│ │ │ ├── headmaster.go
-│ │ │ └── repository.go
-│ │ └── infrastructure/
-│ │ └── headmaster_repository.go
-│ ├── parent/ # Parent CRUD
-│ │ ├── application/
-│ │ │ ├── create_parent.go
-│ │ │ ├── deactivate_parent.go
-│ │ │ ├── get_parent.go
-│ │ │ ├── list_parents.go
-│ │ │ ├── update_parent.go
-│ │ │ └── user_creator.go
-│ │ ├── delivery/http/
-│ │ │ ├── dto.go
-│ │ │ └── handler.go
-│ │ ├── domain/
-│ │ │ ├── parent.go
-│ │ │ └── repository.go
-│ │ └── infrastructure/
-│ │ └── parent_repository.go
-│ ├── school/ # School CRUD, rules, subscriptions
-│ │ ├── application/
-│ │ │ ├── create_school.go
-│ │ │ ├── deactivate_school.go
-│ │ │ ├── get_school.go
-│ │ │ ├── get_subscription.go
-│ │ │ ├── list_schools.go
-│ │ │ ├── manage_rules.go
-│ │ │ └── update_school.go
-│ │ ├── delivery/http/
-│ │ │ ├── dto.go
-│ │ │ └── handler.go
-│ │ ├── domain/
-│ │ │ ├── repository.go
-│ │ │ └── school.go
-│ │ └── infrastructure/
-│ │ └── school_repository.go
-│ ├── shared/ # Cross-cutting utilities
-│ │ ├── apperror/
-│ │ │ └── apperror.go # Domain error types
-│ │ ├── middleware/
-│ │ │ └── auth.go # JWT auth middleware
-│ │ ├── response/
-│ │ │ └── response.go # Consistent JSON response helpers
-│ │ └── validator/
-│ │ └── validator.go # Request binding & validation
-│ ├── student/ # Students, parents (linked), academic structure
-│ │ ├── application/
-│ │ │ ├── academic_handlers.go # Level / class / sub-class CRUD
-│ │ │ ├── create_parent.go
-│ │ │ ├── create_student.go
-│ │ │ ├── deactivate_student.go
-│ │ │ ├── get_student.go
-│ │ │ ├── list_students.go
-│ │ │ ├── manage_parent_link.go # Link / unlink parent ↔ student
-│ │ │ ├── parent_handlers.go
-│ │ │ ├── update_student.go
-│ │ │ └── user_creator.go
-│ │ ├── delivery/http/
-│ │ │ ├── dto.go
-│ │ │ ├── handler.go
-│ │ │ └── student_handler.go
-│ │ ├── domain/
-│ │ │ ├── academic.go
-│ │ │ ├── parent.go
-│ │ │ ├── repository.go
-│ │ │ ├── student_profile.go
-│ │ │ └── student_repository.go
-│ │ └── infrastructure/
-│ │ ├── academic_repository.go
-│ │ ├── parent_repository.go
-│ │ └── student_profile_repository.go
-│ └── user/ # Platform user management & profile
-│ ├── application/
-│ │ ├── change_password.go
-│ │ ├── deactivate_user.go
-│ │ ├── get_user.go
-│ │ ├── list_users.go
-│ │ ├── repository.go
-│ │ └── update_user.go
-│ ├── delivery/http/
-│ │ ├── dto.go
-│ │ └── handler.go
-│ └── infrastructure/
-│ └── user_repository.go
-├── pkg/
-│ ├── database/
-│ │ └── database.go # GORM connection setup
-│ └── jwt/
-│ └── jwt.go # Token generation & parsing
-├── .env.example
-├── docker-compose.yml
-├── Dockerfile
-├── go.mod
-└── go.sum
-
-```
-
-Each domain module follows the same clean architecture layout:
-
-```
-
-internal/<domain>/
-├── application/ # Use-case handlers — business logic, no HTTP concerns
-├── delivery/http/ # Echo handlers + request/response DTOs
-├── domain/ # Entities, repository interfaces, domain constants
-└── infrastructure/ # GORM repository implementations
-
-````
+| Variable                   | Wajib | Keterangan                                                         |
+| -------------------------- | ----- | ------------------------------------------------------------------ |
+| `DATABASE_URL`             | Ya    | Supabase PostgreSQL connection string (session mode, port 5432)    |
+| `SUPABASE_URL`             | Ya    | URL project Supabase (`https://[ref].supabase.co`)                 |
+| `SUPABASE_SERVICE_ROLE_KEY`| Ya    | Service role key untuk Admin API (buat/hapus user)                 |
+| `SUPABASE_JWT_SECRET`      | Ya    | JWT secret dari Supabase dashboard — untuk validasi token          |
+| `APP_PORT`                 | Tidak | Port server, default `8080`                                        |
+| `CORS_ALLOW_ORIGINS`       | Tidak | Origins yang diizinkan, default `*`                                |
+| `SWAGGER_HOST`             | Tidak | Hostname untuk Swagger UI, default `localhost:8080`                |
+| `SWAGGER_SCHEME`           | Tidak | `http` untuk lokal, `https` untuk deployment                       |
 
 ---
 
-## Getting Started
+## Arsitektur
 
-### Prerequisites
+Setiap modul di bawah `internal/{feature}/` mengikuti pola **DDD Layered**:
 
-- Go 1.25+
-- Docker & Docker Compose (for local DB)
-- `swag` CLI (only needed to regenerate Swagger docs — the Dockerfile handles this automatically)
-
-### Environment Variables
-
-Copy the example file and fill in the values:
-
-```bash
-cp .env.example .env
-````
-
-| Variable             | Required | Description                                            |
-| -------------------- | -------- | ------------------------------------------------------ |
-| `APP_ENV`            | No       | `development` (enables SQL logging) or `production`    |
-| `APP_PORT`           | No       | HTTP port, default `8080`                              |
-| `CORS_ALLOW_ORIGINS` | No       | Comma-separated allowlist of origins (default `*`)     |
-| `DATABASE_URL`       | Either   | Full Postgres DSN — use this for Supabase / Railway    |
-| `DB_HOST`            | Either   | Individual DB connection vars (alternative to above)   |
-| `DB_PORT`            | Either   | Default `5432`                                         |
-| `DB_USER`            | Either   | Database user                                          |
-| `DB_PASSWORD`        | Either   | Database password                                      |
-| `DB_NAME`            | Either   | Database name                                          |
-| `DB_SSLMODE`         | No       | `disable` (local) or `require` (Supabase)              |
-| `DB_MAX_OPEN_CONNS`  | No       | Max open DB connections, default `25`                  |
-| `DB_MAX_IDLE_CONNS`  | No       | Max idle DB connections, default `5`                   |
-| `JWT_SECRET`         | **Yes**  | Secret key for signing JWTs — use a long random string |
-
----
-
-<!-- ### Option A — Local PostgreSQL (Docker Compose)
-
-This spins up both the API and a local Postgres instance:
-
-```bash
-# 1. Copy and configure environment
-cp .env.example .env
-# Set JWT_SECRET to a random string, leave DATABASE_URL empty
-
-# 2. Start everything
-docker compose up --build
-
-# API is available at http://localhost:8080
-# Swagger UI at        http://localhost:8080/swagger/index.html
+```
+internal/{feature}/
+├── domain/           # Entity struct + Repository interface (tanpa framework)
+├── application/      # Use-case handler (satu file per operasi: create, list, get, dst)
+├── delivery/http/    # Echo handler + DTO (translate HTTP → domain → HTTP)
+└── infrastructure/   # Implementasi repository via GORM
 ```
 
-The compose file mounts `database/migrations/` into Postgres so the schema is applied automatically on first start. --> Work in progress for midterm assedment use option b, we will provide the lecture the env on the lms.
-
----
-
-### Run Without Docker
-
-Steps for anyone cloning this repo for the first time:
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/your-org/eduaccess-api.git
-cd eduaccess-api
-
-# Install / tidy Go dependencies
-go mod tidy
-
-# Copy the environment file and fill in your values
-cp .env.example .env
-# Open .env and set DATABASE_URL and JWT_SECRET at minimum
-
-swag init -g cmd/main.go --output docs
-
-# 6. Run the server
-go run ./cmd/main.go
 ```
-
-The server starts at `http://localhost:8080` and Swagger UI is at `http://localhost:8080/swagger/index.html`.
-
-### Run Together With Flutter Frontend
-
-Backend base API path is `/api/v1`, and Flutter should point to this base URL.
-
-1. Run backend:
-
-```bash
-cp .env.example .env
-# set JWT_SECRET before running
-go run ./cmd/main.go
-```
-
-2. Run Flutter with the correct API base URL:
-
-```bash
-# Web/Desktop
-flutter run --dart-define=EDUACCESS_BASE_URL=http://localhost:8080/api/v1
-
-# Android emulator
-flutter run --dart-define=EDUACCESS_BASE_URL=http://10.0.2.2:8080/api/v1
-```
-
-For Flutter Web in development, you can restrict CORS safely instead of `*`:
-
-```dotenv
-CORS_ALLOW_ORIGINS=http://localhost:3000,http://localhost:5000
+internal/
+├── admin/            # Admin sekolah CRUD
+├── auth/             # Login, register, refresh (via Supabase Auth)
+├── headmaster/       # Kepala sekolah CRUD
+├── notification/     # Notifikasi (REST + WebSocket)
+├── parent/           # Orang tua CRUD
+├── school/           # Sekolah, langganan, rules
+├── student/          # Siswa CRUD + parent linking + in-memory cache
+├── teacher/          # Guru CRUD
+├── staff/            # Staff CRUD
+├── academic/         # Level, kelas, sub-kelas, jadwal
+├── attendance/       # Absensi via QR code
+└── shared/
+    ├── middleware/   # JWT auth (ES256 via Supabase JWKS)
+    ├── httpcache/    # HTTP caching middleware (ETag + Cache-Control)
+    └── response/     # Standar JSON response helper
 ```
 
 ---
 
-## Database Setup
+## WebSocket — Notifikasi Real-time
 
-The full schema lives in [database/migrations/001_initial_schema.sql](database/migrations/001_initial_schema.sql).
-this is the ERD we plan to impelment (their might be changes in the future)
-https://drive.google.com/file/d/1Rt9KfwXE1S2RZ9Zu3CM6iX4B6pqTg5y0/view?usp=sharing
+**Endpoint:** `GET /ws/notifications?token=<JWT>`
 
-Key tables:
+WebSocket Hub mengelola semua koneksi aktif per user. Saat event terjadi (contoh: siswa absen), backend langsung *broadcast* payload JSON ke semua koneksi orang tua yang sedang online — tanpa client perlu polling.
 
-| Table                  | Purpose                                         |
-| ---------------------- | ----------------------------------------------- |
-| `users`                | All user accounts (all roles)                   |
-| `roles`                | Role definitions                                |
-| `model_has_roles`      | User ↔ role assignment                          |
-| `refresh_tokens`       | JWT refresh token store                         |
-| `schools`              | School tenants                                  |
-| `school_users`         | User ↔ school membership (provides `school_id`) |
-| `school_rules`         | Key-value config per school                     |
-| `plans`                | Subscription catalog with student quota limits  |
-| `subscriptions`        | School subscription history & active plan       |
-| `student_profiles`     | Student-specific data                           |
-| `student_parent_links` | Many-to-many student ↔ parent                   |
-| `academic_levels`      | Grade levels (e.g. SD, SMP)                     |
-| `classrooms`           | Classes within a level                          |
-| `sub_classrooms`       | Sub-classes / sections                          |
-| `headmaster_profiles`  | head master data                                |
+**Contoh koneksi dari Flutter:**
+```dart
+final channel = WebSocketChannel.connect(
+  Uri.parse('ws://localhost:8080/ws/notifications?token=$accessToken'),
+);
+await for (final msg in channel.stream) {
+  final data = jsonDecode(msg);
+  // handle notifikasi masuk
+}
+```
 
-When using **Docker Compose**, the schema is applied automatically on first start. When using **Supabase**, apply it once via the SQL editor or `psql`.
+**Payload yang dikirim server:**
+```json
+{
+  "id": "uuid",
+  "type": "attendance",
+  "title": "Kehadiran Budi Santoso",
+  "body": "Budi Santoso telah hadir di kelas Matematika (Ruang 1) pukul 07:30",
+  "data": { "student_name": "...", "attendance_status": "present" },
+  "createdAt": "2026-01-01T07:30:00Z"
+}
+```
 
 ---
 
-## Roles & Permissions
+## Caching
 
-| Role             | Constant (`domain` package) | Access                             |
-| ---------------- | --------------------------- | ---------------------------------- |
-| `superadmin`     | `RoleSuperadmin`            | Full platform access; no school_id |
-| `admin_sekolah`  | `RoleAdminSekolah`          | Full access within their school    |
-| `kepala_sekolah` | `RoleKepalaSekolah`         | Read/manage within their school    |
-| `guru`           | `RoleGuru`                  | Teacher access                     |
-| `staff`          | `RoleStaff`                 | Staff access                       |
-| `orangtua`       | `RoleOrangTua`              | Parent (linked to students)        |
-| `siswa`          | `RoleSiswa`                 | Student                            |
+Dua strategi caching diterapkan:
+
+### 1. In-Memory Cache — Student List
+
+`GET /students` menggunakan `go-cache` (in-process). Cache key dibentuk dari kombinasi role + school_id + filter parameter + pagination. TTL: 30 detik.
+
+Ketika ada student dibuat/diupdate/dihapus, cache diinvalidasi otomatis via `InvalidatePrefix("student:list:")`.
+
+### 2. HTTP ETag Cache — Endpoint Read-Heavy
+
+Middleware `httpcache` di `internal/shared/httpcache/cache.go` menangani endpoint lain:
+
+| Preset               | Cache-Control          | Digunakan untuk          |
+| -------------------- | ---------------------- | ------------------------ |
+| `Profile`            | `private, max-age=300` | Data profil user         |
+| `Stats`              | `private, max-age=60`  | Dashboard stats          |
+| `Reference`          | `private, max-age=120` | Data akademik (level/kelas) |
+| `ShortLived`         | `private, max-age=30`  | CRUD list (parent, dll)  |
+| `AlwaysRevalidate`   | `private, no-cache`    | Data operasional live    |
+
+Setiap response mendapat header `ETag` (SHA-256 dari body). Request berikutnya dengan `If-None-Match` yang cocok mendapat `304 Not Modified` — hemat bandwidth tanpa data stale.
+
+---
+
+## Auth Flow
+
+Token dikeluarkan oleh **Supabase Auth** dan ditandatangani dengan **ES256 (ECDSA)**. Validasi di backend menggunakan public key yang di-fetch dari JWKS endpoint Supabase — bukan JWT_SECRET biasa.
+
+Custom hook Supabase (`public.custom_access_token_hook`) menyisipkan `app_role` dan `school_id` ke dalam setiap token, sehingga middleware bisa membaca role dan tenant tanpa query database.
+
+```
+Client                          EduAccess API
+  |                                  |
+  |-- POST /auth/login ------------->|
+  |   (email + password)             |--- Supabase.SignIn() -->[ Supabase Auth ]
+  |                                  |<-- access_token (ES256) ---
+  |<-- { access_token, refresh_token }
+  |                                  |
+  |-- GET /students ---------------->|
+  |   Authorization: Bearer <token>  |-- validate ECDSA JWKS
+  |                                  |-- extract app_role, school_id
+  |<-- 200 { data: [...] } ----------|
+```
 
 ---
 
 ## API Reference
 
-Base path: `/api/v1`
+Base path: `/api/v1` — semua endpoint butuh `Authorization: Bearer <token>` kecuali `/auth/login` dan `/auth/register`.
 
-All protected routes require the header:
+Lihat dokumentasi lengkap di Swagger: `http://localhost:8080/swagger/index.html`
 
-```
-Authorization: Bearer <access_token>
-```
+### Ringkasan Endpoint
 
----
-
-### Authentication
-
-| Method | Path             | Auth | Description                            |
-| ------ | ---------------- | ---- | -------------------------------------- |
-| POST   | `/auth/register` | No   | Register a new user                    |
-| POST   | `/auth/login`    | No   | Login, returns access + refresh tokens |
-| POST   | `/auth/refresh`  | No   | Rotate refresh token, get new pair     |
-| POST   | `/auth/logout`   | No   | Revoke refresh token                   |
-
-**Register**
-
-```json
-POST /api/v1/auth/register
-{
-  "name":     "Budi Santoso",
-  "username": "budi",
-  "email":    "budi@sekolah.id",
-  "password": "secret123",
-  "role":     "admin_sekolah"
-}
-```
-
-> `superadmin` accounts cannot be created via this endpoint.
-
-**Login**
-
-```json
-POST /api/v1/auth/login
-{
-  "email":    "budi@sekolah.id",
-  "password": "secret123"
-}
-```
-
-Returns:
-
-```json
-{
-  "success": true,
-  "message": "login successful",
-  "data": {
-    "access_token": "<jwt>",
-    "refresh_token": "<jwt>"
-  }
-}
-```
-
-Access tokens expire in **15 minutes**. Refresh tokens expire in **7 days**.
-
-**Refresh**
-
-```json
-POST /api/v1/auth/refresh
-{
-  "refresh_token": "<your-refresh-token>"
-}
-```
-
-**Logout**
-
-```json
-POST /api/v1/auth/logout
-{
-  "refresh_token": "<your-refresh-token>"
-}
-```
-
----
-
-### Users & Profile
-
-| Method | Path                  | Auth | Description             |
-| ------ | --------------------- | ---- | ----------------------- |
-| GET    | `/users`              | Yes  | List users (paginated)  |
-| GET    | `/users/:id`          | Yes  | Get user by ID          |
-| PUT    | `/users/:id`          | Yes  | Update user name/avatar |
-| DELETE | `/users/:id`          | Yes  | Soft-deactivate user    |
-| PUT    | `/users/:id/password` | Yes  | Change password         |
-| GET    | `/profile`            | Yes  | Get own profile         |
-| PUT    | `/profile`            | Yes  | Update own profile      |
-
-Query params for `GET /users`: `role`, `search`, `page`, `per_page`
-
----
-
-### Schools
-
-| Method | Path                        | Auth | Description                     |
-| ------ | --------------------------- | ---- | ------------------------------- |
-| POST   | `/schools`                  | Yes  | Create school (superadmin only) |
-| GET    | `/schools`                  | Yes  | List schools with active subscription info (paginated) |
-| GET    | `/schools/plans`            | Yes  | List active subscription plans  |
-| GET    | `/schools/:id`              | Yes  | Get school by ID                |
-| PUT    | `/schools/:id`              | Yes  | Update school                   |
-| DELETE | `/schools/:id`              | Yes  | Soft-deactivate school          |
-| GET    | `/schools/:id/rules`        | Yes  | Get school key-value rules      |
-| PUT    | `/schools/:id/rules`        | Yes  | Create/update school rules      |
-| GET    | `/schools/:id/subscription` | Yes  | Get school subscription & plan  |
-| PUT    | `/schools/:id/subscription` | Yes  | Change school subscription      |
-| POST   | `/schools/:id/subscription/checkout` | Yes | Create a Midtrans checkout for changing to another paid subscription |
-| GET    | `/schools/:id/subscription/payments/:payment_id` | Yes | Get a payment transaction and its current status |
-
-Query params for `GET /schools`: `search`, `status` (`active`|`nonactive`), `page`, `per_page`
-
-Subscription notes:
-
-- Sekolah baru otomatis mendapat plan `Trial` selama 14 hari.
-- Batas jumlah siswa mengikuti `plans.max_students`.
-- Pembuatan siswa baru ditolak jika kuota plan aktif sekolah sudah penuh.
-- Checkout Midtrans dipakai untuk perpindahan antar plan berbayar, termasuk downgrade, selama kuota siswa sekolah masih muat pada plan tujuan.
-- Aktivasi subscription baru terjadi setelah webhook Midtrans tervalidasi dan status transaksi sukses.
-- Endpoint `PUT /schools/:id/subscription` tetap dipertahankan sebagai override internal untuk `superadmin`.
-
-Billing:
-
-| Method | Path                 | Auth | Description                                                                 |
-| ------ | -------------------- | ---- | --------------------------------------------------------------------------- |
-| GET    | `/billing/payments`  | Yes  | List payment transactions. Superadmin can see all schools; admin sekolah sees only their own history |
-| POST   | `/billing/webhooks/midtrans` | No   | Midtrans notification endpoint for payment sync |
-
-Query params for `GET /billing/payments`: `school_id` (superadmin only), `status` (`pending`|`paid`|`failed`|`expired`|`cancelled`), `search`, `page`, `per_page`
-
----
-
-### Admins
-
-| Method | Path          | Auth | Description             |
-| ------ | ------------- | ---- | ----------------------- |
-| POST   | `/admins`     | Yes  | Create admin profile    |
-| GET    | `/admins`     | Yes  | List admins (paginated) |
-| GET    | `/admins/:id` | Yes  | Get admin by ID         |
-| PUT    | `/admins/:id` | Yes  | Update admin            |
-| DELETE | `/admins/:id` | Yes  | Soft-deactivate admin   |
-
-Query params for `GET /admins`: `search`, `page`, `per_page`
-
----
-
-### Students
-
-| Method | Path                               | Auth | Description                |
-| ------ | ---------------------------------- | ---- | -------------------------- |
-| POST   | `/students`                        | Yes  | Create student             |
-| GET    | `/students`                        | Yes  | List students (paginated)  |
-| GET    | `/students/:id`                    | Yes  | Get student by ID          |
-| PUT    | `/students/:id`                    | Yes  | Update student             |
-| DELETE | `/students/:id`                    | Yes  | Soft-deactivate student    |
-| POST   | `/students/:id/parents`            | Yes  | Link parent to student     |
-| DELETE | `/students/:id/parents/:parent_id` | Yes  | Unlink parent from student |
-
----
-
-### Parents
-
-| Method | Path           | Auth | Description              |
-| ------ | -------------- | ---- | ------------------------ |
-| POST   | `/parents`     | Yes  | Create parent account    |
-| GET    | `/parents`     | Yes  | List parents (paginated) |
-| GET    | `/parents/:id` | Yes  | Get parent by ID         |
-| PUT    | `/parents/:id` | Yes  | Update parent            |
-| DELETE | `/parents/:id` | Yes  | Soft-deactivate parent   |
-
----
-
-### Academic Structure
-
-| Method | Path                       | Auth | Description      |
-| ------ | -------------------------- | ---- | ---------------- |
-| POST   | `/academic/levels`         | Yes  | Create level     |
-| GET    | `/academic/levels`         | Yes  | List levels      |
-| PUT    | `/academic/levels/:id`     | Yes  | Update level     |
-| DELETE | `/academic/levels/:id`     | Yes  | Delete level     |
-| POST   | `/academic/classes`        | Yes  | Create class     |
-| GET    | `/academic/classes`        | Yes  | List classes     |
-| PUT    | `/academic/classes/:id`    | Yes  | Update class     |
-| DELETE | `/academic/classes/:id`    | Yes  | Delete class     |
-| POST   | `/academic/subclasses`     | Yes  | Create sub-class |
-| GET    | `/academic/subclasses`     | Yes  | List sub-classes |
-| PUT    | `/academic/subclasses/:id` | Yes  | Update sub-class |
-| DELETE | `/academic/subclasses/:id` | Yes  | Delete sub-class |
-
----
-
-## Authentication Flow
-
-```
-Client                            API
-  |                                |
-  |-- POST /auth/login ---------->|
-  |<-- access_token (15 min) -----|
-  |<-- refresh_token (7 days) ----|
-  |                                |
-  |-- GET /api/v1/... ----------->|  Authorization: Bearer <access_token>
-  |<-- 200 OK --------------------|
-  |                                |
-  |   (access_token expires)       |
-  |-- POST /auth/refresh -------->|  body: { "refresh_token": "..." }
-  |<-- new access_token -----------|
-  |<-- new refresh_token ----------|  old refresh_token is revoked
-  |                                |
-  |-- POST /auth/logout ---------->|  body: { "refresh_token": "..." }
-  |<-- 200 OK --------------------|
-```
-
-Tokens are signed with **HS256** using `JWT_SECRET`. The payload includes `user_id`, `school_id` (nil for superadmin), `role`, and `token_type`.
+| Modul           | Endpoint                        | Keterangan                        |
+| --------------- | ------------------------------- | --------------------------------- |
+| **Auth**        | `POST /auth/login`              | Login, dapat access + refresh token |
+|                 | `POST /auth/register`           | Daftar user baru                  |
+|                 | `POST /auth/refresh`            | Refresh access token              |
+|                 | `GET  /auth/me`                 | Identitas user dari JWT           |
+| **Students**    | `GET /students`                 | List siswa (paginated, cached)    |
+|                 | `POST /students`                | Buat siswa baru                   |
+|                 | `GET /students/:id`             | Detail siswa                      |
+|                 | `PUT /students/:id`             | Update siswa                      |
+|                 | `DELETE /students/:id`          | Nonaktifkan siswa                 |
+|                 | `POST /students/:id/parents`    | Link orang tua ke siswa           |
+| **Notifications**| `GET /notifications`           | List notifikasi (paginated)       |
+|                 | `PATCH /notifications/:id/read` | Tandai notifikasi terbaca         |
+|                 | `WS /ws/notifications`          | Stream notifikasi real-time       |
+| **Schools**     | `GET /schools`                  | List sekolah (superadmin)         |
+|                 | `POST /schools`                 | Buat sekolah baru                 |
+| **Academic**    | `GET /academic/levels`          | Level pendidikan                  |
+|                 | `GET /academic/classes`         | Kelas                             |
+|                 | `GET /academic/subclasses`      | Sub-kelas                         |
+| **Attendance**  | `GET /class-schedules/:id/qr`   | Generate QR token absensi         |
+|                 | `POST /attendance/scan`         | Scan QR, catat kehadiran          |
 
 ---
 
 ## Response Format
 
-All endpoints return a consistent JSON envelope.
-
-**Success (single object)**
+Semua endpoint mengembalikan envelope JSON yang konsisten:
 
 ```json
-{
-  "success": true,
-  "message": "user retrieved",
-  "data": { ... }
-}
+// Success (single)
+{ "success": true,  "message": "student retrieved", "data": { ... } }
+
+// Success (paginated)
+{ "success": true,  "message": "students retrieved", "data": [...], "page": 1, "per_page": 20, "total": 150 }
+
+// Error
+{ "success": false, "message": "access denied" }
 ```
-
-**Success (paginated list)**
-
-```json
-{
-  "success":  true,
-  "message":  "students retrieved",
-  "data":     [ ... ],
-  "page":     1,
-  "per_page": 20,
-  "total":    150
-}
-```
-
-**Error**
-
-```json
-{
-  "success": false,
-  "message": "user not found"
-}
-```
-
-Common HTTP status codes:
-
-| Code | Meaning               |
-| ---- | --------------------- |
-| 200  | OK                    |
-| 201  | Created               |
-| 400  | Bad Request           |
-| 401  | Unauthorized          |
-| 403  | Forbidden             |
-| 404  | Not Found             |
-| 409  | Conflict              |
-| 422  | Unprocessable Entity  |
-| 500  | Internal Server Error |
 
 ---
 
-## Swagger / Interactive Docs
+## Regenerate Swagger
 
-After starting the server, open:
-
-```
-http://localhost:8080/swagger/index.html
-```
-
-To use protected endpoints:
-
-1. Call `POST /api/v1/auth/login` to get an access token.
-2. Click **Authorize** (top right) and enter `Bearer <your_access_token>`.
-
-To regenerate docs after changing Swagger annotations:
+Jalankan ini setiap kali mengubah anotasi handler:
 
 ```bash
 swag init -g cmd/main.go --output docs
 ```
-
----
-
-<!-- ## Docker
-
-**Build and run with Docker Compose (recommended for local dev):**
-
-```bash
-docker compose up --build
-```
-
-**Build the image only:**
-
-```bash
-docker build -t eduaccess-api .
-```
-
-**Run the container standalone (requires an external DB):**
-
-```bash
-docker run -p 8080:8080 \
-  -e DATABASE_URL="postgresql://..." \
-  -e JWT_SECRET="your-secret" \
-  eduaccess-api
-```
-
-The Dockerfile is multi-stage (Go builder → Alpine runtime) and generates Swagger docs during the build. Timezone is set to `Asia/Jakarta`. -->still work in progress
 
 ---
 
 ## Health Check
 
 ```
-GET /health
-→ 200 { "status": "ok" }
+GET /health → 200 { "status": "ok" }
 ```
-
----
-
-## Midtrans Setup
-
-1. Buat akun Midtrans dan gunakan mode `Sandbox` terlebih dulu.
-2. Ambil `Server Key` dan, bila diperlukan untuk frontend web, `Client Key` dari dashboard Midtrans.
-3. Isi `.env`:
-
-```dotenv
-MIDTRANS_ENVIRONMENT=sandbox
-MIDTRANS_SERVER_KEY=SB-Mid-server-xxxx
-MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxx
-MIDTRANS_PAYMENT_EXPIRY_MINUTES=1440
-```
-
-4. Apply migration `database/migrations/005_midtrans_payment_transactions.sql` ke database yang dipakai backend.
-5. Jalankan backend, lalu expose endpoint webhook agar bisa diakses Midtrans saat testing.
-6. Set Midtrans payment notification URL ke:
-
-```
-https://your-domain/api/v1/billing/webhooks/midtrans
-```
-
-7. Flow frontend yang disarankan:
-- Panggil `GET /schools/plans`
-- Panggil `POST /schools/:id/subscription/checkout`
-- Untuk daftar/history payment, panggil `GET /billing/payments`
-- Buka `provider_redirect_url` di browser atau webview
-- Setelah user selesai bayar, poll `GET /schools/:id/subscription/payments/:payment_id`
-- Jika status `paid`, refresh `GET /schools/:id/subscription`
-
-8. Untuk demo lokal, gunakan tunnel seperti ngrok atau Cloudflare Tunnel agar Midtrans bisa mengirim webhook ke laptop pengembang.
-
----
-
-## Contributing
-
-1. Create a feature branch from `main`.
-2. Follow the existing clean architecture layout — add new features inside `internal/<domain>/`.
-3. Keep business logic in `application/`, not in HTTP handlers.
-4. Run `go vet ./...` and confirm the server starts before opening a PR.
-5. Never commit `.env` or any file containing real credentials.
